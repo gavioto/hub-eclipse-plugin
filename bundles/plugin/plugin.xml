@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:blackduck?after=additions">
+         <command
+               commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
+               label="Open Warning View"
+               style="push">
+         </command>
+         <command
+               commandId="com.blackducksoftware.integration.popupmenu.RunScan"
+               label="Run Scan"
+               style="push">
+         </command>
+         <command
+               commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
+               label="Scanning Preferences..."
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+         <menu
+               id="blackduck"
+               label="Black Duck">
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenWarningView"
+            id="com.blackducksoftware.integration.popupmenu.OpenWarningView"
+            name="Open Warning View">
+      </command>
+      <command
+            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.RunScan"
+            id="com.blackducksoftware.integration.popupmenu.RunScan"
+            name="Run Scan">
+      </command>
+      <command
+            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenPreferences"
+            id="com.blackducksoftware.integration.popupmenu.OpenPreferences"
+            name="Open Preferences">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+      		name="Black Duck"
+      		id="com.blackducksoftware.integration.eclipseplugin.views"
+      >
+      </category>
+      <view
+            class="com.blackducksoftware.integration.eclipseplugin.views.WarningView"
+            id="com.blackducksoftware.integration.eclipseplugin.views.WarningView"
+            name="Warning View"
+            category="com.blackducksoftware.integration.eclipseplugin.views"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.blackducksoftware.integration.eclipseplugin.preferences.Scanning"
+            class="com.blackducksoftware.integration.eclipseplugin.preferences.ScanningPreferences"
+            id="com.blackducksoftware.integration.eclipseplugin.preferences.ScanningPreferences"
+            name="Scanning Preferences">
+      </page>
+      <page
+            class="com.blackducksoftware.integration.eclipseplugin.preferences.BlackDuckPreferences"
+            id="com.blackducksoftware.integration.eclipseplugin.preferences"
+            name="Black Duck">
+      </page>
+      <page
+            category="com.blackducksoftware.integration.eclipseplugin.preferences"
+            class="com.blackducksoftware.integration.eclipseplugin.preferences.Scanning"
+            id="com.blackducksoftware.integration.eclipseplugin.preferences.Scanning"
+            name="Scanning">
+      </page>
+   </extension>
+
+
+</plugin>
