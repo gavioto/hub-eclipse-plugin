@@ -1,5 +1,8 @@
 package com.blackducksoftware.integration.eclipseplugin.popupmenu;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -138,6 +141,15 @@ public class Activator extends AbstractUIPlugin {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+
+		System.out.println("files:");
+		final ClassLoader cl = ClassLoader.getSystemClassLoader();
+
+		final URL[] urls = ((URLClassLoader) cl).getURLs();
+
+		for (final URL url : urls) {
+			System.out.println(url.getFile());
 		}
 	}
 
