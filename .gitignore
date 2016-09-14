@@ -4,3 +4,4 @@ target/
 .settings/
 bin/
 pom.xml.bak
+.polyglot.build.properties.bak
