@@ -1,44 +1,137 @@
 package com.blackducksoftware.integration.eclipseplugin.views;
 
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
-import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
-import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
-import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningLabelProvider;
-import org.eclipse.jface.viewers.TableViewer;
 
-public class WarningView extends ViewPart {
-	
+import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
+import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
+
+public class WarningView extends ViewPart implements IPropertyChangeListener {
+
+	private final int MAX_COLUMN_SIZE = 100;
 	private TableViewer tableOfWarnings;
-	private final Warning warning1 = new Warning("copmonent 1", 1, "match type 1", "usage 1", "license 1",
-			"security risk 1", "operational risk 1");
-	private final Warning warning2 = new Warning("copmonent 2", 1, "match type 2", "usage 2", "license 2",
-			"security risk 2", "operational risk 2");
-	private final Warning warning3 = new Warning("copmonent 3", 1, "match type 3", "usage 3", "license 3",
-			"security risk 3", "operational risk 3");
-	private final Warning warning4 = new Warning("copmonent 4", 1, "match type 4", "usage 4", "license 4",
-			"security risk 4", "operational risk 4");
-	private final Warning[] warnings = {warning1, warning2, warning3, warning4};
 
 	@Override
-	public void createPartControl(Composite parent) {
-		Table table = new Table(parent, SWT.MULTI | SWT.BORDER);
-		
-		initializeTable(parent, table);
-		
-		tableOfWarnings = new TableViewer(table);
-		// tableOfWarnings.setLabelProvider(new WarningLabelProvider());
-		// tableOfWarnings.setContentProvider(new WarningContentProvider());
-		
-		populateTable(warnings, table);
-		
-		// eventually set input to local store
-		// tableOfWarnings.setInput(warnings);
+	public void createPartControl(final Composite parent) {
+		tableOfWarnings = new TableViewer(parent,
+				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+		createColumns(parent, tableOfWarnings);
+		tableOfWarnings.setContentProvider(new WarningContentProvider());
+		tableOfWarnings.setInput(Activator.getDefault().getPreferenceStore().getString("activeJavaProject"));
+		final Table table = tableOfWarnings.getTable();
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		;
 
+	}
+
+	public void createColumns(final Composite parent, final TableViewer warningTable) {
+		final String[] labels = { "Component", "License", "Match Count", "Match Type", "Operational Risk",
+				"Security Risk", "Usage" };
+		final int[] columnBounds = new int[labels.length];
+		for (int i = 0; i < columnBounds.length; i++) {
+			columnBounds[i] = MAX_COLUMN_SIZE;
+		}
+		for (int i = 0; i < labels.length; i++) {
+			final TableViewerColumn viewCol = new TableViewerColumn(warningTable, SWT.NONE);
+			final TableColumn col = viewCol.getColumn();
+			col.setText(labels[i]);
+			col.setWidth(columnBounds[i]);
+			col.setResizable(true);
+			col.setMoveable(true);
+			setLabel(viewCol, i);
+		}
+	}
+
+	public void setLabel(final TableViewerColumn viewCol, final int index) {
+		if (index == 0) {
+			viewCol.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(final Object warning) {
+					if (warning instanceof Warning) {
+						return ((Warning) warning).getComponent();
+					} else {
+						return "";
+					}
+				}
+			});
+		} else if (index == 1) {
+			viewCol.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(final Object warning) {
+					if (warning instanceof Warning) {
+						return ((Warning) warning).getLicense();
+					} else {
+						return "";
+					}
+				}
+			});
+		} else if (index == 2) {
+			viewCol.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(final Object warning) {
+					if (warning instanceof Warning) {
+						return ((Warning) warning).getMatchCount();
+					} else {
+						return "";
+					}
+				}
+			});
+		} else if (index == 3) {
+			viewCol.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(final Object warning) {
+					if (warning instanceof Warning) {
+						return ((Warning) warning).getMatchType();
+					} else {
+						return "";
+					}
+				}
+			});
+		} else if (index == 4) {
+			viewCol.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(final Object warning) {
+					if (warning instanceof Warning) {
+						return ((Warning) warning).getOperationalRisk();
+					} else {
+						return "";
+					}
+				}
+			});
+		} else if (index == 5) {
+			viewCol.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(final Object warning) {
+					if (warning instanceof Warning) {
+						return ((Warning) warning).getSecurityRisk();
+					} else {
+						return "";
+					}
+				}
+			});
+		} else if (index == 6) {
+			viewCol.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(final Object warning) {
+					if (warning instanceof Warning) {
+						return ((Warning) warning).getUsage();
+					} else {
+						return "";
+					}
+				}
+			});
+		}
 	}
 
 	@Override
@@ -46,52 +139,12 @@ public class WarningView extends ViewPart {
 		// TODO Auto-generated method stub
 		tableOfWarnings.getControl().setFocus();
 	}
-	
-	/*
-	 * initialize the structure of the table
-	 */
-	private void initializeTable(Composite parent, Table table) {
-		
-		table.setLinesVisible(true);
-	    table.setHeaderVisible(true);
-	    
-		TableColumn components = new TableColumn(table, SWT.RIGHT, 0);
-		TableColumn matchCounts = new TableColumn(table, SWT.RIGHT, 1);
-		TableColumn matchTypes = new TableColumn(table, SWT.RIGHT, 2);
-		TableColumn usages = new TableColumn(table, SWT.RIGHT, 3);
-		TableColumn licenses = new TableColumn(table, SWT.RIGHT, 4);
-		TableColumn securityRisks = new TableColumn(table, SWT.RIGHT, 5);
-		TableColumn operationalRisks = new TableColumn(table, SWT.RIGHT, 6);
-		
-		components.setText("Component");
-		matchCounts.setText("Match Count");
-		matchTypes.setText("Match Type");
-		usages.setText("Usage");
-		licenses.setText("License");
-		securityRisks.setText("Security Risk");
-		operationalRisks.setText("Operational Risk");
-		
-	}
-	
-	/*
-	 * Extract content from array of warnings and populate table with it
-	 */
-	private void populateTable(Warning[] warnings, Table table) {
-		
-		for (int i = 0; i < warnings.length; i++) {
-			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(0, warnings[i].getComponent());
-			item.setText(1, warnings[i].getMatchCount());
-			item.setText(2, warnings[i].getMatchType());
-			item.setText(3, warnings[i].getUsage());
-			item.setText(4, warnings[i].getLicense());
-			item.setText(5, warnings[i].getSecurityRisk());
-			item.setText(6, warnings[i].getOperationalRisk());
-		}
-		
-		for (int i = 0; i < table.getColumnCount(); i++) {
-			table.getColumn(i).pack();
-		}
-	}
 
+	@Override
+	public void propertyChange(final PropertyChangeEvent event) {
+		System.out.println(event.getProperty());
+		tableOfWarnings.setInput(event.getNewValue());
+		tableOfWarnings.refresh();
+
+	}
 }

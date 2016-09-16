@@ -1,15 +1,9 @@
 package com.blackducksoftware.integration.eclipseplugin.popupmenu;
 
-import java.net.URL;
-import java.net.URLClassLoader;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -42,8 +36,8 @@ public class Activator extends AbstractUIPlugin {
 		if (!getPreferenceStore().contains("minutesBetweenChecks")) {
 			getPreferenceStore().setValue("minutesBetweenChecks", 5);
 		}
-		if (!getPreferenceStore().contains("activeProject")) {
-			getPreferenceStore().setValue("activeProject", "NONE");
+		if (!getPreferenceStore().contains("activeJavaProject")) {
+			getPreferenceStore().setValue("activeJavaProject", "NONE");
 		}
 		plugin = this;
 	}
@@ -79,78 +73,6 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(final String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	/**
-	 * Returns a list of projects currently in the workspace
-	 *
-	 * @return list of projects in workspace
-	 */
-	public static IProject[] getProjects() {
-		final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		return projects;
-	}
-
-	public static int getNumProjects() {
-		return getProjects().length;
-	}
-
-	public static String[][] getProjectNames() {
-		final IProject[] projects = getProjects();
-		final String[][] names = new String[projects.length + 1][2];
-		for (int i = 0; i < projects.length; i++) {
-			names[i][0] = projects[i].toString().split("/")[1];
-			names[i][1] = projects[i].toString();
-		}
-		names[projects.length][0] = "no active project";
-		names[projects.length][1] = "NONE";
-		return names;
-	}
-
-	public static void printProjectInfo() {
-		final IProject[] projects = getProjects();
-		for (int i = 0; i < projects.length; i++) {
-			try {
-				System.out.print("name: ");
-				System.out.println(projects[i].getDescription().getName());
-				System.out.println();
-				System.out.println("nature ids:");
-				final String[] natureIds = projects[i].getDescription().getNatureIds();
-				for (int j = 0; j < natureIds.length; j++) {
-					System.out.println(natureIds[j]);
-				}
-				System.out.println();
-				if (projects[i].hasNature(JavaCore.NATURE_ID)) {
-					final IJavaProject javaProject = JavaCore.create(projects[i]);
-					final IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
-					final String[] requiredProjectNames = javaProject.getRequiredProjectNames();
-					System.out.println("entries:");
-					for (int j = 0; j < classpathEntries.length; j++) {
-						final IClasspathEntry entry = classpathEntries[j];
-						System.out.println("kind: " + entry.getEntryKind());
-						System.out.println("path: " + entry.getPath().toOSString());
-					}
-					System.out.println();
-					System.out.println("required projects: ");
-					for (int j = 0; j < requiredProjectNames.length; j++) {
-						System.out.println(requiredProjectNames[j]);
-					}
-				}
-				System.out.println("-------------------------");
-			} catch (final CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		System.out.println("files:");
-		final ClassLoader cl = ClassLoader.getSystemClassLoader();
-
-		final URL[] urls = ((URLClassLoader) cl).getURLs();
-
-		for (final URL url : urls) {
-			System.out.println(url.getFile());
-		}
 	}
 
 }
