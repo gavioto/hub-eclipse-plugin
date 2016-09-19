@@ -10,27 +10,20 @@ import org.eclipse.jdt.core.JavaModelException;
 
 public class ProjectInfoProvider {
 
-	public static IProject[] getAllProjects() {
+	private static IProject[] getAllProjects() {
 		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
 	}
+	/*
+	 * private static IJavaProject[] getJavaProjects() { final IProject[]
+	 * projects = getAllProjects(); final IJavaProject[] javaProjects = new
+	 * IJavaProject[getNumJavaProjects()]; int i = 0; for (final IProject
+	 * project : projects) { if (isJavaProject(project)) { javaProjects[i] =
+	 * JavaCore.create(project); i++; } } return javaProjects; }
+	 */
 
-	public static IJavaProject[] getJavaProjects() {
-		final IProject[] projects = getAllProjects();
-		final IJavaProject[] javaProjects = new IJavaProject[getNumJavaProjects()];
-		int i = 0;
-		for (final IProject project : projects) {
-			if (isJavaProject(project)) {
-				javaProjects[i] = JavaCore.create(project);
-				i++;
-			}
-		}
-		return javaProjects;
-	}
-
-	public static int getNumProjects() {
-		return getAllProjects().length;
-	}
-
+	/*
+	 * private static int getNumProjects() { return getAllProjects().length; }
+	 */
 	public static int getNumJavaProjects() {
 		final IProject[] projects = getAllProjects();
 		int numJava = 0;
@@ -51,29 +44,18 @@ public class ProjectInfoProvider {
 			return false;
 		}
 	}
-
-	public static String[] getAllProjectNames() {
-		final IProject[] projects = getAllProjects();
-		final String[] names = new String[projects.length];
-		for (int i = 0; i < projects.length; i++) {
-			names[i] = projects[i].toString();
-		}
-		return names;
-	}
-
-	public static String[] getJavaProjectNames() {
-		final IProject[] projects = getAllProjects();
-		final int numJavaProjects = getNumJavaProjects();
-		final String[] names = new String[numJavaProjects];
-		int javaIndex = 0;
-		for (final IProject project : projects) {
-			if (isJavaProject(project)) {
-				names[javaIndex] = project.toString();
-				javaIndex++;
-			}
-		}
-		return names;
-	}
+	/*
+	 * private static String[] getAllProjectNames() { final IProject[] projects
+	 * = getAllProjects(); final String[] names = new String[projects.length];
+	 * for (int i = 0; i < projects.length; i++) { names[i] =
+	 * projects[i].toString(); } return names; }
+	 *
+	 * private static String[] getJavaProjectNames() { final IProject[] projects
+	 * = getAllProjects(); final int numJavaProjects = getNumJavaProjects();
+	 * final String[] names = new String[numJavaProjects]; int javaIndex = 0;
+	 * for (final IProject project : projects) { if (isJavaProject(project)) {
+	 * names[javaIndex] = project.toString(); javaIndex++; } } return names; }
+	 */
 
 	public static String[][] getJavaProjectLabels() {
 		final IProject[] projects = getAllProjects();
@@ -93,7 +75,7 @@ public class ProjectInfoProvider {
 	}
 
 	public static String[] getDependencies(final String projectName) {
-		if (projectName.equals("NONE")) {
+		if (projectName.equals("")) {
 			return new String[0];
 		}
 		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -125,16 +107,26 @@ public class ProjectInfoProvider {
 			return new String[0];
 		}
 	}
+	/*
+	 * public static void printAllDependencies() { final String[]
+	 * allProjectNames = getAllProjectNames(); for (final String name :
+	 * allProjectNames) { final String[] pathSegments = name.split("/"); final
+	 * String[] deps = getDependencies(pathSegments[pathSegments.length - 1]);
+	 * for (final String dep : deps) { System.out.println(dep); } } }
+	 */
 
-	public static void printAllDependencies() {
-		final String[] allProjectNames = getAllProjectNames();
-		for (final String name : allProjectNames) {
-			final String[] pathSegments = name.split("/");
-			final String[] deps = getDependencies(pathSegments[pathSegments.length - 1]);
-			for (final String dep : deps) {
-				System.out.println(dep);
-			}
-		}
-	}
-
+	/*
+	 * public static String getSelectedProject() { final IWorkbenchWindow
+	 * activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow(); if
+	 * (activeWindow != null) { final IStructuredSelection selection =
+	 * (IStructuredSelection) activeWindow.getSelectionService()
+	 * .getSelection(); if (selection != null && selection.getFirstElement() !=
+	 * null) { final Object selected = selection.getFirstElement(); if (selected
+	 * instanceof IAdaptable) { final String[] pathSegments = ((IAdaptable)
+	 * selected).getAdapter(IProject.class).toString() .split("/"); return
+	 * pathSegments[pathSegments.length - 1]; } else { return ""; } } else {
+	 * return ""; }
+	 *
+	 * } else { return ""; } }
+	 */
 }

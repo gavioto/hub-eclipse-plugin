@@ -1,9 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.popupmenu;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -37,7 +34,7 @@ public class Activator extends AbstractUIPlugin {
 			getPreferenceStore().setValue("minutesBetweenChecks", 5);
 		}
 		if (!getPreferenceStore().contains("activeJavaProject")) {
-			getPreferenceStore().setValue("activeJavaProject", "NONE");
+			getPreferenceStore().setValue("activeJavaProject", "");
 		}
 		plugin = this;
 	}

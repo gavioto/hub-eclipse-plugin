@@ -1,24 +1,47 @@
 package com.blackducksoftware.integration.eclipseplugin.views;
 
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
-import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
-public class WarningView extends ViewPart implements IPropertyChangeListener {
+public class WarningView extends ViewPart {
 
 	private final int MAX_COLUMN_SIZE = 100;
 	private TableViewer tableOfWarnings;
+
+	// listener that changes the warnings displayed in the warning view based on
+	// what project
+	// is selected in the package explorer view
+	private final ISelectionListener projectSelectionListener = new ISelectionListener() {
+		@Override
+		public void selectionChanged(final IWorkbenchPart part, final ISelection sel) {
+			if (!(sel instanceof IStructuredSelection)) {
+				return;
+			}
+			final IStructuredSelection ss = (IStructuredSelection) sel;
+			final Object selectedProject = ss.getFirstElement();
+			if (selectedProject instanceof IAdaptable) {
+				final String[] pathSegments = ((IAdaptable) selectedProject).getAdapter(IProject.class).toString()
+						.split("/");
+				final String projectName = pathSegments[pathSegments.length - 1];
+				tableOfWarnings.setInput(projectName);
+			}
+		}
+	};
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -26,13 +49,11 @@ public class WarningView extends ViewPart implements IPropertyChangeListener {
 				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		createColumns(parent, tableOfWarnings);
 		tableOfWarnings.setContentProvider(new WarningContentProvider());
-		tableOfWarnings.setInput(Activator.getDefault().getPreferenceStore().getString("activeJavaProject"));
+		getSite().getPage().addSelectionListener(projectSelectionListener);
+
 		final Table table = tableOfWarnings.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
-		;
-
 	}
 
 	public void createColumns(final Composite parent, final TableViewer warningTable) {
@@ -138,13 +159,5 @@ public class WarningView extends ViewPart implements IPropertyChangeListener {
 	public void setFocus() {
 		// TODO Auto-generated method stub
 		tableOfWarnings.getControl().setFocus();
-	}
-
-	@Override
-	public void propertyChange(final PropertyChangeEvent event) {
-		System.out.println(event.getProperty());
-		tableOfWarnings.setInput(event.getNewValue());
-		tableOfWarnings.refresh();
-
 	}
 }
