@@ -33,9 +33,6 @@ public class Activator extends AbstractUIPlugin {
 		if (!getPreferenceStore().contains("minutesBetweenChecks")) {
 			getPreferenceStore().setValue("minutesBetweenChecks", 5);
 		}
-		if (!getPreferenceStore().contains("activeJavaProject")) {
-			getPreferenceStore().setValue("activeJavaProject", "");
-		}
 		plugin = this;
 	}
 

@@ -2,13 +2,13 @@ package com.blackducksoftware.integration.eclipseplugin.internal;
 
 public class Warning {
 
-	private String component;
-	private int matchCount;
-	private String matchType;
-	private String usage;
-	private String license;
-	private String securityRisk;
-	private String operationalRisk;
+	private final String component;
+	private final int matchCount;
+	private final String matchType;
+	private final String usage;
+	private final String license;
+	private final String securityRisk;
+	private final String operationalRisk;
 
 	public static int COMPONENT_COLUMN_INDEX = 0;
 	public static int MATCH_COUNT_COLUMN_INDEX = 1;
@@ -29,10 +29,6 @@ public class Warning {
 		this.operationalRisk = operationalRisk;
 	}
 
-	public void setComponent(final String component) {
-		this.component = component;
-	}
-
 	public String getComponent() {
 		return this.component;
 	}
@@ -41,16 +37,8 @@ public class Warning {
 		return component != null;
 	}
 
-	public void setMatchCount(final int matchCount) {
-		this.matchCount = matchCount;
-	}
-
 	public String getMatchCount() {
 		return "" + this.matchCount + " Matches";
-	}
-
-	public void setMatchType(final String matchType) {
-		this.matchType = matchType;
 	}
 
 	public String getMatchType() {
@@ -61,20 +49,12 @@ public class Warning {
 		return matchType != null;
 	}
 
-	public void setUsage(final String usage) {
-		this.usage = usage;
-	}
-
 	public String getUsage() {
 		return this.usage;
 	}
 
 	public boolean hasUsage() {
 		return usage != null;
-	}
-
-	public void setLicense(final String license) {
-		this.license = license;
 	}
 
 	public String getLicense() {
@@ -85,20 +65,12 @@ public class Warning {
 		return license != null;
 	}
 
-	public void setSecurityRisk(final String securityRisk) {
-		this.securityRisk = securityRisk;
-	}
-
 	public String getSecurityRisk() {
 		return this.securityRisk;
 	}
 
 	public boolean hasSecurityRisk() {
 		return securityRisk != null;
-	}
-
-	public void setOperationalRisk(final String operationalRisk) {
-		this.operationalRisk = operationalRisk;
 	}
 
 	public String getOperationalRisk() {

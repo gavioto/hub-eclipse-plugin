@@ -3,28 +3,32 @@ package com.blackducksoftware.integration.eclipseplugin.internal;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 public class ProjectInfoProvider {
 
 	private static IProject[] getAllProjects() {
 		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
 	}
+
 	/*
 	 * private static IJavaProject[] getJavaProjects() { final IProject[]
 	 * projects = getAllProjects(); final IJavaProject[] javaProjects = new
 	 * IJavaProject[getNumJavaProjects()]; int i = 0; for (final IProject
 	 * project : projects) { if (isJavaProject(project)) { javaProjects[i] =
 	 * JavaCore.create(project); i++; } } return javaProjects; }
+	 *
+	 * /* private static int getNumProjects() { return getAllProjects().length;
+	 * }
 	 */
-
-	/*
-	 * private static int getNumProjects() { return getAllProjects().length; }
-	 */
-	public static int getNumJavaProjects() {
+	private static int getNumJavaProjects() {
 		final IProject[] projects = getAllProjects();
 		int numJava = 0;
 		for (final IProject project : projects) {
@@ -44,35 +48,56 @@ public class ProjectInfoProvider {
 			return false;
 		}
 	}
-	/*
-	 * private static String[] getAllProjectNames() { final IProject[] projects
-	 * = getAllProjects(); final String[] names = new String[projects.length];
-	 * for (int i = 0; i < projects.length; i++) { names[i] =
-	 * projects[i].toString(); } return names; }
-	 *
-	 * private static String[] getJavaProjectNames() { final IProject[] projects
-	 * = getAllProjects(); final int numJavaProjects = getNumJavaProjects();
-	 * final String[] names = new String[numJavaProjects]; int javaIndex = 0;
-	 * for (final IProject project : projects) { if (isJavaProject(project)) {
-	 * names[javaIndex] = project.toString(); javaIndex++; } } return names; }
-	 */
 
-	public static String[][] getJavaProjectLabels() {
+	public static String[] getAllProjectNames() {
+		final IProject[] projects = getAllProjects();
+		for (final IProject project : projects) {
+			try {
+				final String[] natures = project.getDescription().getNatureIds();
+				for (final String nature : natures) {
+					System.out.println(nature);
+				}
+			} catch (final CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		final String[] names = new String[projects.length];
+		for (int i = 0; i < projects.length; i++) {
+			final String[] pathSegments = projects[i].toString().split("/");
+			final String projectName = pathSegments[pathSegments.length - 1];
+			names[i] = projectName;
+		}
+		return names;
+	}
+
+	public static String[] getJavaProjectNames() {
 		final IProject[] projects = getAllProjects();
 		final int numJavaProjects = getNumJavaProjects();
-		final String[][] labels = new String[numJavaProjects + 1][2];
+		final String[] names = new String[numJavaProjects];
 		int javaIndex = 0;
 		for (final IProject project : projects) {
 			if (isJavaProject(project)) {
 				final String[] pathSegments = project.toString().split("/");
-				labels[javaIndex][0] = labels[javaIndex][1] = pathSegments[pathSegments.length - 1];
+				final String projectName = pathSegments[pathSegments.length - 1];
+				names[javaIndex] = projectName;
 				javaIndex++;
 			}
 		}
-		labels[numJavaProjects][0] = "no active Java project";
-		labels[numJavaProjects][1] = "NONE";
-		return labels;
+		return names;
 	}
+	/*
+	 * private static String[][] getJavaProjectLabels() { final IProject[]
+	 * projects = getAllProjects(); final int numJavaProjects =
+	 * getNumJavaProjects(); final String[][] labels = new
+	 * String[numJavaProjects + 1][2]; int javaIndex = 0; for (final IProject
+	 * project : projects) { if (isJavaProject(project)) { final String[]
+	 * pathSegments = project.toString().split("/"); labels[javaIndex][0] =
+	 * labels[javaIndex][1] = pathSegments[pathSegments.length - 1];
+	 * javaIndex++; } } labels[numJavaProjects][0] = "no active Java project";
+	 * labels[numJavaProjects][1] = "NONE"; return labels; }
+	 */
 
 	public static String[] getDependencies(final String projectName) {
 		if (projectName.equals("")) {
@@ -115,18 +140,27 @@ public class ProjectInfoProvider {
 	 * for (final String dep : deps) { System.out.println(dep); } } }
 	 */
 
-	/*
-	 * public static String getSelectedProject() { final IWorkbenchWindow
-	 * activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow(); if
-	 * (activeWindow != null) { final IStructuredSelection selection =
-	 * (IStructuredSelection) activeWindow.getSelectionService()
-	 * .getSelection(); if (selection != null && selection.getFirstElement() !=
-	 * null) { final Object selected = selection.getFirstElement(); if (selected
-	 * instanceof IAdaptable) { final String[] pathSegments = ((IAdaptable)
-	 * selected).getAdapter(IProject.class).toString() .split("/"); return
-	 * pathSegments[pathSegments.length - 1]; } else { return ""; } } else {
-	 * return ""; }
-	 *
-	 * } else { return ""; } }
-	 */
+	public static String getSelectedProject() {
+		final IWorkbenchWindow activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (activeWindow != null) {
+			final IStructuredSelection selection = (IStructuredSelection) activeWindow.getSelectionService()
+					.getSelection();
+			if (selection != null && selection.getFirstElement() != null) {
+				final Object selected = selection.getFirstElement();
+				if (selected instanceof IAdaptable) {
+					final String[] pathSegments = ((IAdaptable) selected).getAdapter(IProject.class).toString()
+							.split("/");
+					return pathSegments[pathSegments.length - 1];
+				} else {
+					return "";
+				}
+			} else {
+				return "";
+			}
+
+		} else {
+			return "";
+		}
+	}
+
 }

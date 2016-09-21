@@ -41,24 +41,30 @@ public class WarningLabelProvider implements ITableLabelProvider {
 	public String getColumnText(final Object element, final int columnIndex) {
 		if (element instanceof Warning) {
 			if (columnIndex == Warning.COMPONENT_COLUMN_INDEX) {
-				return "Column";
+				return ((Warning) element).getComponent();
 			} else if (columnIndex == Warning.LICENSE_COLUMN_INDEX) {
-				return "License";
+				return ((Warning) element).getLicense();
 			} else if (columnIndex == Warning.MATCH_COUNT_COLUMN_INDEX) {
-				return "Match Count";
+				return ((Warning) element).getMatchCount();
 			} else if (columnIndex == Warning.MATCH_TYPE_COLUMN_INDEX) {
-				return "Match Type";
+				return ((Warning) element).getMatchType();
 			} else if (columnIndex == Warning.OPERATIONAL_RISK_COLUMN_INDEX) {
-				return "Operational Risk";
+				return ((Warning) element).getOperationalRisk();
 			} else if (columnIndex == Warning.SECURITY_RISK_COLUMN_INDEX) {
-				return "Security Risk";
+				return ((Warning) element).getSecurityRisk();
 			} else if (columnIndex == Warning.USAGE_COLUMN_INDEX) {
-				return "Usage";
+				return ((Warning) element).getUsage();
 			} else {
-				return null;
+				return "";
+			}
+		} else if (element instanceof String) {
+			if (columnIndex == 0) {
+				return (String) element;
+			} else {
+				return "";
 			}
 		} else {
-			return null;
+			return "";
 		}
 	}
 }

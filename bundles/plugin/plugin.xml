@@ -67,21 +67,21 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="com.blackducksoftware.integration.eclipseplugin.preferences.Scanning"
-            class="com.blackducksoftware.integration.eclipseplugin.preferences.ScanningPreferences"
-            id="com.blackducksoftware.integration.eclipseplugin.preferences.ScanningPreferences"
-            name="Scanning Preferences">
+            category="com.blackducksoftware.integration.eclipseplugin.preferences"
+            class="com.blackducksoftware.integration.eclipseplugin.preferences.MinutesBetweenScans"
+            id="com.blackducksoftware.integration.eclipseplugin.preferences.MinutesBetweenScans"
+            name="Minutes Between Scans">
+      </page>
+      <page
+            category="com.blackducksoftware.integration.eclipseplugin.preferences"
+            class="com.blackducksoftware.integration.eclipseplugin.preferences.ActiveJavaProjects"
+            id="com.blackducksoftware.integration.eclipseplugin.preferences.ActiveJavaProjects"
+            name="Active Java Projects">
       </page>
       <page
             class="com.blackducksoftware.integration.eclipseplugin.preferences.BlackDuckPreferences"
             id="com.blackducksoftware.integration.eclipseplugin.preferences"
             name="Black Duck">
-      </page>
-      <page
-            category="com.blackducksoftware.integration.eclipseplugin.preferences"
-            class="com.blackducksoftware.integration.eclipseplugin.preferences.Scanning"
-            id="com.blackducksoftware.integration.eclipseplugin.preferences.Scanning"
-            name="Scanning">
       </page>
    </extension>
 
