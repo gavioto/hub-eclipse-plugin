@@ -26,7 +26,7 @@ import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
-public class WarningView extends ViewPart implements IPropertyChangeListener {
+public class WarningView extends ViewPart {
 
 	private final int MAX_COLUMN_SIZE = 100;
 	private TableViewer tableOfWarnings;
@@ -61,7 +61,6 @@ public class WarningView extends ViewPart implements IPropertyChangeListener {
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						System.out.println("running");
 						tableOfWarnings.setInput("");
 					}
 				});
@@ -69,17 +68,24 @@ public class WarningView extends ViewPart implements IPropertyChangeListener {
 		}
 	};
 
+	private final IPropertyChangeListener projectSelectedListener = new IPropertyChangeListener() {
+
+		@Override
+		public void propertyChange(final PropertyChangeEvent event) {
+			tableOfWarnings.setInput(ProjectInfoProvider.getSelectedProject());
+		}
+
+	};
+
 	@Override
 	public void createPartControl(final Composite parent) {
 		tableOfWarnings = new TableViewer(parent,
 				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		// createColumns(parent, tableOfWarnings);
 		tableOfWarnings.setContentProvider(new WarningContentProvider());
 		createColumns(parent, tableOfWarnings);
 		tableOfWarnings.setInput("");
-
 		getSite().getPage().addSelectionListener(projectSelectionListener);
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(projectSelectedListener);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeletedListener,
 				IResourceChangeEvent.PRE_DELETE);
 
@@ -199,11 +205,6 @@ public class WarningView extends ViewPart implements IPropertyChangeListener {
 	public void dispose() {
 		super.dispose();
 		getSite().getPage().removeSelectionListener(projectSelectionListener);
-		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(this);
-	}
-
-	@Override
-	public void propertyChange(final PropertyChangeEvent event) {
-		tableOfWarnings.setInput(ProjectInfoProvider.getSelectedProject());
+		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(projectSelectedListener);
 	}
 }

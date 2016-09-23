@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.preferences;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
@@ -13,11 +14,18 @@ public class ActiveJavaProjects extends FieldEditorPreferencePage implements IWo
 	@Override
 	protected void createFieldEditors() {
 		// TODO Auto-generated method stub
-		final String[] names = ProjectInfoProvider.getJavaProjectNames();
-		for (final String name : names) {
-			final BooleanFieldEditor activation = new BooleanFieldEditor(name, name, getFieldEditorParent());
-			addField(activation);
+		String[] names;
+		try {
+			names = ProjectInfoProvider.getJavaProjectNames();
+			for (final String name : names) {
+				final BooleanFieldEditor activation = new BooleanFieldEditor(name, name, getFieldEditorParent());
+				addField(activation);
+			}
+		} catch (final CoreException e) {
+			e.printStackTrace();
+			// create dialog saying that error occurred getting project names
 		}
+
 	}
 
 	@Override
