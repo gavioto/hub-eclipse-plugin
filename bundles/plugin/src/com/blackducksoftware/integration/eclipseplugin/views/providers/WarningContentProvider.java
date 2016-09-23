@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -22,16 +23,21 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 			final IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 			final boolean isActivated = prefs.getBoolean((String) projectName);
 			if (isActivated) {
-				final String[] dependencies = ProjectInfoProvider.getDependencies((String) projectName);
-				final Warning[] warnings = new Warning[dependencies.length];
-				for (int i = 0; i < dependencies.length; i++) {
+				String[] dependencies;
+				try {
+					dependencies = ProjectInfoProvider.getMavenAndGradleDependencies((String) projectName);
+					final Warning[] warnings = new Warning[dependencies.length];
+					for (int i = 0; i < dependencies.length; i++) {
 
-					// eventually this will call the REST API module instead to
-					// construct the warning
-					warnings[i] = new Warning(dependencies[i], 0, "", "", "", "", "");
+						// eventually this will call the REST API module instead
+						// to construct the warning
+						warnings[i] = new Warning(dependencies[i], 0, "", "", "", "", "");
+					}
+					return warnings;
+				} catch (final CoreException e) {
+					e.printStackTrace();
+					return new String[] { "error occurred obtaining dependencies" };
 				}
-				return warnings;
-
 			} else {
 				final String[] projectNotActivated = { "Black Duck scan not activated for current project" };
 				return projectNotActivated;
