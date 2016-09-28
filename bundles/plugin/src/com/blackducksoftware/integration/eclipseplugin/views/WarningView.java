@@ -5,6 +5,11 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jdt.core.ElementChangedEvent;
+import org.eclipse.jdt.core.IElementChangedListener;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaElementDelta;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -26,10 +31,14 @@ import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
+/*
+ * Class that implements the warning view UI
+ */
 public class WarningView extends ViewPart {
 
 	private final int MAX_COLUMN_SIZE = 100;
 	private TableViewer tableOfWarnings;
+	private String lastSelectedProjectName = "";
 
 	// listener that changes the warnings displayed in the warning view based on
 	// what project is selected in the package explorer view
@@ -42,10 +51,14 @@ public class WarningView extends ViewPart {
 			final IStructuredSelection ss = (IStructuredSelection) sel;
 			final Object selectedProject = ss.getFirstElement();
 			if (selectedProject instanceof IAdaptable) {
-				final String[] pathSegments = ((IAdaptable) selectedProject).getAdapter(IProject.class).toString()
-						.split("/");
-				final String projectName = pathSegments[pathSegments.length - 1];
-				tableOfWarnings.setInput(projectName);
+				if (((IAdaptable) selectedProject).getAdapter(IProject.class) != null) {
+					final String[] pathSegments = ((IAdaptable) selectedProject).getAdapter(IProject.class).toString()
+							.split("/");
+					final String projectName = pathSegments[pathSegments.length - 1];
+					lastSelectedProjectName = projectName;
+					tableOfWarnings.setInput(lastSelectedProjectName);
+				}
+
 			}
 		}
 	};
@@ -56,14 +69,56 @@ public class WarningView extends ViewPart {
 
 		@Override
 		public void resourceChanged(final IResourceChangeEvent event) {
-			// TODO Auto-generated method stub
 			if (event != null && event.getResource() != null) {
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						tableOfWarnings.setInput("");
+						lastSelectedProjectName = "";
+						tableOfWarnings.setInput(lastSelectedProjectName);
 					}
 				});
+			}
+		}
+	};
+
+	// listener that updates view accordingly when any project's dependencies
+	// change
+	private final IElementChangedListener dependenciesChangedListener = new IElementChangedListener() {
+
+		@Override
+		public void elementChanged(final ElementChangedEvent event) {
+			visit(event.getDelta());
+		}
+
+		private void visit(final IJavaElementDelta delta) {
+			final IJavaElement el = delta.getElement();
+			switch (el.getElementType()) {
+			case IJavaElement.JAVA_MODEL:
+				visitChildren(delta);
+				break;
+			case IJavaElement.JAVA_PROJECT:
+				if (isClasspathChanged(delta.getFlags())) {
+					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							tableOfWarnings.setInput(lastSelectedProjectName);
+						}
+					});
+				}
+				break;
+			default:
+				break;
+			}
+		}
+
+		private boolean isClasspathChanged(final int flags) {
+			return 0 != (flags
+					& (IJavaElementDelta.F_CLASSPATH_CHANGED | IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED));
+		}
+
+		public void visitChildren(final IJavaElementDelta delta) {
+			for (final IJavaElementDelta c : delta.getAffectedChildren()) {
+				visit(c);
 			}
 		}
 	};
@@ -72,7 +127,7 @@ public class WarningView extends ViewPart {
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
-			tableOfWarnings.setInput(ProjectInfoProvider.getSelectedProject());
+			tableOfWarnings.setInput(lastSelectedProjectName);
 		}
 
 	};
@@ -83,17 +138,24 @@ public class WarningView extends ViewPart {
 				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		tableOfWarnings.setContentProvider(new WarningContentProvider());
 		createColumns(parent, tableOfWarnings);
-		tableOfWarnings.setInput("");
+		lastSelectedProjectName = ProjectInfoProvider.getSelectedProject();
+		tableOfWarnings.setInput(lastSelectedProjectName);
+
+		// add all listeners
 		getSite().getPage().addSelectionListener(projectSelectionListener);
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(projectSelectedListener);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeletedListener,
 				IResourceChangeEvent.PRE_DELETE);
+		JavaCore.addElementChangedListener(dependenciesChangedListener, ElementChangedEvent.POST_CHANGE);
 
 		final Table table = tableOfWarnings.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 	}
 
+	/*
+	 * Create the columns
+	 */
 	private void createColumns(final Composite parent, final TableViewer warningTable) {
 		final String[] labels = { "Component", "Match Count", "Match Type", "Usage", "License", "Security Risk",
 				"Operational Risk", };
@@ -112,6 +174,9 @@ public class WarningView extends ViewPart {
 		}
 	}
 
+	/*
+	 * Set the input of each column
+	 */
 	public void setLabel(final TableViewerColumn viewCol, final int index) {
 		if (index == Warning.COMPONENT_COLUMN_INDEX) {
 			viewCol.setLabelProvider(new ColumnLabelProvider() {
@@ -197,14 +262,17 @@ public class WarningView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
 		tableOfWarnings.getControl().setFocus();
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
+
+		// remove all listeners when view is closed
 		getSite().getPage().removeSelectionListener(projectSelectionListener);
 		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(projectSelectedListener);
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectDeletedListener);
+		JavaCore.removeElementChangedListener(dependenciesChangedListener);
 	}
 }
