@@ -45,9 +45,6 @@ public class ActiveJavaProjects extends PreferencePage implements IWorkbenchPref
 				final BooleanFieldEditor isActive = new BooleanFieldEditor(names[i], names[i], activeProjectsComposite);
 				isActive.setPage(this);
 				isActive.setPreferenceStore(getPreferenceStore());
-				// default setting is to have scan enabled for every Java
-				// project
-				getPreferenceStore().setDefault(names[i], true);
 				isActive.load();
 				activeProjectPreferences[i] = isActive;
 			}

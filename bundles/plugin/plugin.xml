@@ -107,5 +107,11 @@
       		name="Active Java Projects"
       		category="BlackDuck">
       </page>
+      <page
+      		class="com.blackducksoftware.integration.eclipseplugin.preferences.ProjectSpecificPreferenceDefaults"
+      		id="ProjectSpecificPreferenceDefaults"
+      		name="Project Specific Preference Defaults"
+      		category="BlackDuck">
+      </page>
    </extension>
 </plugin>

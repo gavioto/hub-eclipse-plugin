@@ -15,11 +15,13 @@ public class OpenPreferences extends AbstractHandler {
 
 	private final String BLACK_DUCK_PAGE_ID = "BlackDuck";
 	private final String ACTIVE_JAVA_PROJECTS_PAGE_ID = "ActiveJavaProjects";
+	private final String PROJECT_SPECIFIC_PREFERENCE_DEFAULTS_PAGE_ID = "ProjectSpecificPreferenceDefaults";
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
-		final String[] pageIds = new String[] { BLACK_DUCK_PAGE_ID, ACTIVE_JAVA_PROJECTS_PAGE_ID };
+		final String[] pageIds = new String[] { BLACK_DUCK_PAGE_ID, ACTIVE_JAVA_PROJECTS_PAGE_ID,
+				PROJECT_SPECIFIC_PREFERENCE_DEFAULTS_PAGE_ID };
 		final PreferenceDialog prefPage = PreferencesUtil.createPreferenceDialogOn(activeShell, BLACK_DUCK_PAGE_ID,
 				pageIds, null);
 		prefPage.open();
