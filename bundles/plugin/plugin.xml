@@ -10,16 +10,46 @@
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Warning View"
                style="push">
-         </command>
-         <command
-               commandId="com.blackducksoftware.integration.popupmenu.RunScan"
-               label="Run Scan"
-               style="push">
+              <visibleWhen>
+         		<with
+         				variable="selection">
+         			<iterate
+         					ifEmpty="false">
+         				<adapt
+         						type="org.eclipse.core.resources.IProject">
+         					<test
+         							property="org.eclipse.core.resources.projectNature"
+         							value="org.eclipse.jdt.core.javanature">
+         					</test>
+         				</adapt>
+         			</iterate>
+         		</with>
+         	</visibleWhen>
          </command>
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
                label="Scanning Preferences..."
                style="push">
+         </command>
+         <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
+         		label="Project Preferences..."
+         		style="push">
+         	<visibleWhen>
+         		<with
+         				variable="selection">
+         			<iterate
+         					ifEmpty="false">
+         				<adapt
+         						type="org.eclipse.core.resources.IProject">
+         					<test
+         							property="org.eclipse.core.resources.projectNature"
+         							value="org.eclipse.jdt.core.javanature">
+         					</test>
+         				</adapt>
+         			</iterate>
+         		</with>
+         	</visibleWhen>	
          </command>
       </menuContribution>
       <menuContribution
@@ -39,14 +69,14 @@
             name="Open Warning View">
       </command>
       <command
-            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.RunScan"
-            id="com.blackducksoftware.integration.popupmenu.RunScan"
-            name="Run Scan">
-      </command>
-      <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenPreferences"
             id="com.blackducksoftware.integration.popupmenu.OpenPreferences"
             name="Open Preferences">
+      </command>
+      <command
+      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenProjectPreferences"
+      		id="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
+      		name="Open Project Preferences">
       </command>
    </extension>
    <extension
@@ -67,23 +97,15 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="com.blackducksoftware.integration.eclipseplugin.preferences"
-            class="com.blackducksoftware.integration.eclipseplugin.preferences.MinutesBetweenScans"
-            id="com.blackducksoftware.integration.eclipseplugin.preferences.MinutesBetweenScans"
-            name="Minutes Between Scans">
-      </page>
-      <page
-            category="com.blackducksoftware.integration.eclipseplugin.preferences"
-            class="com.blackducksoftware.integration.eclipseplugin.preferences.ActiveJavaProjects"
-            id="com.blackducksoftware.integration.eclipseplugin.preferences.ActiveJavaProjects"
-            name="Active Java Projects">
-      </page>
-      <page
             class="com.blackducksoftware.integration.eclipseplugin.preferences.BlackDuckPreferences"
-            id="com.blackducksoftware.integration.eclipseplugin.preferences"
+            id="BlackDuck"
             name="Black Duck">
       </page>
+      <page
+      		class="com.blackducksoftware.integration.eclipseplugin.preferences.ActiveJavaProjects"
+      		id="ActiveJavaProjects"
+      		name="Active Java Projects"
+      		category="BlackDuck">
+      </page>
    </extension>
-
-
 </plugin>

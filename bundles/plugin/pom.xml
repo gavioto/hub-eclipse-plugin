@@ -34,6 +34,13 @@
                   <type>jar</type>
                   <outputDirectory>./target/dependencies</outputDirectory>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.commons</groupId>
+                  <artifactId>commons-lang3</artifactId>
+                  <version>3.4</version>
+                  <type>jar</type>
+                  <outputDirectory>./target/dependencies</outputDirectory>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

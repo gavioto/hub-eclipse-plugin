@@ -1,5 +1,8 @@
 package com.blackducksoftware.integration.eclipseplugin.internal;
 
+/*
+ * Class representing an analysis of a component from the Hub
+ */
 public class Warning {
 
 	private final String component;

@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -9,7 +10,9 @@ import com.blackducksoftware.integration.eclipseplugin.internal.ProjectInfoProvi
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
-// eventually, instead of just strings, this will return an array of warnings (once hub REST API is established)
+/*
+ * Class that provides the content for the warning view
+ */
 public class WarningContentProvider extends ArrayContentProvider implements IStructuredContentProvider {
 
 	@Override
@@ -20,9 +23,14 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 			return noSelectedProject;
 
 		} else if (projectName instanceof String) {
+
+			// filter what warnings are displayed based on user preferences
 			final IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 			final boolean isActivated = prefs.getBoolean((String) projectName);
-			if (isActivated) {
+			final String displayWarningsPropertyId = StringUtils
+					.join(new String[] { (String) projectName, "displayWarnings" }, ':');
+			final boolean displayWarnings = prefs.getBoolean(displayWarningsPropertyId);
+			if (isActivated && displayWarnings) {
 				String[] dependencies;
 				try {
 					dependencies = ProjectInfoProvider.getMavenAndGradleDependencies((String) projectName);
