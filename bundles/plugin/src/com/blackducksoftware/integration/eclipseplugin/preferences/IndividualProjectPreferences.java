@@ -62,8 +62,6 @@ public class IndividualProjectPreferences extends PreferencePage implements IWor
 				displayWarningsComposite);
 		displayWarnings.setPage(this);
 		displayWarnings.setPreferenceStore(getPreferenceStore());
-		// this should be in activator
-		getPreferenceStore().setDefault(displayWarningsPropertyId, true);
 		displayWarnings.load();
 		return displayWarningsComposite;
 	}

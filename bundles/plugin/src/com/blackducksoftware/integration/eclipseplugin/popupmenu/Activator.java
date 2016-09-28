@@ -10,6 +10,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -19,6 +21,9 @@ import com.blackducksoftware.integration.eclipseplugin.internal.ProjectInfoProvi
  * The activator class controls the plug-in life cycle
  */
 public class Activator extends AbstractUIPlugin {
+
+	public static final String ACTIVATE_SCAN_BY_DEFAULT = "activateScanByDefault";
+	public static final String DISPLAY_WARNINGS_BY_DEFAULT = "displayWarningsByDefault";
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.blackduck.integration.eclipseplugin"; //$NON-NLS-1$
@@ -42,10 +47,7 @@ public class Activator extends AbstractUIPlugin {
 										if (resource instanceof IProject
 												&& ((IProject) resource).hasNature(JavaCore.NATURE_ID)) {
 											final String projectName = resource.getName();
-											final String displayWarnings = StringUtils
-													.join(new String[] { projectName, "displayWarnings" }, ':');
-											getPreferenceStore().setDefault(displayWarnings, true);
-											getPreferenceStore().setDefault(projectName, true);
+											setAllProjectSpecificDefaults(projectName);
 										}
 									} catch (final CoreException e) {
 										e.printStackTrace();
@@ -59,10 +61,41 @@ public class Activator extends AbstractUIPlugin {
 		}
 	};
 
+	private final IPropertyChangeListener defaultsChangeListener = new IPropertyChangeListener() {
+
+		@Override
+		public void propertyChange(final PropertyChangeEvent event) {
+			System.out.println("property changed");
+			try {
+				final String[] projectNames = ProjectInfoProvider.getJavaProjectNames();
+				for (final String projectName : projectNames) {
+					setAllProjectSpecificDefaults(projectName);
+				}
+			} catch (final CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+	};
+
 	/**
 	 * The constructor
 	 */
 	public Activator() {
+	}
+
+	private void setAllProjectSpecificDefaults(final String projectName) {
+		final String displayWarnings = StringUtils.join(new String[] { projectName, "displayWarnings" }, ':');
+		if (getPreferenceStore().getString(DISPLAY_WARNINGS_BY_DEFAULT).equals("true")) {
+			getPreferenceStore().setDefault(displayWarnings, true);
+		} else {
+			getPreferenceStore().setDefault(displayWarnings, false);
+		}
+		if (getPreferenceStore().getString(ACTIVATE_SCAN_BY_DEFAULT).equals("true")) {
+			getPreferenceStore().setDefault(projectName, true);
+		} else {
+			getPreferenceStore().setDefault(projectName, false);
+		}
 	}
 
 	/*
@@ -74,15 +107,22 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
+		if (!getPreferenceStore().contains(ACTIVATE_SCAN_BY_DEFAULT)) {
+			getPreferenceStore().setValue(ACTIVATE_SCAN_BY_DEFAULT, "true");
+			getPreferenceStore().setDefault(ACTIVATE_SCAN_BY_DEFAULT, "true");
+		}
+		if (!getPreferenceStore().contains(DISPLAY_WARNINGS_BY_DEFAULT)) {
+			getPreferenceStore().setValue(DISPLAY_WARNINGS_BY_DEFAULT, "true");
+			getPreferenceStore().setDefault(ACTIVATE_SCAN_BY_DEFAULT, "true");
+		}
 		final String[] projectNames = ProjectInfoProvider.getJavaProjectNames();
 
 		// make sure all default preferences are set
 		for (final String projectName : projectNames) {
-			final String displayWarnings = StringUtils.join(new String[] { projectName, "displayWarnings" }, ':');
-			getPreferenceStore().setDefault(displayWarnings, true);
-			getPreferenceStore().setDefault(projectName, true);
+			setAllProjectSpecificDefaults(projectName);
 		}
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectAddedListener);
+		getPreferenceStore().addPropertyChangeListener(defaultsChangeListener);
 		plugin = this;
 	}
 
