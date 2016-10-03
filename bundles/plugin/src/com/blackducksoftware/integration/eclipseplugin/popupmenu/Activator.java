@@ -65,7 +65,6 @@ public class Activator extends AbstractUIPlugin {
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
-			System.out.println("property changed");
 			try {
 				final String[] projectNames = ProjectInfoProvider.getJavaProjectNames();
 				for (final String projectName : projectNames) {
