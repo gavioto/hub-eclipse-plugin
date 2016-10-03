@@ -1,25 +1,26 @@
 package com.blackducksoftware.integration.eclipseplugin.dialogs;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.net.URISyntaxException;
 
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
-import com.blackducksoftware.integration.hub.builder.ValidationResult;
-import com.blackducksoftware.integration.hub.builder.ValidationResultEnum;
 import com.blackducksoftware.integration.hub.builder.ValidationResults;
+import com.blackducksoftware.integration.hub.exception.BDRestException;
+import com.blackducksoftware.integration.hub.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class AuthorizationValidator {
 
-	public String isValid(final String username, final String password) {
-		// call hub-common functionality here
+	public String isValid(final String hubUrl, final String username, final String password) {
+		if (hubUrl == null || hubUrl.equals("") || username == null || username.equals("") || password == null
+				|| password.equals("")) {
+			return AuthorizationDialog.CREDENTIAL_MISSING_MESSAGE;
+		}
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setUsername(username);
 		builder.setPassword(password);
-		builder.setHubUrl("http://eng-hub-valid01.dc1.lan/");
+		builder.setHubUrl(hubUrl);
 		builder.setTimeout(120);
 		builder.setProxyPassword("");
 		builder.setProxyPort("");
@@ -28,33 +29,23 @@ public class AuthorizationValidator {
 		builder.setIgnoredProxyHosts("");
 		final ValidationResults<GlobalFieldKey, HubServerConfig> results = builder.buildResults();
 		if (results.isSuccess()) {
-			System.out.println("success");
-			final Map<GlobalFieldKey, List<ValidationResult>> resultMap = results.getResultMap();
-			final Set<GlobalFieldKey> keyset = resultMap.keySet();
-			final Iterator<GlobalFieldKey> keyit = keyset.iterator();
-			while (keyit.hasNext()) {
-				final List<ValidationResult> resultList = resultMap.get(keyit.next());
-				final Iterator<ValidationResult> resultit = resultList.iterator();
-				while (resultit.hasNext()) {
-					final ValidationResult result = resultit.next();
-					final ValidationResultEnum type = result.getResultType();
-					if (type == ValidationResultEnum.ERROR) {
-						System.out.println("error");
-					} else if (type == ValidationResultEnum.OK) {
-						System.out.println("ok");
-					} else if (type == ValidationResultEnum.WARN) {
-						System.out.println("warning");
-					} else if (type == null) {
-						System.out.println("null");
-					} else {
-						System.out.println("idk");
-					}
-				}
+			final HubServerConfig config = results.getConstructedObject();
+			final RestConnection connection = new RestConnection(config.getHubUrl().toString());
+			try {
+				connection.setCookies(config.getGlobalCredentials().getUsername(),
+						config.getGlobalCredentials().getDecryptedPassword());
+				return AuthorizationDialog.LOGIN_SUCCESS_MESSAGE;
+			} catch (final IllegalArgumentException e) {
+				return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
+			} catch (final URISyntaxException e) {
+				return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
+			} catch (final BDRestException e) {
+				return AuthorizationDialog.INCORRECT_CREDENTIALS_MESSAGE;
+			} catch (final EncryptionException e) {
+				return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
 			}
-		} else {
-			System.out.println("failure");
 		}
-		return null;
+		return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
 	}
 
 }

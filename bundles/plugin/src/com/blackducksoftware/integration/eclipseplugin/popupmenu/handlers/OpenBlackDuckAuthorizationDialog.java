@@ -17,7 +17,7 @@ public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
-		final AuthorizationDialog authDialog = new AuthorizationDialog(activeShell, TITLE, MESSAGE, "",
+		final AuthorizationDialog authDialog = new AuthorizationDialog(activeShell, TITLE, MESSAGE, "", "",
 				new AuthorizationValidator());
 		authDialog.create();
 		authDialog.open();
