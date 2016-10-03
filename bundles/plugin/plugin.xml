@@ -7,6 +7,11 @@
             allPopups="false"
             locationURI="popup:blackduck?after=additions">
          <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
+         		label="Black Duck Authorization..."
+         		style="push">
+         </command>
+         <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Warning View"
                style="push">
@@ -63,6 +68,11 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
+      <command
+      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenBlackDuckAuthorizationDialog"
+      		id="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
+      		name="Open Black Duck Authorization Dialog">
+      </command>
       <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenWarningView"
             id="com.blackducksoftware.integration.popupmenu.OpenWarningView"

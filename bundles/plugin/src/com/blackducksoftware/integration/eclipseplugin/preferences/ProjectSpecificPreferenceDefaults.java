@@ -62,7 +62,6 @@ public class ProjectSpecificPreferenceDefaults extends PreferencePage implements
 	@Override
 	protected void performDefaults() {
 		activateAutomatically.loadDefault();
-		super.performDefaults();
 	}
 
 }
