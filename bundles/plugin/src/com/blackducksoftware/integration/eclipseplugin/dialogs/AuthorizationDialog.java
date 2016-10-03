@@ -1,5 +1,8 @@
 package com.blackducksoftware.integration.eclipseplugin.dialogs;
 
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.StringConverter;
@@ -36,6 +39,7 @@ public class AuthorizationDialog extends Dialog {
 	public static final String INCORRECT_CREDENTIALS_MESSAGE = "Incorrect username or password. Please try again";
 	public static final String LOGIN_ERROR_MESSAGE = "An error occurred while logging in";
 	public static final String CREDENTIAL_MISSING_MESSAGE = "Please enter a hub URL instance, a username, and a password";
+	public static final String ERROR_SAVING_CREDENTIALS_MESSAGE = "Error occurred when saving credentials";
 
 	public static final int TEST_CREDENTIALS_ID = 133;
 	public static final int SAVE_CREDENTIALS_ID = 134;
@@ -43,7 +47,7 @@ public class AuthorizationDialog extends Dialog {
 	public static final String SAVE_CREDENTIALS_LABEL = "Save Hub Authorization";
 
 	public AuthorizationDialog(final Shell parentShell, final String dialogTitle, final String dialogMessage,
-			final String initialHubUrlValue, final String initialUsernameValue,
+			final String initialHubUrlValue, final String initialUsernameValue, final String initialPasswordValue,
 			final AuthorizationValidator validator) {
 		super(parentShell);
 		this.title = dialogTitle;
@@ -59,7 +63,11 @@ public class AuthorizationDialog extends Dialog {
 		} else {
 			usernameInputValue = initialUsernameValue;
 		}
-		passwordInputValue = "";
+		if (initialPasswordValue == null) {
+			passwordInputValue = "";
+		} else {
+			passwordInputValue = initialPasswordValue;
+		}
 	}
 
 	@Override
@@ -75,9 +83,21 @@ public class AuthorizationDialog extends Dialog {
 		if (buttonId == TEST_CREDENTIALS_ID) {
 			validateInput();
 		} else if (buttonId == SAVE_CREDENTIALS_ID) {
-			// if valid, then saveCredentials()
+			try {
+				saveCredentials();
+			} catch (final StorageException e) {
+				setErrorMessage(ERROR_SAVING_CREDENTIALS_MESSAGE);
+			}
 		}
 		super.buttonPressed(buttonId);
+	}
+
+	private void saveCredentials() throws StorageException {
+		final ISecurePreferences defaultNode = SecurePreferencesFactory.getDefault();
+		final ISecurePreferences passwordNode = defaultNode.node("Black Duck");
+		passwordNode.put("activeHubUrl", hubUrl.getText(), false);
+		passwordNode.put("activeUsername", username.getText(), false);
+		passwordNode.put("activePassword", password.getText(), true);
 	}
 
 	@Override
@@ -89,12 +109,18 @@ public class AuthorizationDialog extends Dialog {
 		// setting focus??
 		if (hubUrlInputValue != null) {
 			hubUrl.setText(hubUrlInputValue);
+		} else {
+			hubUrl.setText("");
 		}
 		if (usernameInputValue != null) {
 			username.setText(usernameInputValue);
+		} else {
+			username.setText("");
 		}
 		if (passwordInputValue != null) {
 			password.setText(passwordInputValue);
+		} else {
+			password.setText("");
 		}
 	}
 
@@ -130,7 +156,7 @@ public class AuthorizationDialog extends Dialog {
 		username.setLayoutData(textData);
 		username.addModifyListener(textListener);
 		createLabel(parent, composite, labelData, "Password:");
-		password = new Text(composite, SWT.SINGLE | SWT.BORDER);
+		password = new Text(composite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
 		password.setLayoutData(textData);
 		password.addModifyListener(textListener);
 
