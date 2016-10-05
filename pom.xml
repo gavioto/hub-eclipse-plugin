@@ -14,6 +14,7 @@
 
   <modules>
     <module>bundles/plugin</module>
+    <module>bundles/plugin-test</module>
   </modules>
 
   <properties>
