@@ -30,7 +30,7 @@ public class AuthorizationValidator {
 		} else {
 			builder.setTimeout(timeout);
 		}
-		if (useProxyValues) {
+		if (!useProxyValues) {
 			builder.setProxyPassword("");
 			builder.setProxyPort("");
 			builder.setProxyUsername("");

@@ -25,6 +25,12 @@ public class AuthorizationDialog extends Dialog {
 
 	private final AuthorizationValidator validator;
 
+	private final String proxyPassword;
+	private final String proxyPort;
+	private final String proxyUsername;
+	private final String proxyHost;
+	private final String ignoredProxyHosts;
+
 	private Text hubUrl;
 	private String hubUrlInputValue;
 	private Text username;
@@ -40,17 +46,6 @@ public class AuthorizationDialog extends Dialog {
 
 	private Button useProxyInfoButton;
 	private boolean useProxyInfo;
-
-	private Text proxyPassword;
-	private String proxyPasswordInputValue;
-	private Text proxyPort;
-	private String proxyPortInputValue;
-	private Text proxyUsername;
-	private String proxyUsernameInputValue;
-	private Text proxyHost;
-	private String proxyHostInputValue;
-	private Text ignoredProxyHosts;
-	private String ignoredProxyHostsInputValue;
 
 	private Button testCredentials;
 	private Button saveCredentials;
@@ -106,11 +101,6 @@ public class AuthorizationDialog extends Dialog {
 			if (e.getSource() instanceof Button) {
 				final Button useProxyInfoButton = (Button) e.getSource();
 				useProxyInfo = useProxyInfoButton.getSelection();
-				proxyUsername.setEnabled(useProxyInfo);
-				proxyPassword.setEnabled(useProxyInfo);
-				proxyPort.setEnabled(useProxyInfo);
-				proxyHost.setEnabled(useProxyInfo);
-				ignoredProxyHosts.setEnabled(useProxyInfo);
 			}
 		}
 	};
@@ -128,14 +118,17 @@ public class AuthorizationDialog extends Dialog {
 
 	public AuthorizationDialog(final Shell parentShell, final String dialogTitle, final String dialogMessage,
 			final String initialHubUrlValue, final String initialUsernameValue, final String initialPasswordValue,
-			final String initialProxyPasswordValue, final String initialProxyPortValue,
-			final String initialProxyUsernameValue, final String initialProxyHostValue,
-			final String initialIgnoredProxyHostsValue, final String initialTimeoutValue,
-			final AuthorizationValidator validator) {
+			final String proxyPassword, final String proxyPort, final String proxyUsername, final String proxyHost,
+			final String ignoredProxyHosts, final String initialTimeoutValue, final AuthorizationValidator validator) {
 		super(parentShell);
 		this.title = dialogTitle;
 		this.message = dialogMessage;
 		this.validator = validator;
+		this.proxyPassword = proxyPassword;
+		this.proxyPort = proxyPort;
+		this.proxyUsername = proxyUsername;
+		this.proxyHost = proxyHost;
+		this.ignoredProxyHosts = ignoredProxyHosts;
 		if (initialHubUrlValue == null) {
 			hubUrlInputValue = "";
 		} else {
@@ -150,31 +143,6 @@ public class AuthorizationDialog extends Dialog {
 			passwordInputValue = "";
 		} else {
 			passwordInputValue = initialPasswordValue;
-		}
-		if (initialProxyPasswordValue == null) {
-			proxyPasswordInputValue = "";
-		} else {
-			proxyPasswordInputValue = initialProxyPasswordValue;
-		}
-		if (initialProxyPortValue == null) {
-			proxyPortInputValue = "";
-		} else {
-			proxyPortInputValue = initialProxyPortValue;
-		}
-		if (initialProxyUsernameValue == null) {
-			proxyUsernameInputValue = "";
-		} else {
-			proxyUsernameInputValue = initialProxyUsernameValue;
-		}
-		if (initialProxyHostValue == null) {
-			proxyHostInputValue = "";
-		} else {
-			proxyHostInputValue = initialProxyHostValue;
-		}
-		if (initialIgnoredProxyHostsValue == null) {
-			ignoredProxyHostsInputValue = "";
-		} else {
-			ignoredProxyHostsInputValue = initialIgnoredProxyHostsValue;
 		}
 		if (initialTimeoutValue == null) {
 			timeoutInputValue = "";
@@ -212,13 +180,6 @@ public class AuthorizationDialog extends Dialog {
 		passwordNode.put("activeHubUrl", hubUrl.getText(), false);
 		passwordNode.put("activeUsername", username.getText(), false);
 		passwordNode.put("activePassword", password.getText(), true);
-		if (useProxyInfo) {
-			passwordNode.put("activeProxyUsername", proxyUsername.getText(), false);
-			passwordNode.put("activeProxyPassword", proxyPassword.getText(), true);
-			passwordNode.put("activeProxyHost", proxyHost.getText(), false);
-			passwordNode.put("activeProxyPort", proxyPort.getText(), false);
-			passwordNode.put("activeIgnoredProxyHosts", ignoredProxyHosts.getText(), false);
-		}
 		if (useDefaultTimeout) {
 			passwordNode.put("activeTimeout", "120", false);
 		} else {
@@ -254,31 +215,6 @@ public class AuthorizationDialog extends Dialog {
 			timeout.setText(timeoutInputValue);
 		} else {
 			timeout.setText("");
-		}
-		if (proxyUsernameInputValue != null) {
-			proxyUsername.setText(proxyUsernameInputValue);
-		} else {
-			proxyUsername.setText("");
-		}
-		if (proxyPasswordInputValue != null) {
-			proxyPassword.setText(proxyPasswordInputValue);
-		} else {
-			proxyPassword.setText("");
-		}
-		if (proxyPortInputValue != null) {
-			proxyPort.setText(proxyPortInputValue);
-		} else {
-			proxyPort.setText("");
-		}
-		if (proxyHostInputValue != null) {
-			proxyHost.setText(proxyHostInputValue);
-		} else {
-			proxyHost.setText("");
-		}
-		if (ignoredProxyHostsInputValue != null) {
-			ignoredProxyHosts.setText(ignoredProxyHostsInputValue);
-		} else {
-			ignoredProxyHosts.setText("");
 		}
 	}
 
@@ -325,27 +261,6 @@ public class AuthorizationDialog extends Dialog {
 		useProxyInfoButton.addSelectionListener(useProxyInfoListener);
 		useProxyInfo = useProxyInfoButton.getSelection();
 
-		createLabel(parent, composite, labelData, "Proxy Username:");
-		proxyUsername = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		proxyUsername.setLayoutData(textData);
-		proxyUsername.setEnabled(useProxyInfo);
-		createLabel(parent, composite, labelData, "Proxy Password:");
-		proxyPassword = new Text(composite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
-		proxyPassword.setLayoutData(textData);
-		proxyPassword.setEnabled(useProxyInfo);
-		createLabel(parent, composite, labelData, "Proxy Port:");
-		proxyPort = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		proxyPort.setLayoutData(textData);
-		proxyPort.setEnabled(useProxyInfo);
-		createLabel(parent, composite, labelData, "Proxy Host:");
-		proxyHost = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		proxyHost.setLayoutData(textData);
-		proxyHost.setEnabled(useProxyInfo);
-		createLabel(parent, composite, labelData, "Ignored Proxy Hosts:");
-		ignoredProxyHosts = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		ignoredProxyHosts.setLayoutData(textData);
-		ignoredProxyHosts.setEnabled(useProxyInfo);
-
 		errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
 		errorMessageText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
 		errorMessageText.setBackground(errorMessageText.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -366,12 +281,16 @@ public class AuthorizationDialog extends Dialog {
 	protected void validateInput() {
 		String errorMessage = null;
 		if (validator != null) {
-			errorMessage = validator.isValid(hubUrl.getText(), username.getText(), password.getText(),
-					proxyPassword.getText(), proxyPort.getText(), proxyUsername.getText(), proxyHost.getText(),
-					ignoredProxyHosts.getText(), timeout.getText(), useDefaultTimeout, useProxyInfo);
+			errorMessage = validator.isValid(hubUrl.getText(), username.getText(), password.getText(), proxyPassword,
+					proxyPort, proxyUsername, proxyHost, ignoredProxyHosts, timeout.getText(), useDefaultTimeout,
+					useProxyInfo);
 		}
 		if (errorMessage != null && errorMessage.equals(LOGIN_SUCCESS_MESSAGE)) {
 			saveCredentials.setEnabled(true);
+		} else {
+			if (saveCredentials.isEnabled()) {
+				saveCredentials.setEnabled(false);
+			}
 		}
 		setErrorMessage(errorMessage);
 	}
