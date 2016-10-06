@@ -14,6 +14,8 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class AuthorizationValidator {
 
+	private String timeout;
+
 	public String isValid(final String hubUrl, final String username, final String password, final String proxyPassword,
 			final String proxyPort, final String proxyUsername, final String proxyHost, final String ignoredProxyHosts,
 			final String timeout, final boolean useDefaultTimeout, final boolean useProxyValues) {
@@ -21,6 +23,7 @@ public class AuthorizationValidator {
 				|| password.equals("")) {
 			return AuthorizationDialog.CREDENTIAL_MISSING_MESSAGE;
 		}
+
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
 		builder.setUsername(username);
 		builder.setPassword(password);
@@ -65,6 +68,7 @@ public class AuthorizationValidator {
 		}
 
 		final ValidationResults<GlobalFieldKey, HubServerConfig> results = builder.buildResults();
+		this.timeout = builder.getTimeout();
 		if (results.isSuccess()) {
 			final HubServerConfig config = results.getConstructedObject();
 			final RestConnection connection = new RestConnection(config.getHubUrl().toString());
@@ -80,16 +84,20 @@ public class AuthorizationValidator {
 					return e.getMessage();
 				}
 			} catch (final IllegalArgumentException e) {
-				return e.getMessage();
+				return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
 			} catch (final URISyntaxException e) {
-				return e.getMessage();
+				return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
 			} catch (final BDRestException e) {
-				return e.getMessage();
+				return AuthorizationDialog.INCORRECT_CREDENTIALS_MESSAGE;
 			} catch (final EncryptionException e) {
-				return e.getMessage();
+				return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
 			}
 		}
 		return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
+	}
+
+	public String getTimeout() {
+		return this.timeout;
 	}
 
 }
