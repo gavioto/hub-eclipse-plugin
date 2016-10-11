@@ -12,6 +12,11 @@
          		style="push">
          </command>
          <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
+         		label="Black Duck Proxy Settings..."
+         		style="push">
+         </command>
+         <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Warning View"
                style="push">
@@ -87,6 +92,11 @@
       		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenProjectPreferences"
       		id="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
       		name="Open Project Preferences">
+      </command>
+      <command
+      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenBlackDuckProxyInfoDialog"
+      		id="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
+      		name="Open Proxy Server Settings Dialog">
       </command>
    </extension>
    <extension

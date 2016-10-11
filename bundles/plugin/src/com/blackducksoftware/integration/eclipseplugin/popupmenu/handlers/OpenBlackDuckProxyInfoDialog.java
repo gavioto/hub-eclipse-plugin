@@ -9,40 +9,26 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.blackducksoftware.integration.eclipseplugin.dialogs.AuthorizationDialog;
+import com.blackducksoftware.integration.eclipseplugin.dialogs.ProxyServerInfoDialog;
 
-public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
+public class OpenBlackDuckProxyInfoDialog extends AbstractHandler {
 
-	private final String TITLE = "Hub Authorization";
-	private final String MESSAGE = "Enter your Hub credentials below:";
+	private final String TITLE = "Proxy Server Information";
+	private final String MESSAGE = "Enter your proxy server information below if you use one:";
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
-		String hubUrl;
-		String username;
-		String password;
+		final ISecurePreferences blackDuckNode = SecurePreferencesFactory.getDefault().node("Black Duck");
+		String proxyUsername;
 		String proxyPassword;
 		String proxyPort;
-		String proxyUsername;
 		String proxyHost;
 		String ignoredProxyHosts;
-		String timeout;
-		final ISecurePreferences blackDuckNode = SecurePreferencesFactory.getDefault().node("Black Duck");
 		try {
-			hubUrl = blackDuckNode.get("activeHubUrl", "");
+			proxyUsername = blackDuckNode.get("activeProxyUsername", "");
 		} catch (final StorageException e) {
-			hubUrl = "";
-		}
-		try {
-			username = blackDuckNode.get("activeUsername", "");
-		} catch (final StorageException e) {
-			username = "";
-		}
-		try {
-			password = blackDuckNode.get("activePassword", "");
-		} catch (final StorageException e) {
-			password = "";
+			proxyUsername = "";
 		}
 		try {
 			proxyPassword = blackDuckNode.get("activeProxyPassword", "");
@@ -55,11 +41,6 @@ public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 			proxyPort = "";
 		}
 		try {
-			proxyUsername = blackDuckNode.get("activeProxyUsername", "");
-		} catch (final StorageException e) {
-			proxyUsername = "";
-		}
-		try {
 			proxyHost = blackDuckNode.get("activeProxyHost", "");
 		} catch (final StorageException e) {
 			proxyHost = "";
@@ -69,15 +50,10 @@ public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 		} catch (final StorageException e) {
 			ignoredProxyHosts = "";
 		}
-		try {
-			timeout = blackDuckNode.get("activeTimeout", "");
-		} catch (final StorageException e) {
-			timeout = "";
-		}
-		final AuthorizationDialog authDialog = new AuthorizationDialog(activeShell, TITLE, MESSAGE, hubUrl, username,
-				password, proxyPassword, proxyPort, proxyUsername, proxyHost, ignoredProxyHosts, timeout);
-		authDialog.create();
-		authDialog.open();
+		final ProxyServerInfoDialog dialog = new ProxyServerInfoDialog(activeShell, TITLE, MESSAGE, proxyPassword,
+				proxyPort, proxyUsername, proxyHost, ignoredProxyHosts);
+		dialog.create();
+		dialog.open();
 		return null;
 	}
 
