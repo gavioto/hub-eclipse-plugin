@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.blackducksoftware.integration.eclipseplugin.dialogs.AuthorizationDialog;
-import com.blackducksoftware.integration.eclipseplugin.dialogs.AuthorizationValidator;
 
 public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 
@@ -76,8 +75,7 @@ public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 			timeout = "";
 		}
 		final AuthorizationDialog authDialog = new AuthorizationDialog(activeShell, TITLE, MESSAGE, hubUrl, username,
-				password, proxyPassword, proxyPort, proxyUsername, proxyHost, ignoredProxyHosts, timeout,
-				new AuthorizationValidator());
+				password, proxyPassword, proxyPort, proxyUsername, proxyHost, ignoredProxyHosts, timeout);
 		authDialog.create();
 		authDialog.open();
 		return null;

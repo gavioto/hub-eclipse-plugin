@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.dialogs;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -22,8 +23,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public class AuthorizationDialog extends Dialog {
-
-	private final AuthorizationValidator validator;
 
 	private final String proxyPassword;
 	private final String proxyPort;
@@ -74,7 +73,7 @@ public class AuthorizationDialog extends Dialog {
 	private final VerifyListener timeoutVerifyListener = new VerifyListener() {
 		@Override
 		public void verifyText(final VerifyEvent e) {
-			if (e.character != '0' && e.character != '1' && e.character != '2' && e.character != '3'
+			if ( !StringUtils.isNumeric(e.text) && e.character != '0' && e.character != '1' && e.character != '2' && e.character != '3'
 					&& e.character != '4' && e.character != '5' && e.character != '6' && e.character != '7'
 					&& e.character != '8' && e.character != '9' && e.keyCode != SWT.DEL && e.keyCode != SWT.BS) {
 				e.doit = false;
@@ -115,15 +114,19 @@ public class AuthorizationDialog extends Dialog {
 	public static final int SAVE_CREDENTIALS_ID = 134;
 	public static final String TEST_CREDENTIALS_LABEL = "Test Hub Connection";
 	public static final String SAVE_CREDENTIALS_LABEL = "Save Hub Authorization";
+	
+	public static final int HUB_URL_TEXT_INDEX = 0;
+	public static final int USERNAME_TEXT_INDEX = 1;
+	public static final int PASSWORD_TEXT_INDEX = 2;
+	public static final int TIMEOUT_TEXT_INDEX = 3;
 
 	public AuthorizationDialog(final Shell parentShell, final String dialogTitle, final String dialogMessage,
 			final String initialHubUrlValue, final String initialUsernameValue, final String initialPasswordValue,
 			final String proxyPassword, final String proxyPort, final String proxyUsername, final String proxyHost,
-			final String ignoredProxyHosts, final String initialTimeoutValue, final AuthorizationValidator validator) {
+			final String ignoredProxyHosts, final String initialTimeoutValue) {
 		super(parentShell);
 		this.title = dialogTitle;
 		this.message = dialogMessage;
-		this.validator = validator;
 		this.proxyPassword = proxyPassword;
 		this.proxyPort = proxyPort;
 		this.proxyUsername = proxyUsername;
@@ -280,11 +283,17 @@ public class AuthorizationDialog extends Dialog {
 
 	protected void validateInput() {
 		String errorMessage = null;
+		final AuthorizationValidator validator = new AuthorizationValidator(hubUrl.getText(), username.getText(),
+				password.getText(), proxyPassword, proxyPort, proxyUsername, proxyHost, ignoredProxyHosts,
+				timeout.getText(), useDefaultTimeout, useProxyInfo);
 		if (validator != null) {
-			errorMessage = validator.isValid(hubUrl.getText(), username.getText(), password.getText(), proxyPassword,
-					proxyPort, proxyUsername, proxyHost, ignoredProxyHosts, timeout.getText(), useDefaultTimeout,
-					useProxyInfo);
+			errorMessage = validator.isValid();
 		}
+		setSaveCredentialsEnabled(errorMessage);
+		setErrorMessage(errorMessage);
+	}
+	
+	protected void setSaveCredentialsEnabled(String errorMessage) {
 		if (errorMessage != null && errorMessage.equals(LOGIN_SUCCESS_MESSAGE)) {
 			saveCredentials.setEnabled(true);
 		} else {
@@ -292,7 +301,6 @@ public class AuthorizationDialog extends Dialog {
 				saveCredentials.setEnabled(false);
 			}
 		}
-		setErrorMessage(errorMessage);
 	}
 
 	public void setErrorMessage(final String errorMessage) {
