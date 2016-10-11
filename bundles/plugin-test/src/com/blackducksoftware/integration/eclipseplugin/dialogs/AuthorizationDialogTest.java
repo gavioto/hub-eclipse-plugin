@@ -8,6 +8,7 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -22,11 +23,14 @@ import org.junit.runner.RunWith;
 public class AuthorizationDialogTest {
 
 	private static SWTWorkbenchBot bot;
+	private final static String TEST_PROJECT_NAME = "authorization-dialog-test-project";
 
 	@BeforeClass
 	public static void setupWorkspaceBot() {
 		bot = new SWTWorkbenchBot();
+		try {
 		bot.viewByTitle("Welcome").close();
+		} catch (RuntimeException e) {}
 		SWTBotMenu fileMenu = bot.menu("File");
 		SWTBotMenu projectMenu = fileMenu.menu("New");
 		SWTBotMenu newMenu = projectMenu.menu("Project...");
@@ -46,7 +50,7 @@ public class AuthorizationDialogTest {
 	    	
 	    });
 		bot.button("Next >").click();
-		bot.textWithLabel("Project name:").setText("test maven project");
+		bot.textWithLabel("Project name:").setText(TEST_PROJECT_NAME);
 		bot.button("Finish").click();
 		try {
 			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
@@ -56,7 +60,7 @@ public class AuthorizationDialogTest {
 
 	@Test
 	public void timeoutTextareaOnlyAllowsNumberInput() {
-		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem("test maven project");
+		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
 		node.select().contextMenu("Black Duck").contextMenu("Black Duck Authorization...").click();
 		bot.waitUntil(Conditions.shellIsActive("Hub Authorization"));
@@ -100,7 +104,7 @@ public class AuthorizationDialogTest {
 	
 	@Test
 	public void saveCredentialsNotEnabled() {
-		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem("test maven project");
+		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
 		node.select().contextMenu("Black Duck").contextMenu("Black Duck Authorization...").click();
 		bot.waitUntil(Conditions.shellIsActive("Hub Authorization"));
@@ -108,10 +112,25 @@ public class AuthorizationDialogTest {
 		assertFalse(saveCredsButton.isEnabled());
 		bot.shell("Hub Authorization").close();
 	}
+	
+	@Test
+	public void disableAndEnableTimeoutWorks() {
+		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
+		node.setFocus();
+		node.select().contextMenu("Black Duck").contextMenu("Black Duck Authorization...").click();
+		bot.waitUntil(Conditions.shellIsActive("Hub Authorization"));
+		SWTBotCheckBox disableTimeoutButton = bot.checkBox("Use default timeout of 120 seconds?");
+		SWTBotText timeoutText = bot.text(AuthorizationDialog.TIMEOUT_TEXT_INDEX);
+		assertFalse(disableTimeoutButton.isChecked());
+		assertTrue(timeoutText.isEnabled());
+		disableTimeoutButton.click();
+		assertTrue(disableTimeoutButton.isChecked());
+		assertFalse(timeoutText.isEnabled());
+	}
 
 	@AfterClass
 	public static void teardownWorkspaceBot() {
-		bot.closeAllShells();
+		bot.resetWorkbench();
 	}
 
 }
