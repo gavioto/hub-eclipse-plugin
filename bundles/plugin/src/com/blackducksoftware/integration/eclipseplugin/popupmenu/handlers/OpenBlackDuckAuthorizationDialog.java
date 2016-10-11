@@ -9,11 +9,11 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.blackducksoftware.integration.eclipseplugin.constants.DialogTitles;
 import com.blackducksoftware.integration.eclipseplugin.dialogs.AuthorizationDialog;
 
 public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 
-	private final String TITLE = "Hub Authorization";
 	private final String MESSAGE = "Enter your Hub credentials below:";
 
 	@Override
@@ -74,7 +74,7 @@ public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 		} catch (final StorageException e) {
 			timeout = "";
 		}
-		final AuthorizationDialog authDialog = new AuthorizationDialog(activeShell, TITLE, MESSAGE, hubUrl, username,
+		final AuthorizationDialog authDialog = new AuthorizationDialog(activeShell, DialogTitles.HUB_AUTHORIZATION, MESSAGE, hubUrl, username,
 				password, proxyPassword, proxyPort, proxyUsername, proxyHost, ignoredProxyHosts, timeout);
 		authDialog.create();
 		authDialog.open();

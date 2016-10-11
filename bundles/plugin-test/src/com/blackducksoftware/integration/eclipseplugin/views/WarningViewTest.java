@@ -19,6 +19,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.blackducksoftware.integration.eclipseplugin.constants.MenuLabels;
+import com.blackducksoftware.integration.eclipseplugin.constants.ViewIds;
+import com.blackducksoftware.integration.eclipseplugin.constants.ViewNames;
+
 public class WarningViewTest {
 	
 	public static SWTWorkbenchBot bot;
@@ -67,32 +71,22 @@ public class WarningViewTest {
 		} catch (TimeoutException e) {}
 	}
 	
-	@Ignore
+	@Test
 	public void testThatWarningViewOpensFromContextMenu() {
 		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
-		SWTBotMenu warningViewMenu = node.select().contextMenu("Black Duck").contextMenu("Open Warning View");
+		SWTBotMenu warningViewMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK).contextMenu(MenuLabels.WARNING_VIEW);
 		warningViewMenu.click();
-		bot.waitUntil(new DefaultCondition() {
-			public String getFailureMessage() {
-				return "could not find details button";
-			}
-			
-			public boolean test() {
-				return bot.button("Details >>").isEnabled();
-			}
-		});
-		bot.button("Details >>").click();
-		assertNotNull(bot.viewByTitle("Warning View"));
-		assertTrue(bot.viewById("com.blackducksoftware.integration.eclipseplugin.views.WarningView").isActive());
-		bot.viewByTitle("Warning View").close();
+		assertNotNull(bot.viewByTitle(ViewNames.WARNING));
+		assertTrue(bot.viewById(ViewIds.WARNING).isActive());
+		bot.viewByTitle(ViewNames.WARNING).close();
 	}
 	
-	@Ignore
+	@Test
 	public void testThatWarningViewOpensFromWindowMenu() {
 		bot.menu("Window").menu("Show View").menu("Other...").click();
 		bot.waitUntil(Conditions.shellIsActive("Show View"));
-		bot.tree().expandNode("Black Duck").expandNode("Warning View").select();
+		bot.tree().expandNode(ViewNames.BLACK_DUCK).expandNode(ViewNames.WARNING).select();
 		bot.waitUntil(new DefaultCondition() {
 			public String getFailureMessage() {
 				return "ok button could not be enabled";
@@ -102,11 +96,9 @@ public class WarningViewTest {
 			}
 		});
 		bot.button("OK").click();
-		bot.button("<< Details").click();
-		bot.sleep(5000);
-		assertNotNull(bot.viewByTitle("Warning View"));
-		assertTrue(bot.viewByTitle("Warning View").isActive());
-		bot.viewByTitle("Warning View").close();
+		assertNotNull(bot.viewByTitle(ViewNames.WARNING));
+		assertTrue(bot.viewByTitle(ViewNames.WARNING).isActive());
+		bot.viewByTitle(ViewNames.WARNING).close();
 	}
 	
 	@AfterClass

@@ -19,6 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.blackducksoftware.integration.eclipseplugin.constants.DialogTitles;
+import com.blackducksoftware.integration.eclipseplugin.constants.MenuLabels;
+
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class AuthorizationDialogTest {
 
@@ -62,8 +65,8 @@ public class AuthorizationDialogTest {
 	public void timeoutTextareaOnlyAllowsNumberInput() {
 		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
-		node.select().contextMenu("Black Duck").contextMenu("Black Duck Authorization...").click();
-		bot.waitUntil(Conditions.shellIsActive("Hub Authorization"));
+		node.select().contextMenu(MenuLabels.BLACK_DUCK).contextMenu(MenuLabels.BLACK_DUCK_AUTHORIZATION).click();
+		bot.waitUntil(Conditions.shellIsActive(DialogTitles.HUB_AUTHORIZATION));
 		SWTBotText timeoutText = bot.text(AuthorizationDialog.TIMEOUT_TEXT_INDEX);
 		timeoutText.setText("abcd");
 		assertTrue(timeoutText.getText().equals(""));
@@ -98,7 +101,7 @@ public class AuthorizationDialogTest {
 		timeoutText.typeText("afje");
 		assertTrue(timeoutText.getText().equals("23"));
 		
-		bot.shell("Hub Authorization").close();
+		bot.shell(DialogTitles.HUB_AUTHORIZATION).close();
 		
 	}
 	
@@ -106,19 +109,19 @@ public class AuthorizationDialogTest {
 	public void saveCredentialsNotEnabled() {
 		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
-		node.select().contextMenu("Black Duck").contextMenu("Black Duck Authorization...").click();
-		bot.waitUntil(Conditions.shellIsActive("Hub Authorization"));
+		node.select().contextMenu(MenuLabels.BLACK_DUCK).contextMenu(MenuLabels.BLACK_DUCK_AUTHORIZATION).click();
+		bot.waitUntil(Conditions.shellIsActive(DialogTitles.HUB_AUTHORIZATION));
 		SWTBotButton saveCredsButton = bot.button("Save Hub Authorization");
 		assertFalse(saveCredsButton.isEnabled());
-		bot.shell("Hub Authorization").close();
+		bot.shell(DialogTitles.HUB_AUTHORIZATION).close();
 	}
 	
 	@Test
 	public void disableAndEnableTimeoutWorks() {
 		SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
-		node.select().contextMenu("Black Duck").contextMenu("Black Duck Authorization...").click();
-		bot.waitUntil(Conditions.shellIsActive("Hub Authorization"));
+		node.select().contextMenu(MenuLabels.BLACK_DUCK).contextMenu(MenuLabels.BLACK_DUCK_AUTHORIZATION).click();
+		bot.waitUntil(Conditions.shellIsActive(DialogTitles.HUB_AUTHORIZATION));
 		SWTBotCheckBox disableTimeoutButton = bot.checkBox("Use default timeout of 120 seconds?");
 		SWTBotText timeoutText = bot.text(AuthorizationDialog.TIMEOUT_TEXT_INDEX);
 		assertFalse(disableTimeoutButton.isChecked());

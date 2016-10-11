@@ -11,12 +11,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.blackducksoftware.integration.eclipseplugin.constants.ViewIds;
+
 /*
  * Class that opens the warning view
  */
 public class OpenWarningView extends AbstractHandler {
-
-	private final String WARNING_VIEW_ID = "com.blackducksoftware.integration.eclipseplugin.views.WarningView";
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -31,7 +31,7 @@ public class OpenWarningView extends AbstractHandler {
 			if (window != null) {
 				final IWorkbenchPage page = window.getActivePage();
 				if (page != null) {
-					page.showView(WARNING_VIEW_ID);
+					page.showView(ViewIds.WARNING);
 				}
 			}
 		} catch (final PartInitException e) {
