@@ -14,7 +14,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
-import org.junit.Ignore;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,8 +28,7 @@ public class AuthorizationDialogBotTest {
 	private static SWTWorkbenchBot bot;
 	private final static String TEST_PROJECT_NAME = "authorization-dialog-test-project";
 
-	// change annotation to @BeforeClass when ready to reintroduce SWTBot tests
-	@Ignore
+	@BeforeClass
 	public static void setupWorkspaceBot() {
 		bot = new SWTWorkbenchBot();
 		try {
@@ -65,14 +65,7 @@ public class AuthorizationDialogBotTest {
 		}
 	}
 
-	// remove when SWTBot tests enabled
 	@Test
-	public void placeholderTest() {
-		assertTrue(true);
-	}
-
-	// change annotation to @Test when ready to reintroduce SWTBot tests
-	@Ignore
 	public void timeoutTextareaOnlyAllowsNumberInput() {
 		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
@@ -116,8 +109,7 @@ public class AuthorizationDialogBotTest {
 
 	}
 
-	// change annotation to @Test when ready to reintroduce SWTBot tests
-	@Ignore
+	@Test
 	public void saveCredentialsNotEnabled() {
 		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
@@ -128,8 +120,7 @@ public class AuthorizationDialogBotTest {
 		bot.shell(DialogTitles.HUB_AUTHORIZATION).close();
 	}
 
-	// change annotation to @Test when ready to reintroduce SWTBot tests
-	@Ignore
+	@Test
 	public void disableAndEnableTimeoutWorks() {
 		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
@@ -144,8 +135,7 @@ public class AuthorizationDialogBotTest {
 		assertFalse(timeoutText.isEnabled());
 	}
 
-	// change annotation to @AfterClass when ready to reintroduce SWTBot tests
-	@Ignore
+	@AfterClass
 	public static void teardownWorkspaceBot() {
 		bot.resetWorkbench();
 	}
