@@ -4,27 +4,31 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.MenuLabels;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewIds;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewNames;
 
-public class WarningViewTest {
+@RunWith(SWTBotJunit4ClassRunner.class)
+public class WarningViewBotTest {
 
 	public static SWTWorkbenchBot bot;
 
 	private static final String TEST_PROJECT_NAME = "warning-view-test-project";
 
-	// change annotation to @BeforeClass when ready to reintroduce SWTBot tests
-	@Ignore
+	@BeforeClass
 	public static void setUpWorkspaceBot() {
 		bot = new SWTWorkbenchBot();
 		try {
@@ -72,13 +76,11 @@ public class WarningViewTest {
 		}
 	}
 
-	// remove when SWTBot tests enabled
 	@Test
 	public void placeholderTest() {
 		assertTrue(true);
 	}
 
-	// change annotation to @Test when ready to reintroduce SWTBot tests
 	@Ignore
 	public void testThatWarningViewOpensFromContextMenu() {
 		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
@@ -91,7 +93,6 @@ public class WarningViewTest {
 		bot.viewByTitle(ViewNames.WARNING).close();
 	}
 
-	// change annotation to @Test when ready to reintroduce SWTBot tests
 	@Ignore
 	public void testThatWarningViewOpensFromWindowMenu() {
 		bot.menu("Window").menu("Show View").menu("Other...").click();
@@ -114,8 +115,7 @@ public class WarningViewTest {
 		bot.viewByTitle(ViewNames.WARNING).close();
 	}
 
-	// change annotation to @AfterClass when ready to reintroduce SWTBot tests
-	@Ignore
+	@AfterClass
 	public static void tearDownWorkspaceBot() {
 		bot.resetWorkbench();
 	}
