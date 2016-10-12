@@ -26,7 +26,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import com.blackducksoftware.integration.eclipseplugin.internal.ProjectInfoProvider;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
@@ -138,7 +138,7 @@ public class WarningView extends ViewPart {
 				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		tableOfWarnings.setContentProvider(new WarningContentProvider());
 		createColumns(parent, tableOfWarnings);
-		lastSelectedProjectName = ProjectInfoProvider.getSelectedProject();
+		lastSelectedProjectName = WorkspaceInformationService.getSelectedProject();
 		tableOfWarnings.setInput(lastSelectedProjectName);
 
 		// add all listeners

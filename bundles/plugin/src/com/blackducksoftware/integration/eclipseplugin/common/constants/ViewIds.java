@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.constants;
+package com.blackducksoftware.integration.eclipseplugin.common.constants;
 
 public class ViewIds {
 	public static final String BLACK_DUCK = "com.blackducksoftware.integration.eclipseplugin.views";

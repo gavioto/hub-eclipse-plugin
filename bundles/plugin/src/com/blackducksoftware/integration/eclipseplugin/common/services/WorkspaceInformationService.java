@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.internal;
+package com.blackducksoftware.integration.eclipseplugin.common.services;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -16,7 +16,7 @@ import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 /*
  * Class that provides information about projects in the workspace
  */
-public class ProjectInfoProvider {
+public class WorkspaceInformationService {
 
 	private static final String MAVEN_CLASSPATH_VARIABLE_NAME = "M2_REPO";
 

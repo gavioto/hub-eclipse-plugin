@@ -11,7 +11,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.blackducksoftware.integration.eclipseplugin.constants.ViewIds;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewIds;
 
 /*
  * Class that opens the warning view

@@ -80,6 +80,13 @@
                   <type>jar</type>
                   <outputDirectory>${output-dir}</outputDirectory>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.mockito</groupId>
+                  <artifactId>mockito-all</artifactId>
+                  <version>1.10.19</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

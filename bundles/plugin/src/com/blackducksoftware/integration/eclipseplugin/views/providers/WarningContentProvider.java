@@ -6,7 +6,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
-import com.blackducksoftware.integration.eclipseplugin.internal.ProjectInfoProvider;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
@@ -33,7 +33,7 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 			if (isActivated && displayWarnings) {
 				String[] dependencies;
 				try {
-					dependencies = ProjectInfoProvider.getMavenAndGradleDependencies((String) projectName);
+					dependencies = WorkspaceInformationService.getMavenAndGradleDependencies((String) projectName);
 					final Warning[] warnings = new Warning[dependencies.length];
 					for (int i = 0; i < dependencies.length; i++) {
 

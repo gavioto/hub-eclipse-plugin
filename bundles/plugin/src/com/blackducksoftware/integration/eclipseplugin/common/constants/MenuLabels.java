@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.constants;
+package com.blackducksoftware.integration.eclipseplugin.common.constants;
 
 public class MenuLabels {
 	public static final String BLACK_DUCK_AUTHORIZATION = "Black Duck Authorization...";

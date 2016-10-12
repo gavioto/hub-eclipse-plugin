@@ -1,9 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.dialogs;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.StringConverter;
@@ -22,36 +19,32 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.blackducksoftware.integration.eclipseplugin.common.constants.DefaultValues;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.DialogTitles;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
+import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
+
 public class AuthorizationDialog extends Dialog {
 
-	private final String proxyPassword;
-	private final String proxyPort;
-	private final String proxyUsername;
-	private final String proxyHost;
-	private final String ignoredProxyHosts;
-
 	private Text hubUrl;
-	private String hubUrlInputValue;
 	private Text username;
-	private String usernameInputValue;
 	private Text password;
-	private String passwordInputValue;
 
 	private Button useDefaultTimeoutButton;
 	private boolean useDefaultTimeout;
 
 	private Text timeout;
-	private String timeoutInputValue;
 
 	private Button useProxyInfoButton;
 	private boolean useProxyInfo;
 
 	private Button testCredentials;
 	private Button saveCredentials;
-	private final String title;
-	private final String message;
 	private String errorMessage;
 	private Text errorMessageText;
+
+	private final SecurePreferencesService prefService;
+	private final AuthorizationValidator validator;
 
 	private final ModifyListener textListener = new ModifyListener() {
 		@Override
@@ -73,9 +66,10 @@ public class AuthorizationDialog extends Dialog {
 	private final VerifyListener timeoutVerifyListener = new VerifyListener() {
 		@Override
 		public void verifyText(final VerifyEvent e) {
-			if ( !StringUtils.isNumeric(e.text) && e.character != '0' && e.character != '1' && e.character != '2' && e.character != '3'
-					&& e.character != '4' && e.character != '5' && e.character != '6' && e.character != '7'
-					&& e.character != '8' && e.character != '9' && e.keyCode != SWT.DEL && e.keyCode != SWT.BS) {
+			if (!StringUtils.isNumeric(e.text) && e.character != '0' && e.character != '1' && e.character != '2'
+					&& e.character != '3' && e.character != '4' && e.character != '5' && e.character != '6'
+					&& e.character != '7' && e.character != '8' && e.character != '9' && e.keyCode != SWT.DEL
+					&& e.keyCode != SWT.BS) {
 				e.doit = false;
 			} else {
 				e.doit = true;
@@ -94,6 +88,7 @@ public class AuthorizationDialog extends Dialog {
 			}
 		}
 	};
+
 	private final SelectionAdapter useProxyInfoListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -104,62 +99,32 @@ public class AuthorizationDialog extends Dialog {
 		}
 	};
 
-	public static final String LOGIN_SUCCESS_MESSAGE = "Successful login!";
-	public static final String INCORRECT_CREDENTIALS_MESSAGE = "Incorrect username or password. Please try again";
-	public static final String LOGIN_ERROR_MESSAGE = "An error occurred while logging in";
-	public static final String CREDENTIAL_MISSING_MESSAGE = "Please enter a hub URL instance, a username, and a password";
 	public static final String ERROR_SAVING_CREDENTIALS_MESSAGE = "Error occurred when saving credentials";
 
 	public static final int TEST_CREDENTIALS_ID = 133;
 	public static final int SAVE_CREDENTIALS_ID = 134;
 	public static final String TEST_CREDENTIALS_LABEL = "Test Hub Connection";
 	public static final String SAVE_CREDENTIALS_LABEL = "Save Hub Authorization";
-	
+
 	public static final int HUB_URL_TEXT_INDEX = 0;
 	public static final int USERNAME_TEXT_INDEX = 1;
 	public static final int PASSWORD_TEXT_INDEX = 2;
 	public static final int TIMEOUT_TEXT_INDEX = 3;
 
-	public AuthorizationDialog(final Shell parentShell, final String dialogTitle, final String dialogMessage,
-			final String initialHubUrlValue, final String initialUsernameValue, final String initialPasswordValue,
-			final String proxyPassword, final String proxyPort, final String proxyUsername, final String proxyHost,
-			final String ignoredProxyHosts, final String initialTimeoutValue) {
+	public static final String TITLE = DialogTitles.HUB_AUTHORIZATION;
+	public static final String MESSAGE = "Enter your Hub credentials below:";
+
+	public AuthorizationDialog(final Shell parentShell, final SecurePreferencesService prefService,
+			final AuthorizationValidator validator) {
 		super(parentShell);
-		this.title = dialogTitle;
-		this.message = dialogMessage;
-		this.proxyPassword = proxyPassword;
-		this.proxyPort = proxyPort;
-		this.proxyUsername = proxyUsername;
-		this.proxyHost = proxyHost;
-		this.ignoredProxyHosts = ignoredProxyHosts;
-		if (initialHubUrlValue == null) {
-			hubUrlInputValue = "";
-		} else {
-			hubUrlInputValue = initialHubUrlValue;
-		}
-		if (initialUsernameValue == null) {
-			usernameInputValue = "";
-		} else {
-			usernameInputValue = initialUsernameValue;
-		}
-		if (initialPasswordValue == null) {
-			passwordInputValue = "";
-		} else {
-			passwordInputValue = initialPasswordValue;
-		}
-		if (initialTimeoutValue == null) {
-			timeoutInputValue = "";
-		} else {
-			timeoutInputValue = initialTimeoutValue;
-		}
+		this.prefService = prefService;
+		this.validator = validator;
 	}
 
 	@Override
 	protected void configureShell(final Shell shell) {
 		super.configureShell(shell);
-		if (title != null) {
-			shell.setText(title);
-		}
+		shell.setText(TITLE);
 	}
 
 	@Override
@@ -167,58 +132,78 @@ public class AuthorizationDialog extends Dialog {
 		if (buttonId == TEST_CREDENTIALS_ID) {
 			validateInput();
 		} else if (buttonId == SAVE_CREDENTIALS_ID) {
-			try {
-				saveCredentials();
+			final boolean saveSuccess = saveCredentials();
+			if (saveSuccess) {
 				close();
-			} catch (final StorageException e) {
-				setErrorMessage(ERROR_SAVING_CREDENTIALS_MESSAGE);
 			}
 		}
 		super.buttonPressed(buttonId);
 	}
 
-	private void saveCredentials() throws StorageException {
-		final ISecurePreferences defaultNode = SecurePreferencesFactory.getDefault();
-		final ISecurePreferences passwordNode = defaultNode.node("Black Duck");
-		passwordNode.put("activeHubUrl", hubUrl.getText(), false);
-		passwordNode.put("activeUsername", username.getText(), false);
-		passwordNode.put("activePassword", password.getText(), true);
-		if (useDefaultTimeout) {
-			passwordNode.put("activeTimeout", "120", false);
-		} else {
-			passwordNode.put("activeTimeout", timeout.getText(), false);
+	private boolean saveCredentials() {
+		final boolean usernameSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.HUB_USERNAME,
+				username.getText(), false);
+		final boolean passwordSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.HUB_PASSWORD,
+				password.getText(), true);
+		final boolean hubUrlSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.HUB_URL, hubUrl.getText(),
+				false);
+		final String saveErrorMessage = buildSaveErrorMessage(usernameSaveSuccessful, passwordSaveSuccessful,
+				hubUrlSaveSuccessful);
+		setErrorMessage(saveErrorMessage);
+		return usernameSaveSuccessful && passwordSaveSuccessful && hubUrlSaveSuccessful;
+	}
+
+	private String buildSaveErrorMessage(final boolean usernameSaveSuccessful, final boolean passwordSaveSuccessful,
+			final boolean hubUrlSaveSuccessful) {
+		if (usernameSaveSuccessful && passwordSaveSuccessful && hubUrlSaveSuccessful) {
+			return "";
 		}
+		String errorMessage = "Error saving: ";
+		boolean firstAddition = true;
+		if (!usernameSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "username" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
+		}
+		if (!passwordSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "password" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
+		}
+		if (!hubUrlSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "hub URL" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
+		}
+		return errorMessage;
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(final Composite parent) {
-
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 		testCredentials = createButton(parent, TEST_CREDENTIALS_ID, TEST_CREDENTIALS_LABEL, true);
 		testCredentials.setEnabled(false);
 		saveCredentials = createButton(parent, SAVE_CREDENTIALS_ID, SAVE_CREDENTIALS_LABEL, false);
 		saveCredentials.setEnabled(false);
 
-		if (hubUrlInputValue != null) {
-			hubUrl.setText(hubUrlInputValue);
-		} else {
-			hubUrl.setText("");
-		}
-		if (usernameInputValue != null) {
-			username.setText(usernameInputValue);
-		} else {
-			username.setText("");
-		}
-		if (passwordInputValue != null) {
-			password.setText(passwordInputValue);
-		} else {
-			password.setText("");
-		}
-		if (timeoutInputValue != null) {
-			timeout.setText(timeoutInputValue);
-		} else {
-			timeout.setText("");
-		}
+		final String initialHubUrl = prefService.getSecurePreference(PreferenceNames.HUB_URL);
+		hubUrl.setText(initialHubUrl);
+		final String initialUsername = prefService.getSecurePreference(PreferenceNames.HUB_USERNAME);
+		username.setText(initialUsername);
+		final String initialPassword = prefService.getSecurePreference(PreferenceNames.HUB_PASSWORD);
+		password.setText(initialPassword);
 	}
 
 	@Override
@@ -228,12 +213,10 @@ public class AuthorizationDialog extends Dialog {
 				| GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
 		labelData.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 		final GridData textData = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL);
-		if (message != null) {
-			final Label label = new Label(composite, SWT.WRAP);
-			label.setText(message);
-			label.setLayoutData(labelData);
-			label.setFont(parent.getFont());
-		}
+		final Label label = new Label(composite, SWT.WRAP);
+		label.setText(MESSAGE);
+		label.setLayoutData(labelData);
+		label.setFont(parent.getFont());
 
 		createLabel(parent, composite, labelData, "Hub Instance URL:");
 		hubUrl = new Text(composite, SWT.SINGLE | SWT.BORDER);
@@ -283,18 +266,63 @@ public class AuthorizationDialog extends Dialog {
 
 	protected void validateInput() {
 		String errorMessage = null;
-		final AuthorizationValidator validator = new AuthorizationValidator(hubUrl.getText(), username.getText(),
-				password.getText(), proxyPassword, proxyPort, proxyUsername, proxyHost, ignoredProxyHosts,
-				timeout.getText(), useDefaultTimeout, useProxyInfo);
 		if (validator != null) {
-			errorMessage = validator.isValid();
+			String username;
+			String password;
+			String hubUrl;
+			if (this.username != null) {
+				username = this.username.getText();
+			} else {
+				username = "";
+			}
+			if (this.password != null) {
+				password = this.password.getText();
+			} else {
+				password = "";
+			}
+			if (this.hubUrl != null) {
+				hubUrl = this.hubUrl.getText();
+			} else {
+				hubUrl = "";
+			}
+			String proxyUsername;
+			String proxyPassword;
+			String proxyPort;
+			String proxyHost;
+			String ignoredProxyHosts;
+			if (useProxyInfo) {
+				proxyUsername = prefService.getSecurePreference(PreferenceNames.PROXY_USERNAME);
+				proxyPassword = prefService.getSecurePreference(PreferenceNames.PROXY_PASSWORD);
+				proxyPort = prefService.getSecurePreference(PreferenceNames.PROXY_PORT);
+				proxyHost = prefService.getSecurePreference(PreferenceNames.PROXY_HOST);
+				ignoredProxyHosts = prefService.getSecurePreference(PreferenceNames.IGNORED_PROXY_HOSTS);
+			} else {
+				proxyUsername = DefaultValues.PROXY_USERNAME;
+				proxyPassword = DefaultValues.PROXY_PASSWORD;
+				proxyPort = DefaultValues.PROXY_PORT;
+				proxyHost = DefaultValues.PROXY_HOST;
+				ignoredProxyHosts = DefaultValues.IGNORED_PROXY_HOSTS;
+			}
+			String timeout;
+			if (useDefaultTimeout) {
+				timeout = DefaultValues.TIMEOUT;
+			} else {
+				if (this.timeout != null) {
+					timeout = this.timeout.getText();
+				} else {
+					timeout = "";
+				}
+			}
+			errorMessage = validator.validateCredentials(username, password, hubUrl, proxyUsername, proxyPassword,
+					proxyPort, proxyHost, ignoredProxyHosts, timeout);
+
 		}
 		setSaveCredentialsEnabled(errorMessage);
 		setErrorMessage(errorMessage);
 	}
-	
-	protected void setSaveCredentialsEnabled(String errorMessage) {
-		if (errorMessage != null && errorMessage.equals(LOGIN_SUCCESS_MESSAGE)) {
+
+	protected void setSaveCredentialsEnabled(final String errorMessage) {
+		if (errorMessage != null && errorMessage.equals(AuthorizationValidator.LOGIN_SUCCESS_MESSAGE)) {
 			saveCredentials.setEnabled(true);
 		} else {
 			if (saveCredentials.isEnabled()) {

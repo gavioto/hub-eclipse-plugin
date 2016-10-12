@@ -9,7 +9,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.blackducksoftware.integration.eclipseplugin.constants.DialogTitles;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.DialogTitles;
 import com.blackducksoftware.integration.eclipseplugin.dialogs.ProxyServerInfoDialog;
 
 public class OpenBlackDuckProxyInfoDialog extends AbstractHandler {

@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.constants;
+package com.blackducksoftware.integration.eclipseplugin.common.constants;
 
 public class PreferencePageIds {
 	public static final String BLACK_DUCK = "BlackDuck";

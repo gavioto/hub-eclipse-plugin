@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.blackducksoftware.integration.eclipseplugin.constants.PreferencePageIds;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferencePageIds;
 
 /*
  * Class that opens the general Black Duck preferences menu in a window
