@@ -8,21 +8,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferencePageIds;
+
 /*
  * Class that opens the general Black Duck preferences menu in a window
  */
 public class OpenPreferences extends AbstractHandler {
 
-	private final String BLACK_DUCK_PAGE_ID = "BlackDuck";
-	private final String ACTIVE_JAVA_PROJECTS_PAGE_ID = "ActiveJavaProjects";
-	private final String PROJECT_SPECIFIC_PREFERENCE_DEFAULTS_PAGE_ID = "ProjectSpecificPreferenceDefaults";
-
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
-		final String[] pageIds = new String[] { BLACK_DUCK_PAGE_ID, ACTIVE_JAVA_PROJECTS_PAGE_ID,
-				PROJECT_SPECIFIC_PREFERENCE_DEFAULTS_PAGE_ID };
-		final PreferenceDialog prefPage = PreferencesUtil.createPreferenceDialogOn(activeShell, BLACK_DUCK_PAGE_ID,
+		final String[] pageIds = new String[] { PreferencePageIds.BLACK_DUCK, PreferencePageIds.ACTIVE_JAVA_PROJECTS,
+				PreferencePageIds.PROJECT_SPECIFIC_PREFERENCE_DEFAULTS };
+		final PreferenceDialog prefPage = PreferencesUtil.createPreferenceDialogOn(activeShell, PreferencePageIds.BLACK_DUCK,
 				pageIds, null);
 		prefPage.open();
 		return null;

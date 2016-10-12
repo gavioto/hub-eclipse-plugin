@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.blackducksoftware.integration.eclipseplugin.internal.ProjectInfoProvider;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 /*
@@ -39,7 +39,7 @@ public class ActiveJavaProjects extends PreferencePage implements IWorkbenchPref
 		activeProjectsLabel.setText("Active Java Projects");
 
 		try {
-			final String[] names = ProjectInfoProvider.getJavaProjectNames();
+			final String[] names = WorkspaceInformationService.getJavaProjectNames();
 			activeProjectPreferences = new BooleanFieldEditor[names.length];
 			for (int i = 0; i < names.length; i++) {
 				final BooleanFieldEditor isActive = new BooleanFieldEditor(names[i], names[i], activeProjectsComposite);

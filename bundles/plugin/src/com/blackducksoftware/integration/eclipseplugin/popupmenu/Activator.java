@@ -15,7 +15,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.blackducksoftware.integration.eclipseplugin.internal.ProjectInfoProvider;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -66,7 +66,7 @@ public class Activator extends AbstractUIPlugin {
 		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
 			try {
-				final String[] projectNames = ProjectInfoProvider.getJavaProjectNames();
+				final String[] projectNames = WorkspaceInformationService.getJavaProjectNames();
 				for (final String projectName : projectNames) {
 					setAllProjectSpecificDefaults(projectName);
 				}
@@ -114,7 +114,7 @@ public class Activator extends AbstractUIPlugin {
 			getPreferenceStore().setValue(DISPLAY_WARNINGS_BY_DEFAULT, "true");
 			getPreferenceStore().setDefault(ACTIVATE_SCAN_BY_DEFAULT, "true");
 		}
-		final String[] projectNames = ProjectInfoProvider.getJavaProjectNames();
+		final String[] projectNames = WorkspaceInformationService.getJavaProjectNames();
 
 		// make sure all default preferences are set
 		for (final String projectName : projectNames) {

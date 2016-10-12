@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.eclipseplugin.dialogs;
 import java.net.URISyntaxException;
 
 import com.blackducksoftware.integration.builder.ValidationResults;
+import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -12,120 +13,57 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class AuthorizationValidator {
 
-	private final String hubUrl;
-	private final String username;
-	private final String password;
-	private String proxyPassword;
-	private String proxyPort;
-	private String proxyUsername;
-	private String proxyHost;
-	private String ignoredProxyHosts;
-	private String timeout;
+	private final HubServerConfigBuilder builder;
+	private final HubRestConnectionService connectionService;
 
-	private final String DEFAULT_TIMEOUT = "120";
+	public static final String LOGIN_SUCCESS_MESSAGE = "Successful login!";
+	public static final String INCORRECT_CREDENTIALS_MESSAGE = "Incorrect username or password. Please try again";
+	public static final String LOGIN_ERROR_MESSAGE = "An error occurred while logging in";
+	public static final String CREDENTIAL_MISSING_MESSAGE = "Please enter a hub URL instance, a username, and a password";
+	public static final String TIMEOUT_MISSING_MESSAGE = "Please specify a timeout value";
 
-	public AuthorizationValidator(final String hubUrl, final String username, final String password,
-			final String proxyPassword, final String proxyPort, final String proxyUsername, final String proxyHost,
-			final String ignoredProxyHosts, final String timeout, final boolean useDefaultTimeout,
-			final boolean useProxyValues) {
-		if (hubUrl == null) {
-			this.hubUrl = "";
-		} else {
-			this.hubUrl = hubUrl;
-		}
-		if (username == null) {
-			this.username = "";
-		} else {
-			this.username = username;
-		}
-		if (password == null) {
-			this.password = "";
-		} else {
-			this.password = password;
-		}
-		if (useProxyValues) {
-			if (proxyPassword == null) {
-				this.proxyPassword = "";
-			} else {
-				this.proxyPassword = proxyPassword;
-			}
-			if (proxyPort == null) {
-				this.proxyPort = "";
-			} else {
-				this.proxyPort = proxyPort;
-			}
-			if (proxyUsername == null) {
-				this.proxyUsername = "";
-			} else {
-				this.proxyUsername = proxyUsername;
-			}
-			if (proxyHost == null) {
-				this.proxyHost = "";
-			} else {
-				this.proxyHost = proxyHost;
-			}
-			if (ignoredProxyHosts == null) {
-				this.ignoredProxyHosts = "";
-			} else {
-				this.ignoredProxyHosts = ignoredProxyHosts;
-			}
-		} else {
-			this.proxyPassword = "";
-			this.proxyPort = "";
-			this.proxyUsername = "";
-			this.proxyHost = "";
-			this.ignoredProxyHosts = "";
-		}
-		if (useDefaultTimeout) {
-			this.timeout = DEFAULT_TIMEOUT;
-		} else {
-			if (timeout == null) {
-				this.timeout = DEFAULT_TIMEOUT;
-			} else {
-				this.timeout = timeout;
-			}
-		}
+	public AuthorizationValidator(final HubServerConfigBuilder builder,
+			final HubRestConnectionService connectionService) {
+		this.builder = builder;
+		this.connectionService = connectionService;
 	}
 
-	public String isValid() {
+	public String validateCredentials(final String username, final String password, final String hubUrl,
+			final String proxyUsername, final String proxyPassword, final String proxyPort, final String proxyHost,
+			final String ignoredProxyHosts, final String timeout) {
 		if (hubUrl == null || hubUrl.equals("") || username == null || username.equals("") || password == null
 				|| password.equals("")) {
-			return AuthorizationDialog.CREDENTIAL_MISSING_MESSAGE;
+			return CREDENTIAL_MISSING_MESSAGE;
 		}
-
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder(true);
-		setFields(builder);
-		try {
-			final boolean loginSuccess = login(builder);
-			if (loginSuccess) {
-				return AuthorizationDialog.LOGIN_SUCCESS_MESSAGE;
-			} else {
-				return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
-			}
-		} catch (final IllegalArgumentException e) {
-			return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
-		} catch (final URISyntaxException e) {
-			return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
-		} catch (final BDRestException e) {
-			return AuthorizationDialog.INCORRECT_CREDENTIALS_MESSAGE;
-		} catch (final EncryptionException e) {
-			return AuthorizationDialog.LOGIN_ERROR_MESSAGE;
+		if (timeout == null || timeout.equals("")) {
+			return TIMEOUT_MISSING_MESSAGE;
 		}
-	}
-
-	public boolean login(final HubServerConfigBuilder builder)
-			throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+		setHubServerConfigBuilderFields(username, password, hubUrl, proxyUsername, proxyPassword, proxyPort, proxyHost,
+				ignoredProxyHosts, timeout);
 		final ValidationResults<GlobalFieldKey, HubServerConfig> results = builder.buildResults();
 		if (results.isSuccess()) {
 			final HubServerConfig config = results.getConstructedObject();
-			final RestConnection connection = new RestConnection(config.getHubUrl().toString());
-			connection.setCookies(config.getGlobalCredentials().getUsername(),
-					config.getGlobalCredentials().getDecryptedPassword());
+			final RestConnection connection = connectionService.getRestConnection(config.getHubUrl().toString());
+			try {
+				connectionService.setCookies(connection, config.getGlobalCredentials().getUsername(),
+						config.getGlobalCredentials().getDecryptedPassword());
+				return LOGIN_SUCCESS_MESSAGE;
+			} catch (final IllegalArgumentException e) {
+				return LOGIN_ERROR_MESSAGE;
+			} catch (final URISyntaxException e) {
+				return LOGIN_ERROR_MESSAGE;
+			} catch (final BDRestException e) {
+				return INCORRECT_CREDENTIALS_MESSAGE;
+			} catch (final EncryptionException e) {
+				return LOGIN_ERROR_MESSAGE;
+			}
 		}
-		return results.isSuccess();
+		return LOGIN_ERROR_MESSAGE;
 	}
 
-	private void setFields(final HubServerConfigBuilder builder) {
+	private void setHubServerConfigBuilderFields(final String username, final String password, final String hubUrl,
+			final String proxyUsername, final String proxyPassword, final String proxyPort, final String proxyHost,
+			final String ignoredProxyHosts, final String timeout) {
 		builder.setUsername(username);
 		builder.setPassword(password);
 		builder.setHubUrl(hubUrl);
@@ -136,41 +74,4 @@ public class AuthorizationValidator {
 		builder.setProxyPort(proxyPort);
 		builder.setIgnoredProxyHosts(ignoredProxyHosts);
 	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public String getHubUrl() {
-		return hubUrl;
-	}
-
-	public String getProxyUsername() {
-		return this.proxyUsername;
-	}
-
-	public String getProxyPassword() {
-		return this.proxyPassword;
-	}
-
-	public String getProxyPort() {
-		return this.proxyPort;
-	}
-
-	public String getProxyHost() {
-		return this.proxyHost;
-	}
-
-	public String getIgnoredProxyHosts() {
-		return this.ignoredProxyHosts;
-	}
-
-	public String getTimeout() {
-		return this.timeout;
-	}
-
 }
