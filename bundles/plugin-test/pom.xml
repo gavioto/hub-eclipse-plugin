@@ -25,7 +25,6 @@
         <version>${tycho.version}</version>
         <configuration>
           <useUIHarness>true</useUIHarness>
-          <argLine>-Xvnc</argLine>
           <useUIThread>false</useUIThread>
           <product>org.eclipse.sdk.ide</product>
           <application>org.eclipse.ui.ide.workbench</application>
