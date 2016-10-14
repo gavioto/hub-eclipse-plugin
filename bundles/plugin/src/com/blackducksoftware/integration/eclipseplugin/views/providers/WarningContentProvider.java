@@ -8,12 +8,18 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
-import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 /*
  * Class that provides the content for the warning view
  */
 public class WarningContentProvider extends ArrayContentProvider implements IStructuredContentProvider {
+
+	private final IPreferenceStore prefs;
+
+	public WarningContentProvider(final IPreferenceStore prefs) {
+		super();
+		this.prefs = prefs;
+	}
 
 	@Override
 	public Object[] getElements(final Object projectName) {
@@ -25,7 +31,6 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 		} else if (projectName instanceof String) {
 
 			// filter what warnings are displayed based on user preferences
-			final IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 			final boolean isActivated = prefs.getBoolean((String) projectName);
 			final String displayWarningsPropertyId = StringUtils
 					.join(new String[] { (String) projectName, "displayWarnings" }, ':');

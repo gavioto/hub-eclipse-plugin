@@ -18,7 +18,7 @@ import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
  */
 public class WorkspaceInformationService {
 
-	private static final String MAVEN_CLASSPATH_VARIABLE_NAME = "M2_REPO";
+	protected static final String MAVEN_CLASSPATH_VARIABLE_NAME = "M2_REPO";
 
 	/*
 	 * Get all projects in the workspace
@@ -30,7 +30,7 @@ public class WorkspaceInformationService {
 	/*
 	 * Get the number of Java projects in the workspace
 	 */
-	private static int getNumJavaProjects() throws CoreException {
+	protected static int getNumJavaProjects() throws CoreException {
 		final IProject[] projects = getAllProjects();
 		int numJava = 0;
 		for (final IProject project : projects) {
@@ -44,7 +44,7 @@ public class WorkspaceInformationService {
 	/*
 	 * Determine whether project is a Java project
 	 */
-	private static boolean isJavaProject(final IProject project) throws CoreException {
+	protected static boolean isJavaProject(final IProject project) throws CoreException {
 		return project.hasNature(JavaCore.NATURE_ID);
 	}
 
@@ -71,8 +71,8 @@ public class WorkspaceInformationService {
 	 * Determine whether the dependency with the given file path is a Maven
 	 * dependency
 	 */
-	private static boolean isMavenDependency(final String filePath) {
-		final String m2Repo = JavaCore.getClasspathVariable("M2_REPO").toString();
+	protected static boolean isMavenDependency(final String filePath) {
+		final String m2Repo = JavaCore.getClasspathVariable(MAVEN_CLASSPATH_VARIABLE_NAME).toString();
 		final String[] m2RepoSegments = m2Repo.split("/");
 		final String[] filePathSegments = filePath.split("/");
 		if (filePathSegments.length < m2RepoSegments.length) {
@@ -92,7 +92,7 @@ public class WorkspaceInformationService {
 	 * Determine whether the dependency with the given file path is a Gradle
 	 * dependency
 	 */
-	private static boolean isGradleDependency(final String projectName) {
+	protected static boolean isGradleDependency(final String projectName) {
 		final String[] projectFilepathSegments = projectName.split("/");
 		if (projectFilepathSegments[projectFilepathSegments.length - 3].equals("lib")
 				|| projectFilepathSegments[projectFilepathSegments.length - 2].equals("plugins")
@@ -148,12 +148,13 @@ public class WorkspaceInformationService {
 			final String[] gavs = new String[numMavenAndGradleDeps];
 			int gavsIndex = 0;
 			for (int j = 0; j < dependencyFilepaths.length; j++) {
+				final FilePathGavExtractor extractor = new FilePathGavExtractor();
 				if (isMavenDependency(dependencyFilepaths[j])) {
-					gavs[gavsIndex] = FilePathGavExtractor.getMavenPathGav(dependencyFilepaths[j],
+					gavs[gavsIndex] = extractor.getMavenPathGav(dependencyFilepaths[j],
 							JavaCore.getClasspathVariable(MAVEN_CLASSPATH_VARIABLE_NAME).toString()).toString();
 					gavsIndex++;
 				} else if (isGradleDependency(dependencyFilepaths[j])) {
-					gavs[gavsIndex] = FilePathGavExtractor.getGradlePathGav(dependencyFilepaths[j]).toString();
+					gavs[gavsIndex] = extractor.getGradlePathGav(dependencyFilepaths[j]).toString();
 					gavsIndex++;
 				}
 			}
