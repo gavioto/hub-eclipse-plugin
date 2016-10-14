@@ -107,8 +107,8 @@
       >
       </category>
       <view
-            class="com.blackducksoftware.integration.eclipseplugin.views.WarningView"
-            id="com.blackducksoftware.integration.eclipseplugin.views.WarningView"
+            class="com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView"
+            id="com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView"
             name="Warning View"
             category="com.blackducksoftware.integration.eclipseplugin.views"
             restorable="true">

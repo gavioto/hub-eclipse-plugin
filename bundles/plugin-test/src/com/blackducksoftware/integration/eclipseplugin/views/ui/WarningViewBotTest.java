@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.views;
+package com.blackducksoftware.integration.eclipseplugin.views.ui;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

@@ -25,6 +25,7 @@
         <version>${tycho.version}</version>
         <configuration>
           <useUIHarness>true</useUIHarness>
+          <argLine>${os-jvm-flags}</argLine>
           <useUIThread>false</useUIThread>
           <product>org.eclipse.sdk.ide</product>
           <application>org.eclipse.ui.ide.workbench</application>
@@ -61,14 +62,14 @@
                 <artifactItem>
                   <groupId>com.blackducksoftware.integration</groupId>
                   <artifactId>hub-common</artifactId>
-                  <version>1.4.9-SNAPSHOT</version>
+                  <version>1.4.11</version>
                   <type>jar</type>
                   <outputDirectory>${output-dir}</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>com.blackducksoftware.integration</groupId>
                   <artifactId>integration-common</artifactId>
-                  <version>1.0.2</version>
+                  <version>1.0.5</version>
                   <type>jar</type>
                   <outputDirectory>${output-dir}</outputDirectory>
                 </artifactItem>
@@ -86,6 +87,62 @@
                   <type>jar</type>
                   <outputDirectory>${output-dir}</outputDirectory>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.powermock</groupId>
+                  <artifactId>powermock-module-junit4</artifactId>
+                  <version>1.6.5</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.powermock</groupId>
+                  <artifactId>powermock-module-junit4-common</artifactId>
+                  <version>1.6.5</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.powermock</groupId>
+                  <artifactId>powermock-api-mockito</artifactId>
+                  <version>1.6.5</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.powermock</groupId>
+                  <artifactId>powermock-api-mockito-common</artifactId>
+                  <version>1.6.5</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.powermock</groupId>
+                  <artifactId>powermock-core</artifactId>
+                  <version>1.6.5</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.powermock</groupId>
+                  <artifactId>powermock-api-support</artifactId>
+                  <version>1.6.5</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.powermock</groupId>
+                  <artifactId>powermock-reflect</artifactId>
+                  <version>1.6.5</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.javassist</groupId>
+                  <artifactId>javassist</artifactId>
+                  <version>3.20.0-GA</version>
+                  <type>jar</type>
+                  <outputDirectory>${output-dir}</outputDirectory>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
@@ -93,4 +150,18 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>macosx-jvm-flags</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <os-jvm-flags>-XstartOnFirstThread</os-jvm-flags>
+      </properties>
+    </profile>
+  </profiles>
 </project>

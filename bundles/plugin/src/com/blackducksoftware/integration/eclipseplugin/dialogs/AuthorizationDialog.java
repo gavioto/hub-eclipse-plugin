@@ -66,10 +66,7 @@ public class AuthorizationDialog extends Dialog {
 	private final VerifyListener timeoutVerifyListener = new VerifyListener() {
 		@Override
 		public void verifyText(final VerifyEvent e) {
-			if (!StringUtils.isNumeric(e.text) && e.character != '0' && e.character != '1' && e.character != '2'
-					&& e.character != '3' && e.character != '4' && e.character != '5' && e.character != '6'
-					&& e.character != '7' && e.character != '8' && e.character != '9' && e.keyCode != SWT.DEL
-					&& e.keyCode != SWT.BS) {
+			if (!StringUtils.isNumeric(e.text) && e.keyCode != SWT.DEL && e.keyCode != SWT.BS) {
 				e.doit = false;
 			} else {
 				e.doit = true;
