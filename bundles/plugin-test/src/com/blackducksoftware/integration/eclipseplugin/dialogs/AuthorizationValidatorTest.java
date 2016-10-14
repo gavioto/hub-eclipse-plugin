@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.blackducksoftware.integration.builder.ValidationResults;
-import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.HubRestConnectionUtil;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -31,7 +31,7 @@ public class AuthorizationValidatorTest {
 	@Mock
 	HubServerConfigBuilder builder;
 	@Mock
-	HubRestConnectionService connectionService;
+	HubRestConnectionUtil connectionService;
 	@Mock
 	HubServerConfig config;
 	@Mock

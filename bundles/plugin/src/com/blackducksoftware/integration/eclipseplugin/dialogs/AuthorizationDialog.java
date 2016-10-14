@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.DefaultValues;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.DialogTitles;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
-import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.SecurePreferencesService;
 
 public class AuthorizationDialog extends Dialog {
 

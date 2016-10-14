@@ -42,6 +42,17 @@ public class AuthorizationDialogBotTest {
 		bot.waitUntil(Conditions.shellIsActive("New Project"));
 		final SWTBotTree optionTree = bot.tree();
 		final SWTBotTreeItem javaNode = optionTree.expandNode("Java");
+		bot.waitUntil(new DefaultCondition() {
+			@Override
+			public String getFailureMessage() {
+				return "couldn't expand java node";
+			}
+
+			@Override
+			public boolean test() throws Exception {
+				return javaNode.isExpanded();
+			}
+		});
 		javaNode.expandNode("Java Project").select();
 		bot.waitUntil(new DefaultCondition() {
 			@Override

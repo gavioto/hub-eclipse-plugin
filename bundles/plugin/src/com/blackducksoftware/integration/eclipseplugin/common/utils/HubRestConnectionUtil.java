@@ -1,11 +1,11 @@
-package com.blackducksoftware.integration.eclipseplugin.common.services;
+package com.blackducksoftware.integration.eclipseplugin.common.utils;
 
 import java.net.URISyntaxException;
 
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
-public class HubRestConnectionService {
+public class HubRestConnectionUtil {
 	public RestConnection getRestConnection(final String url) {
 		return new RestConnection(url);
 	}

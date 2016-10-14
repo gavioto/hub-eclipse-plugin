@@ -3,7 +3,7 @@ package com.blackducksoftware.integration.eclipseplugin.dialogs;
 import java.net.URISyntaxException;
 
 import com.blackducksoftware.integration.builder.ValidationResults;
-import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.HubRestConnectionUtil;
 import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
@@ -14,7 +14,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 public class AuthorizationValidator {
 
 	private final HubServerConfigBuilder builder;
-	private final HubRestConnectionService connectionService;
+	private final HubRestConnectionUtil connectionService;
 
 	public static final String LOGIN_SUCCESS_MESSAGE = "Successful login!";
 	public static final String INCORRECT_CREDENTIALS_MESSAGE = "Incorrect username or password. Please try again";
@@ -23,7 +23,7 @@ public class AuthorizationValidator {
 	public static final String TIMEOUT_MISSING_MESSAGE = "Please specify a timeout value";
 
 	public AuthorizationValidator(final HubServerConfigBuilder builder,
-			final HubRestConnectionService connectionService) {
+			final HubRestConnectionUtil connectionService) {
 		this.builder = builder;
 		this.connectionService = connectionService;
 	}

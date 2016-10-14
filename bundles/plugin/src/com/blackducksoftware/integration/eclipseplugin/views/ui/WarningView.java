@@ -15,7 +15,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.DependencyInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.ProjectInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.PreferenceChangeDisplayUpdateListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDeletedListener;
@@ -37,6 +39,7 @@ public class WarningView extends ViewPart {
 	private ProjectSelectionListener projectSelectionListener;
 	private Display display;
 	private IPreferenceStore prefs;
+	private WorkspaceInformationService workspaceInformationService;
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -47,6 +50,8 @@ public class WarningView extends ViewPart {
 		projectDependenciesChangeListener = new ProjectDependenciesChangeListener(this, display);
 		projectSelectionListener = new ProjectSelectionListener(this);
 		prefs = Activator.getDefault().getPreferenceStore();
+		workspaceInformationService = new WorkspaceInformationService(
+				new ProjectInformationService(new DependencyInformationService()));
 
 		// add all listeners
 		getSite().getPage().addSelectionListener(projectSelectionListener);
@@ -59,7 +64,7 @@ public class WarningView extends ViewPart {
 				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		tableOfWarnings.setContentProvider(new WarningContentProvider(prefs));
 		createColumns(parent, tableOfWarnings);
-		lastSelectedProjectName = WorkspaceInformationService.getSelectedProject();
+		lastSelectedProjectName = workspaceInformationService.getSelectedProject();
 		tableOfWarnings.setInput(lastSelectedProjectName);
 
 		final Table table = tableOfWarnings.getTable();

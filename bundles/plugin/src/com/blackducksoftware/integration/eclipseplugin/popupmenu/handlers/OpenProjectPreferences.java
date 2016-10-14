@@ -9,7 +9,9 @@ import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.DependencyInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.ProjectInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.utils.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.preferences.IndividualProjectPreferences;
 
 /*
@@ -23,7 +25,12 @@ public class OpenProjectPreferences extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
 		final PreferenceManager mgr = new PreferenceManager(preferencePathSeparatorCharacter);
-		final String projectPrefId = WorkspaceInformationService.getSelectedProject();
+
+		final DependencyInformationService depService = new DependencyInformationService();
+		final ProjectInformationService projService = new ProjectInformationService(depService);
+		final WorkspaceInformationService workspaceService = new WorkspaceInformationService(projService);
+
+		final String projectPrefId = workspaceService.getSelectedProject();
 		final IndividualProjectPreferences prefPage = new IndividualProjectPreferences(projectPrefId, projectPrefId);
 		final PreferenceNode prefNode = new PreferenceNode(projectPrefId, prefPage);
 		mgr.addToRoot(prefNode);
