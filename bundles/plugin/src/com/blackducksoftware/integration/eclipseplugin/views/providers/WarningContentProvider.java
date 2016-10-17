@@ -6,8 +6,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
-import com.blackducksoftware.integration.eclipseplugin.common.utils.DependencyInformationService;
-import com.blackducksoftware.integration.eclipseplugin.common.utils.ProjectInformationService;
+import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
+import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
 
 /*
@@ -40,7 +41,8 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 				String[] dependencies;
 				try {
 					final DependencyInformationService depService = new DependencyInformationService();
-					final ProjectInformationService projService = new ProjectInformationService(depService);
+					final FilePathGavExtractor extractor = new FilePathGavExtractor();
+					final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
 					dependencies = projService.getMavenAndGradleDependencies((String) projectName);
 					final Warning[] warnings = new Warning[dependencies.length];
 					for (int i = 0; i < dependencies.length; i++) {

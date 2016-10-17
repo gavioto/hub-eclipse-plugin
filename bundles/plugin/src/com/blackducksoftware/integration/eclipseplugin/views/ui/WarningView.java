@@ -15,9 +15,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import com.blackducksoftware.integration.eclipseplugin.common.utils.DependencyInformationService;
-import com.blackducksoftware.integration.eclipseplugin.common.utils.ProjectInformationService;
-import com.blackducksoftware.integration.eclipseplugin.common.utils.WorkspaceInformationService;
+import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
+import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.PreferenceChangeDisplayUpdateListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDeletedListener;
@@ -51,7 +52,7 @@ public class WarningView extends ViewPart {
 		projectSelectionListener = new ProjectSelectionListener(this);
 		prefs = Activator.getDefault().getPreferenceStore();
 		workspaceInformationService = new WorkspaceInformationService(
-				new ProjectInformationService(new DependencyInformationService()));
+				new ProjectInformationService(new DependencyInformationService(), new FilePathGavExtractor()));
 
 		// add all listeners
 		getSite().getPage().addSelectionListener(projectSelectionListener);

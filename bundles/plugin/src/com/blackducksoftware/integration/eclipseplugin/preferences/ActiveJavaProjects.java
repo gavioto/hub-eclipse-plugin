@@ -13,9 +13,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.blackducksoftware.integration.eclipseplugin.common.utils.DependencyInformationService;
-import com.blackducksoftware.integration.eclipseplugin.common.utils.ProjectInformationService;
-import com.blackducksoftware.integration.eclipseplugin.common.utils.WorkspaceInformationService;
+import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
+import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 /*
@@ -41,7 +42,8 @@ public class ActiveJavaProjects extends PreferencePage implements IWorkbenchPref
 		activeProjectsLabel.setText("Active Java Projects");
 
 		final DependencyInformationService depService = new DependencyInformationService();
-		final ProjectInformationService projService = new ProjectInformationService(depService);
+		final FilePathGavExtractor extractor = new FilePathGavExtractor();
+		final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
 		final WorkspaceInformationService workspaceService = new WorkspaceInformationService(projService);
 
 		try {

@@ -29,21 +29,6 @@ public class WorkspaceInformationServiceTest {
 	}
 
 	@Test
-	public void testIsMavenDependency() {
-		assertTrue(true);
-	}
-
-	@Test
-	public void testIsGradleDependency() {
-		assertTrue(true);
-	}
-
-	@Test
-	public void testIsJavaProject() {
-		assertTrue(true);
-	}
-
-	@Test
 	public void testGettingProjectsFunctionality() {
 		assertTrue(true);
 	}

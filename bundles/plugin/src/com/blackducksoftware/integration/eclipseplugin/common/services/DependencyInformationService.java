@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.common.utils;
+package com.blackducksoftware.integration.eclipseplugin.common.services;
 
 import org.eclipse.jdt.core.JavaCore;
 
