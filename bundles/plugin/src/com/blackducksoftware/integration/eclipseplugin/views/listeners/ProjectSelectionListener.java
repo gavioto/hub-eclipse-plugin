@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.eclipseplugin.views.listeners;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,14 +27,18 @@ public class ProjectSelectionListener implements ISelectionListener {
 		final IStructuredSelection ss = (IStructuredSelection) sel;
 		final Object selectedProject = ss.getFirstElement();
 		if (selectedProject instanceof IAdaptable) {
-			if (((IAdaptable) selectedProject).getAdapter(IProject.class) != null) {
-				if (warningView.getTable() != null) {
-					final String[] pathSegments = ((IAdaptable) selectedProject).getAdapter(IProject.class).toString()
-							.split("/");
-					final String projectName = pathSegments[pathSegments.length - 1];
+			final IProject project = ((IAdaptable) selectedProject).getAdapter(IProject.class);
+			String projectName;
+			try {
+				if (project != null && project.getDescription() != null && warningView.getTable() != null) {
+					projectName = project.getDescription().getName();
 					warningView.setLastSelectedProjectName(projectName);
 					warningView.setTableInput(projectName);
 				}
+			} catch (final CoreException e) {
+				projectName = "";
+				warningView.setLastSelectedProjectName(projectName);
+				warningView.setTableInput(projectName);
 			}
 		}
 	}

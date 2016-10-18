@@ -1,10 +1,12 @@
 package com.blackducksoftware.integration.eclipseplugin.common.services;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -38,10 +40,12 @@ public class WorkspaceInformationService {
 		int javaIndex = 0;
 		for (final IProject project : projects) {
 			if (projectInformationService.isJavaProject(project)) {
-				final String[] pathSegments = project.toString().split("/");
-				final String projectName = pathSegments[pathSegments.length - 1];
-				names[javaIndex] = projectName;
-				javaIndex++;
+				final IProjectDescription projectDescription = project.getDescription();
+				if (projectDescription != null) {
+					final String projectName = projectDescription.getName();
+					names[javaIndex] = projectName;
+					javaIndex++;
+				}
 			}
 		}
 		return names;
@@ -50,22 +54,30 @@ public class WorkspaceInformationService {
 	public String getSelectedProject() {
 		final IWorkbenchWindow activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (activeWindow != null) {
-			final IStructuredSelection selection = (IStructuredSelection) activeWindow.getSelectionService()
-					.getSelection();
-			if (selection != null && selection.getFirstElement() != null) {
-				final Object selected = selection.getFirstElement();
-				if (selected != null && selected instanceof IAdaptable) {
-					if (((IAdaptable) selected).getAdapter(IProject.class) != null) {
-						final String[] pathSegments = ((IAdaptable) selected).getAdapter(IProject.class).toString()
-								.split("/");
-						return pathSegments[pathSegments.length - 1];
+			final ISelectionService selectionService = activeWindow.getSelectionService();
+			if (selectionService != null) {
+				final IStructuredSelection selection = (IStructuredSelection) selectionService.getSelection();
+				if (selection != null && selection.getFirstElement() != null) {
+					final Object selected = selection.getFirstElement();
+					if (selected instanceof IAdaptable) {
+						final IProject project = ((IAdaptable) selected).getAdapter(IProject.class);
+						try {
+							if (project != null && project.getDescription() != null) {
+								return project.getDescription().getName();
+							} else {
+								return "";
+							}
+						} catch (final CoreException e) {
+							return "";
+						}
+
 					} else {
 						return "";
 					}
-
 				} else {
 					return "";
 				}
+
 			} else {
 				return "";
 			}
