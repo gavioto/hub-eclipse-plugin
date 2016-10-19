@@ -12,9 +12,6 @@ import com.blackducksoftware.integration.eclipseplugin.common.services.Dependenc
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
 
-/*
- * Class that provides the content for the warning view
- */
 public class WarningContentProvider extends ArrayContentProvider implements IStructuredContentProvider {
 
 	private final IPreferenceStore prefs;

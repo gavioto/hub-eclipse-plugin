@@ -19,10 +19,6 @@ import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectIn
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
-/*
- * Class that implements preference page where user chooses which Java
- * projects to activate the Black Duck plugin for
- */
 public class ActiveJavaProjects extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private BooleanFieldEditor[] activeProjectPreferences;
