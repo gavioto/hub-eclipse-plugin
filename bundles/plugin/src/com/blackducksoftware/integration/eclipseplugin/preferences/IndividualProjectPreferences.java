@@ -10,10 +10,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.blackducksoftware.integration.eclipseplugin.common.constants.ProjectSpecificPreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 /*
@@ -54,11 +54,9 @@ public class IndividualProjectPreferences extends PreferencePage implements IWor
 		displayWarningsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		displayWarningsComposite.setLayout(new GridLayout());
 
-		final Label displayWarningsLabel = new Label(displayWarningsComposite, SWT.HORIZONTAL);
-		displayWarningsLabel.setText("Active Java Projects");
-
-		final String displayWarningsPropertyId = StringUtils.join(new String[] { projectId, "displayWarnings" }, ':');
-		displayWarnings = new BooleanFieldEditor(displayWarningsPropertyId, "Display Warnings",
+		final String displayWarningsPropertyId = StringUtils
+				.join(new String[] { projectId, ProjectSpecificPreferenceNames.ACTIVATE_PROJECT }, ':');
+		displayWarnings = new BooleanFieldEditor(displayWarningsPropertyId, "Activate Black Duck scan",
 				displayWarningsComposite);
 		displayWarnings.setPage(this);
 		displayWarnings.setPreferenceStore(getPreferenceStore());

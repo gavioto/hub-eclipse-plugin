@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.blackducksoftware.integration.eclipseplugin.common.constants.ProjectSpecificPreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 public class ProjectSpecificPreferenceDefaults extends PreferencePage implements IWorkbenchPreferencePage {
@@ -32,8 +33,8 @@ public class ProjectSpecificPreferenceDefaults extends PreferencePage implements
 		automaticActivationLabel.setText("Activate Black Duck");
 		final String[][] labelsAndValues = new String[][] { { "Activate Scan Automatically", "true" },
 				{ "Do Not Activate Scan Automatically", "false" } };
-		activateAutomatically = new RadioGroupFieldEditor(Activator.ACTIVATE_SCAN_BY_DEFAULT,
-				"Activate Scan Automatically", 2, labelsAndValues, automaticActivationComposite);
+		activateAutomatically = new RadioGroupFieldEditor(ProjectSpecificPreferenceNames.ACTIVATE_PROJECT,
+				"Activate Scan Automatically for New Projects", 2, labelsAndValues, automaticActivationComposite);
 		activateAutomatically.setPage(this);
 		activateAutomatically.setPreferenceStore(Activator.getDefault().getPreferenceStore());
 		activateAutomatically.load();

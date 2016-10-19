@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.DefaultValues;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.DialogTitles;
-import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.SecurePreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.dialogs.listeners.EnableButtonListener;
 import com.blackducksoftware.integration.eclipseplugin.dialogs.listeners.EnableTextListener;
@@ -83,11 +83,11 @@ public class AuthorizationDialog extends Dialog {
 	}
 
 	private boolean saveCredentials() {
-		final boolean usernameSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.HUB_USERNAME,
+		final boolean usernameSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.HUB_USERNAME,
 				username.getText(), false);
-		final boolean passwordSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.HUB_PASSWORD,
+		final boolean passwordSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.HUB_PASSWORD,
 				password.getText(), true);
-		final boolean hubUrlSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.HUB_URL, hubUrl.getText(),
+		final boolean hubUrlSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.HUB_URL, hubUrl.getText(),
 				false);
 		final String saveErrorMessage = buildSaveErrorMessage(usernameSaveSuccessful, passwordSaveSuccessful,
 				hubUrlSaveSuccessful);
@@ -140,13 +140,13 @@ public class AuthorizationDialog extends Dialog {
 		saveCredentials = createButton(parent, SAVE_CREDENTIALS_ID, SAVE_CREDENTIALS_LABEL, false);
 		saveCredentials.setEnabled(false);
 
-		final String initialHubUrl = prefService.getSecurePreference(PreferenceNames.HUB_URL);
+		final String initialHubUrl = prefService.getSecurePreference(SecurePreferenceNames.HUB_URL);
 		hubUrl.setText(initialHubUrl);
 		hubUrl.addModifyListener(new EnableButtonListener(saveCredentials));
-		final String initialUsername = prefService.getSecurePreference(PreferenceNames.HUB_USERNAME);
+		final String initialUsername = prefService.getSecurePreference(SecurePreferenceNames.HUB_USERNAME);
 		username.setText(initialUsername);
 		username.addModifyListener(new EnableButtonListener(saveCredentials));
-		final String initialPassword = prefService.getSecurePreference(PreferenceNames.HUB_PASSWORD);
+		final String initialPassword = prefService.getSecurePreference(SecurePreferenceNames.HUB_PASSWORD);
 		password.setText(initialPassword);
 		password.addModifyListener(new EnableButtonListener(saveCredentials));
 	}
@@ -231,11 +231,11 @@ public class AuthorizationDialog extends Dialog {
 			String ignoredProxyHosts;
 			final boolean useProxyInfo = useProxyInfoButton.getSelection();
 			if (useProxyInfo) {
-				proxyUsername = prefService.getSecurePreference(PreferenceNames.PROXY_USERNAME);
-				proxyPassword = prefService.getSecurePreference(PreferenceNames.PROXY_PASSWORD);
-				proxyPort = prefService.getSecurePreference(PreferenceNames.PROXY_PORT);
-				proxyHost = prefService.getSecurePreference(PreferenceNames.PROXY_HOST);
-				ignoredProxyHosts = prefService.getSecurePreference(PreferenceNames.IGNORED_PROXY_HOSTS);
+				proxyUsername = prefService.getSecurePreference(SecurePreferenceNames.PROXY_USERNAME);
+				proxyPassword = prefService.getSecurePreference(SecurePreferenceNames.PROXY_PASSWORD);
+				proxyPort = prefService.getSecurePreference(SecurePreferenceNames.PROXY_PORT);
+				proxyHost = prefService.getSecurePreference(SecurePreferenceNames.PROXY_HOST);
+				ignoredProxyHosts = prefService.getSecurePreference(SecurePreferenceNames.IGNORED_PROXY_HOSTS);
 			} else {
 				proxyUsername = DefaultValues.PROXY_USERNAME;
 				proxyPassword = DefaultValues.PROXY_PASSWORD;

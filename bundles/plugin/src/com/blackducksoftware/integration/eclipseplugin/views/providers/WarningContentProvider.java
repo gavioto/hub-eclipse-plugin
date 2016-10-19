@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
 import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.ProjectSpecificPreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
@@ -35,7 +36,7 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 			// filter what warnings are displayed based on user preferences
 			final boolean isActivated = prefs.getBoolean((String) projectName);
 			final String displayWarningsPropertyId = StringUtils
-					.join(new String[] { (String) projectName, "displayWarnings" }, ':');
+					.join(new String[] { (String) projectName, ProjectSpecificPreferenceNames.ACTIVATE_PROJECT }, ':');
 			final boolean displayWarnings = prefs.getBoolean(displayWarningsPropertyId);
 			if (isActivated && displayWarnings) {
 				String[] dependencies;

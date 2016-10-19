@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
+import com.blackducksoftware.integration.eclipseplugin.common.constants.SecurePreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.dialogs.listeners.NumericInputListener;
 
@@ -97,15 +97,15 @@ public class ProxyServerInfoDialog extends Dialog {
 	protected void createButtonsForButtonBar(final Composite parent) {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 		createButton(parent, IDialogConstants.OK_ID, "Save Proxy Credentials", true);
-		final String initialProxyUsername = prefService.getSecurePreference(PreferenceNames.PROXY_USERNAME);
+		final String initialProxyUsername = prefService.getSecurePreference(SecurePreferenceNames.PROXY_USERNAME);
 		proxyUsername.setText(initialProxyUsername);
-		final String initialProxyPassword = prefService.getSecurePreference(PreferenceNames.PROXY_PASSWORD);
+		final String initialProxyPassword = prefService.getSecurePreference(SecurePreferenceNames.PROXY_PASSWORD);
 		proxyPassword.setText(initialProxyPassword);
-		final String initialProxyPort = prefService.getSecurePreference(PreferenceNames.PROXY_PORT);
+		final String initialProxyPort = prefService.getSecurePreference(SecurePreferenceNames.PROXY_PORT);
 		proxyPort.setText(initialProxyPort);
-		final String initialProxyHost = prefService.getSecurePreference(PreferenceNames.PROXY_HOST);
+		final String initialProxyHost = prefService.getSecurePreference(SecurePreferenceNames.PROXY_HOST);
 		proxyHost.setText(initialProxyHost);
-		final String initialIgnoredProxyHosts = prefService.getSecurePreference(PreferenceNames.IGNORED_PROXY_HOSTS);
+		final String initialIgnoredProxyHosts = prefService.getSecurePreference(SecurePreferenceNames.IGNORED_PROXY_HOSTS);
 		ignoredProxyHosts.setText(initialIgnoredProxyHosts);
 	}
 
@@ -180,15 +180,15 @@ public class ProxyServerInfoDialog extends Dialog {
 	}
 
 	private boolean saveProxyInfo() {
-		final boolean proxyPasswordSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_PASSWORD,
+		final boolean proxyPasswordSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_PASSWORD,
 				proxyPassword.getText(), true);
-		final boolean proxyPortSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_PORT,
+		final boolean proxyPortSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_PORT,
 				proxyPort.getText(), false);
-		final boolean proxyUsernameSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_USERNAME,
+		final boolean proxyUsernameSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_USERNAME,
 				proxyUsername.getText(), false);
 		final boolean ignoredProxyHostsSaveSuccessful = prefService
-				.saveSecurePreference(PreferenceNames.IGNORED_PROXY_HOSTS, ignoredProxyHosts.getText(), false);
-		final boolean proxyHostSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_HOST,
+				.saveSecurePreference(SecurePreferenceNames.IGNORED_PROXY_HOSTS, ignoredProxyHosts.getText(), false);
+		final boolean proxyHostSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_HOST,
 				proxyHost.getText(), false);
 		final String message = buildSaveErrorMessage(proxyPasswordSaveSuccessful, proxyPortSaveSuccessful,
 				proxyUsernameSaveSuccessful, ignoredProxyHostsSaveSuccessful, proxyHostSaveSuccessful);
