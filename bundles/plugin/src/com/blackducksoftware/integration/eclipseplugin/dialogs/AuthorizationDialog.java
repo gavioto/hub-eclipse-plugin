@@ -5,12 +5,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -23,6 +17,9 @@ import com.blackducksoftware.integration.eclipseplugin.common.constants.DefaultV
 import com.blackducksoftware.integration.eclipseplugin.common.constants.DialogTitles;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
+import com.blackducksoftware.integration.eclipseplugin.dialogs.listeners.EnableButtonListener;
+import com.blackducksoftware.integration.eclipseplugin.dialogs.listeners.EnableTextListener;
+import com.blackducksoftware.integration.eclipseplugin.dialogs.listeners.NumericInputListener;
 
 public class AuthorizationDialog extends Dialog {
 
@@ -31,12 +28,10 @@ public class AuthorizationDialog extends Dialog {
 	private Text password;
 
 	private Button useDefaultTimeoutButton;
-	private boolean useDefaultTimeout;
 
 	private Text timeout;
 
 	private Button useProxyInfoButton;
-	private boolean useProxyInfo;
 
 	private Button testCredentials;
 	private Button saveCredentials;
@@ -45,56 +40,6 @@ public class AuthorizationDialog extends Dialog {
 
 	private final SecurePreferencesService prefService;
 	private final AuthorizationValidator validator;
-
-	private final ModifyListener textListener = new ModifyListener() {
-		@Override
-		public void modifyText(final ModifyEvent e) {
-			if (saveCredentials.isEnabled()) {
-				saveCredentials.setEnabled(false);
-			}
-			if (hubUrl.getText() == null || hubUrl.getText().equals("") || username.getText() == null
-					|| username.getText().equals("") || password.getText() == null || password.getText().equals("")) {
-				if (testCredentials.isEnabled()) {
-					testCredentials.setEnabled(false);
-				}
-			} else if (!testCredentials.isEnabled()) {
-				testCredentials.setEnabled(true);
-			}
-		}
-	};
-
-	private final VerifyListener timeoutVerifyListener = new VerifyListener() {
-		@Override
-		public void verifyText(final VerifyEvent e) {
-			if (!StringUtils.isNumeric(e.text) && e.keyCode != SWT.DEL && e.keyCode != SWT.BS) {
-				e.doit = false;
-			} else {
-				e.doit = true;
-			}
-
-		}
-	};
-
-	private final SelectionAdapter useDefaultTimeoutListener = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (e.getSource() instanceof Button) {
-				final Button useDefaultTimeoutButton = (Button) e.getSource();
-				useDefaultTimeout = useDefaultTimeoutButton.getSelection();
-				timeout.setEnabled(!useDefaultTimeout);
-			}
-		}
-	};
-
-	private final SelectionAdapter useProxyInfoListener = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (e.getSource() instanceof Button) {
-				final Button useProxyInfoButton = (Button) e.getSource();
-				useProxyInfo = useProxyInfoButton.getSelection();
-			}
-		}
-	};
 
 	public static final String ERROR_SAVING_CREDENTIALS_MESSAGE = "Error occurred when saving credentials";
 
@@ -191,16 +136,19 @@ public class AuthorizationDialog extends Dialog {
 	protected void createButtonsForButtonBar(final Composite parent) {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 		testCredentials = createButton(parent, TEST_CREDENTIALS_ID, TEST_CREDENTIALS_LABEL, true);
-		testCredentials.setEnabled(false);
+		testCredentials.setEnabled(true);
 		saveCredentials = createButton(parent, SAVE_CREDENTIALS_ID, SAVE_CREDENTIALS_LABEL, false);
 		saveCredentials.setEnabled(false);
 
 		final String initialHubUrl = prefService.getSecurePreference(PreferenceNames.HUB_URL);
 		hubUrl.setText(initialHubUrl);
+		hubUrl.addModifyListener(new EnableButtonListener(saveCredentials));
 		final String initialUsername = prefService.getSecurePreference(PreferenceNames.HUB_USERNAME);
 		username.setText(initialUsername);
+		username.addModifyListener(new EnableButtonListener(saveCredentials));
 		final String initialPassword = prefService.getSecurePreference(PreferenceNames.HUB_PASSWORD);
 		password.setText(initialPassword);
+		password.addModifyListener(new EnableButtonListener(saveCredentials));
 	}
 
 	@Override
@@ -218,31 +166,25 @@ public class AuthorizationDialog extends Dialog {
 		createLabel(parent, composite, labelData, "Hub Instance URL:");
 		hubUrl = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		hubUrl.setLayoutData(textData);
-		hubUrl.addModifyListener(textListener);
 		createLabel(parent, composite, labelData, "Username:");
 		username = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		username.setLayoutData(textData);
-		username.addModifyListener(textListener);
 		createLabel(parent, composite, labelData, "Password:");
 		password = new Text(composite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
 		password.setLayoutData(textData);
-		password.addModifyListener(textListener);
 
 		useDefaultTimeoutButton = new Button(composite, SWT.CHECK);
 		useDefaultTimeoutButton.setText("Use default timeout of 120 seconds?");
-		useDefaultTimeoutButton.addSelectionListener(useDefaultTimeoutListener);
-		useDefaultTimeout = useDefaultTimeoutButton.getSelection();
 
 		createLabel(parent, composite, labelData, "Timeout:");
 		timeout = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		timeout.setLayoutData(textData);
-		timeout.addVerifyListener(timeoutVerifyListener);
-		timeout.setEnabled(!useDefaultTimeout);
+		timeout.addVerifyListener(new NumericInputListener());
+		timeout.setEnabled(!useDefaultTimeoutButton.getSelection());
+		useDefaultTimeoutButton.addSelectionListener(new EnableTextListener(timeout));
 
 		useProxyInfoButton = new Button(composite, SWT.CHECK);
 		useProxyInfoButton.setText("Use proxy information?");
-		useProxyInfoButton.addSelectionListener(useProxyInfoListener);
-		useProxyInfo = useProxyInfoButton.getSelection();
 
 		errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
 		errorMessageText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
@@ -287,6 +229,7 @@ public class AuthorizationDialog extends Dialog {
 			String proxyPort;
 			String proxyHost;
 			String ignoredProxyHosts;
+			final boolean useProxyInfo = useProxyInfoButton.getSelection();
 			if (useProxyInfo) {
 				proxyUsername = prefService.getSecurePreference(PreferenceNames.PROXY_USERNAME);
 				proxyPassword = prefService.getSecurePreference(PreferenceNames.PROXY_PASSWORD);
@@ -301,6 +244,7 @@ public class AuthorizationDialog extends Dialog {
 				ignoredProxyHosts = DefaultValues.IGNORED_PROXY_HOSTS;
 			}
 			String timeout;
+			final boolean useDefaultTimeout = useDefaultTimeoutButton.getSelection();
 			if (useDefaultTimeout) {
 				timeout = DefaultValues.TIMEOUT;
 			} else {
@@ -342,9 +286,6 @@ public class AuthorizationDialog extends Dialog {
 
 	@Override
 	public boolean close() {
-		hubUrl.removeModifyListener(textListener);
-		username.removeModifyListener(textListener);
-		password.removeModifyListener(textListener);
 		return super.close();
 	}
 

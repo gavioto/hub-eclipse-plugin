@@ -1,8 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.dialogs;
 
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.equinox.security.storage.StorageException;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -13,16 +11,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
+import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
+import com.blackducksoftware.integration.eclipseplugin.dialogs.listeners.NumericInputListener;
+
 public class ProxyServerInfoDialog extends Dialog {
 
 	private final String title;
 	private final String message;
-
-	private final String proxyPasswordInputValue;
-	private final String proxyPortInputValue;
-	private final String proxyUsernameInputValue;
-	private final String proxyHostInputValue;
-	private final String ignoredProxyHostsInputValue;
 
 	private Text proxyPassword;
 	private Text proxyPort;
@@ -32,20 +28,16 @@ public class ProxyServerInfoDialog extends Dialog {
 
 	private Text saveErrorMessage;
 
+	private final SecurePreferencesService prefService;
+
 	public static final String ERROR_SAVING_PROXY_INFO_MESSAGE = "Error encountered saving proxy server information";
 
-	public ProxyServerInfoDialog(final Shell parentShell, final String dialogTitle, final String dialogMessage,
-			final String initialProxyPasswordValue, final String initialProxyPortValue,
-			final String initialProxyUsernameValue, final String initialProxyHostValue,
-			final String initialIgnoredProxyHostsValue) {
+	public ProxyServerInfoDialog(final Shell parentShell, final SecurePreferencesService prefService,
+			final String dialogTitle, final String dialogMessage) {
 		super(parentShell);
 		title = dialogTitle;
 		message = dialogMessage;
-		proxyPasswordInputValue = initialProxyPasswordValue;
-		proxyPortInputValue = initialProxyPortValue;
-		proxyUsernameInputValue = initialProxyUsernameValue;
-		ignoredProxyHostsInputValue = initialIgnoredProxyHostsValue;
-		proxyHostInputValue = initialProxyHostValue;
+		this.prefService = prefService;
 	}
 
 	@Override
@@ -72,6 +64,7 @@ public class ProxyServerInfoDialog extends Dialog {
 		createLabel(parent, composite, labelData, "Proxy Port:");
 		proxyPort = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		proxyPort.setLayoutData(textData);
+		proxyPort.addVerifyListener(new NumericInputListener());
 		createLabel(parent, composite, labelData, "Proxy Host:");
 		proxyHost = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		proxyHost.setLayoutData(textData);
@@ -103,35 +96,25 @@ public class ProxyServerInfoDialog extends Dialog {
 	@Override
 	protected void createButtonsForButtonBar(final Composite parent) {
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-		if (proxyPassword != null && proxyPasswordInputValue != null) {
-			proxyPassword.setText(proxyPasswordInputValue);
-		}
-		if (proxyPort != null && proxyPortInputValue != null) {
-			proxyPort.setText(proxyPortInputValue);
-		}
-		if (proxyUsername != null && proxyUsernameInputValue != null) {
-			proxyUsername.setText(proxyUsernameInputValue);
-		}
-		if (proxyHost != null && proxyHostInputValue != null) {
-			proxyHost.setText(proxyHostInputValue);
-		}
-		if (ignoredProxyHosts != null && ignoredProxyHostsInputValue != null) {
-			ignoredProxyHosts.setText(ignoredProxyHostsInputValue);
-		}
+		createButton(parent, IDialogConstants.OK_ID, "Save Proxy Credentials", true);
+		final String initialProxyUsername = prefService.getSecurePreference(PreferenceNames.PROXY_USERNAME);
+		proxyUsername.setText(initialProxyUsername);
+		final String initialProxyPassword = prefService.getSecurePreference(PreferenceNames.PROXY_PASSWORD);
+		proxyPassword.setText(initialProxyPassword);
+		final String initialProxyPort = prefService.getSecurePreference(PreferenceNames.PROXY_PORT);
+		proxyPort.setText(initialProxyPort);
+		final String initialProxyHost = prefService.getSecurePreference(PreferenceNames.PROXY_HOST);
+		proxyHost.setText(initialProxyHost);
+		final String initialIgnoredProxyHosts = prefService.getSecurePreference(PreferenceNames.IGNORED_PROXY_HOSTS);
+		ignoredProxyHosts.setText(initialIgnoredProxyHosts);
 	}
 
 	@Override
 	protected void buttonPressed(final int buttonId) {
 		if (buttonId == IDialogConstants.OK_ID) {
-			try {
-				saveProxyInfo();
-				saveErrorMessage.setText(" \n ");
+			final boolean saveSuccess = saveProxyInfo();
+			if (saveSuccess) {
 				super.buttonPressed(buttonId);
-			} catch (final StorageException e) {
-				if (saveErrorMessage != null) {
-					saveErrorMessage.setText(ERROR_SAVING_PROXY_INFO_MESSAGE);
-				}
 			}
 		} else {
 			saveErrorMessage.setText(" \n ");
@@ -139,23 +122,78 @@ public class ProxyServerInfoDialog extends Dialog {
 		}
 	}
 
-	private void saveProxyInfo() throws StorageException {
-		final ISecurePreferences defaultNode = SecurePreferencesFactory.getDefault();
-		final ISecurePreferences blackDuckNode = defaultNode.node("Black Duck");
-		if (proxyPassword != null) {
-			blackDuckNode.put("activeProxyPassword", proxyPassword.getText(), true);
+	private String buildSaveErrorMessage(final boolean proxyPasswordSaveSuccessful,
+			final boolean proxyPortSaveSuccessful, final boolean proxyUsernameSaveSuccessful,
+			final boolean ignoredProxyHostsSaveSuccessful, final boolean proxyHostSaveSuccessful) {
+		if (proxyPasswordSaveSuccessful && proxyPortSaveSuccessful && proxyUsernameSaveSuccessful
+				&& ignoredProxyHostsSaveSuccessful && proxyHostSaveSuccessful) {
+			return "";
 		}
-		if (proxyPort != null) {
-			blackDuckNode.put("activeProxyPort", proxyPort.getText(), false);
+		String errorMessage = "Error saving: ";
+		boolean firstAddition = true;
+		if (!proxyPasswordSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "proxy password" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
 		}
-		if (proxyUsername != null) {
-			blackDuckNode.put("activeProxyUsername", proxyUsername.getText(), false);
+		if (!proxyPortSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "proxy port" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
 		}
-		if (ignoredProxyHosts != null) {
-			blackDuckNode.put("activeIgnoredProxyHosts", ignoredProxyHosts.getText(), false);
+		if (!proxyUsernameSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "proxy username" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
 		}
-		if (proxyHost != null) {
-			blackDuckNode.put("activeProxyHost", proxyHost.getText(), false);
+		if (!ignoredProxyHostsSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "ignored proxy hosts" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
 		}
+		if (!proxyHostSaveSuccessful) {
+			final String[] stringsToJoin = new String[] { errorMessage, "proxy host" };
+			if (firstAddition) {
+				errorMessage = StringUtils.join(stringsToJoin, " ");
+				firstAddition = false;
+			} else {
+				errorMessage = StringUtils.join(stringsToJoin, ", ");
+			}
+		}
+		return errorMessage;
+	}
+
+	private boolean saveProxyInfo() {
+		final boolean proxyPasswordSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_PASSWORD,
+				proxyPassword.getText(), true);
+		final boolean proxyPortSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_PORT,
+				proxyPort.getText(), false);
+		final boolean proxyUsernameSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_USERNAME,
+				proxyUsername.getText(), false);
+		final boolean ignoredProxyHostsSaveSuccessful = prefService
+				.saveSecurePreference(PreferenceNames.IGNORED_PROXY_HOSTS, ignoredProxyHosts.getText(), false);
+		final boolean proxyHostSaveSuccessful = prefService.saveSecurePreference(PreferenceNames.PROXY_HOST,
+				proxyHost.getText(), false);
+		final String message = buildSaveErrorMessage(proxyPasswordSaveSuccessful, proxyPortSaveSuccessful,
+				proxyUsernameSaveSuccessful, ignoredProxyHostsSaveSuccessful, proxyHostSaveSuccessful);
+		saveErrorMessage.setText(message);
+		return proxyPasswordSaveSuccessful && proxyPortSaveSuccessful && proxyUsernameSaveSuccessful
+				&& ignoredProxyHostsSaveSuccessful && proxyHostSaveSuccessful;
 	}
 }
