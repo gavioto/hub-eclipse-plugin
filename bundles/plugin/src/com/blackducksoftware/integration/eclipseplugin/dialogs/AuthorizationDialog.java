@@ -87,8 +87,8 @@ public class AuthorizationDialog extends Dialog {
 				username.getText(), false);
 		final boolean passwordSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.HUB_PASSWORD,
 				password.getText(), true);
-		final boolean hubUrlSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.HUB_URL, hubUrl.getText(),
-				false);
+		final boolean hubUrlSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.HUB_URL,
+				hubUrl.getText(), false);
 		final String saveErrorMessage = buildSaveErrorMessage(usernameSaveSuccessful, passwordSaveSuccessful,
 				hubUrlSaveSuccessful);
 		setErrorMessage(saveErrorMessage);
@@ -179,17 +179,17 @@ public class AuthorizationDialog extends Dialog {
 		createLabel(parent, composite, labelData, "Timeout:");
 		timeout = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		timeout.setLayoutData(textData);
-		timeout.addVerifyListener(new NumericInputListener());
 		timeout.setEnabled(!useDefaultTimeoutButton.getSelection());
 		useDefaultTimeoutButton.addSelectionListener(new EnableTextListener(timeout));
 
 		useProxyInfoButton = new Button(composite, SWT.CHECK);
 		useProxyInfoButton.setText("Use proxy information?");
 
-		errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
+		errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
 		errorMessageText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
 		errorMessageText.setBackground(errorMessageText.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		setErrorMessage(errorMessage);
+		timeout.addVerifyListener(new NumericInputListener(errorMessageText, "Timeout"));
 
 		applyDialogFont(composite);
 		return composite;

@@ -26,7 +26,7 @@ public class ProxyServerInfoDialog extends Dialog {
 	private Text proxyHost;
 	private Text ignoredProxyHosts;
 
-	private Text saveErrorMessage;
+	private Text errorText;
 
 	private final SecurePreferencesService prefService;
 
@@ -64,16 +64,16 @@ public class ProxyServerInfoDialog extends Dialog {
 		createLabel(parent, composite, labelData, "Proxy Port:");
 		proxyPort = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		proxyPort.setLayoutData(textData);
-		proxyPort.addVerifyListener(new NumericInputListener());
 		createLabel(parent, composite, labelData, "Proxy Host:");
 		proxyHost = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		proxyHost.setLayoutData(textData);
 		createLabel(parent, composite, labelData, "Ignored Proxy Hosts:");
 		ignoredProxyHosts = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		ignoredProxyHosts.setLayoutData(textData);
-		saveErrorMessage = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
-		saveErrorMessage.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
-		saveErrorMessage.setBackground(saveErrorMessage.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		errorText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
+		errorText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
+		errorText.setBackground(errorText.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		proxyPort.addVerifyListener(new NumericInputListener(errorText, "Proxy Port"));
 		return composite;
 	}
 
@@ -105,7 +105,8 @@ public class ProxyServerInfoDialog extends Dialog {
 		proxyPort.setText(initialProxyPort);
 		final String initialProxyHost = prefService.getSecurePreference(SecurePreferenceNames.PROXY_HOST);
 		proxyHost.setText(initialProxyHost);
-		final String initialIgnoredProxyHosts = prefService.getSecurePreference(SecurePreferenceNames.IGNORED_PROXY_HOSTS);
+		final String initialIgnoredProxyHosts = prefService
+				.getSecurePreference(SecurePreferenceNames.IGNORED_PROXY_HOSTS);
 		ignoredProxyHosts.setText(initialIgnoredProxyHosts);
 	}
 
@@ -117,7 +118,7 @@ public class ProxyServerInfoDialog extends Dialog {
 				super.buttonPressed(buttonId);
 			}
 		} else {
-			saveErrorMessage.setText(" \n ");
+			errorText.setText(" \n ");
 			super.buttonPressed(buttonId);
 		}
 	}
@@ -180,19 +181,19 @@ public class ProxyServerInfoDialog extends Dialog {
 	}
 
 	private boolean saveProxyInfo() {
-		final boolean proxyPasswordSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_PASSWORD,
-				proxyPassword.getText(), true);
+		final boolean proxyPasswordSaveSuccessful = prefService
+				.saveSecurePreference(SecurePreferenceNames.PROXY_PASSWORD, proxyPassword.getText(), true);
 		final boolean proxyPortSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_PORT,
 				proxyPort.getText(), false);
-		final boolean proxyUsernameSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_USERNAME,
-				proxyUsername.getText(), false);
+		final boolean proxyUsernameSaveSuccessful = prefService
+				.saveSecurePreference(SecurePreferenceNames.PROXY_USERNAME, proxyUsername.getText(), false);
 		final boolean ignoredProxyHostsSaveSuccessful = prefService
 				.saveSecurePreference(SecurePreferenceNames.IGNORED_PROXY_HOSTS, ignoredProxyHosts.getText(), false);
 		final boolean proxyHostSaveSuccessful = prefService.saveSecurePreference(SecurePreferenceNames.PROXY_HOST,
 				proxyHost.getText(), false);
 		final String message = buildSaveErrorMessage(proxyPasswordSaveSuccessful, proxyPortSaveSuccessful,
 				proxyUsernameSaveSuccessful, ignoredProxyHostsSaveSuccessful, proxyHostSaveSuccessful);
-		saveErrorMessage.setText(message);
+		errorText.setText(message);
 		return proxyPasswordSaveSuccessful && proxyPortSaveSuccessful && proxyUsernameSaveSuccessful
 				&& ignoredProxyHostsSaveSuccessful && proxyHostSaveSuccessful;
 	}

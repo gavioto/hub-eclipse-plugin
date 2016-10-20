@@ -12,7 +12,6 @@ import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestCo
 import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.dialogs.AuthorizationDialog;
 import com.blackducksoftware.integration.eclipseplugin.dialogs.AuthorizationValidator;
-import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 
 public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 
@@ -21,8 +20,7 @@ public class OpenBlackDuckAuthorizationDialog extends AbstractHandler {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
 		final SecurePreferencesService prefService = new SecurePreferencesService(SecurePreferenceNodes.BLACK_DUCK,
 				SecurePreferencesFactory.getDefault());
-		final HubServerConfigBuilder builder = new HubServerConfigBuilder(false);
-		final AuthorizationValidator validator = new AuthorizationValidator(builder, new HubRestConnectionService());
+		final AuthorizationValidator validator = new AuthorizationValidator(new HubRestConnectionService());
 		final AuthorizationDialog authDialog = new AuthorizationDialog(activeShell, prefService, validator);
 		authDialog.create();
 		authDialog.open();
