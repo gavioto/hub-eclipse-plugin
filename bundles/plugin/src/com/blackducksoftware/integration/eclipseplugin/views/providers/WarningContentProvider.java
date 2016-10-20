@@ -16,6 +16,12 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 
 	private final IPreferenceStore prefs;
 
+	public static final String[] NO_SELECTED_PROJECT = new String[] { "No project currently selected" };
+	public static final String[] ERR_OBTAINING_DEPENDENCIES = new String[] { "Error occurred obtaining dependencies" };
+	public static final String[] PROJECT_NOT_ACTIVATED = new String[] {
+			"Black Duck scan not activated for current project" };
+	public static final String[] ERR_UNKNOWN_INPUT = new String[] { "Input is of unknown type" };
+
 	public WarningContentProvider(final IPreferenceStore prefs) {
 		super();
 		this.prefs = prefs;
@@ -25,8 +31,7 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 	public Object[] getElements(final Object projectName) {
 
 		if (projectName.equals("")) {
-			final String[] noSelectedProject = { "No project currently selected" };
-			return noSelectedProject;
+			return NO_SELECTED_PROJECT;
 
 		} else if (projectName instanceof String) {
 
@@ -52,16 +57,14 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 					return warnings;
 				} catch (final CoreException e) {
 					e.printStackTrace();
-					return new String[] { "error occurred obtaining dependencies" };
+					return ERR_OBTAINING_DEPENDENCIES;
 				}
 			} else {
-				final String[] projectNotActivated = { "Black Duck scan not activated for current project" };
-				return projectNotActivated;
+				return PROJECT_NOT_ACTIVATED;
 			}
 
 		} else {
-			final String[] unknownInputType = { "input is of unknown type" };
-			return unknownInputType;
+			return ERR_UNKNOWN_INPUT;
 		}
 	}
 
