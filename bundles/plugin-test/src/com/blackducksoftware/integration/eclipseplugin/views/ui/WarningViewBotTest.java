@@ -85,8 +85,8 @@ public class WarningViewBotTest {
 	public void testThatWarningViewOpensFromContextMenu() {
 		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
-		final SWTBotMenu warningViewMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK)
-				.contextMenu(MenuLabels.WARNING_VIEW);
+		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
+		final SWTBotMenu warningViewMenu = blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW);
 		warningViewMenu.click();
 		assertNotNull(bot.viewByTitle(ViewNames.WARNING));
 		assertTrue(bot.viewById(ViewIds.WARNING).isActive());

@@ -6,7 +6,6 @@
     <groupId>com.blackducksoftware.integration</groupId>
     <artifactId>hub-eclipse-plugin-root</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
   </parent>
 
   <artifactId>hub-eclipse-plugin-test</artifactId>
@@ -162,6 +161,7 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
 
