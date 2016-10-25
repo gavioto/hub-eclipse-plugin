@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.eclipseplugin.common.services;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.internal.resources.ResourceException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -25,7 +26,11 @@ public class ProjectInformationService {
 	}
 
 	public boolean isJavaProject(final IProject project) throws CoreException {
-		return project.hasNature(JavaCore.NATURE_ID);
+		try {
+			return project.hasNature(JavaCore.NATURE_ID);
+		} catch (final ResourceException e) {
+			return false;
+		}
 	}
 
 	public int getNumBinaryDependencies(final IPackageFragmentRoot[] packageFragmentRoots) throws CoreException {
