@@ -7,19 +7,59 @@
             allPopups="false"
             locationURI="popup:blackduck?after=additions">
          <command
-               commandId="com.blackduck.integration.popupmenu.OpenWarningView"
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
+         		label="Black Duck Authorization..."
+         		style="push">
+         </command>
+         <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
+         		label="Black Duck Proxy Settings..."
+         		style="push">
+         </command>
+         <command
+               commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Warning View"
                style="push">
+              <visibleWhen>
+         		<with
+         				variable="selection">
+         			<iterate
+         					ifEmpty="false">
+         				<adapt
+         						type="org.eclipse.core.resources.IProject">
+         					<test
+         							property="org.eclipse.core.resources.projectNature"
+         							value="org.eclipse.jdt.core.javanature">
+         					</test>
+         				</adapt>
+         			</iterate>
+         		</with>
+         	</visibleWhen>
          </command>
          <command
-               commandId="com.blackduck.integration.popupmenu.RunScan"
-               label="Run Scan"
-               style="push">
-         </command>
-         <command
-               commandId="com.blackduck.integration.popupmenu.OpenPreferences"
+               commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
                label="Scanning Preferences..."
                style="push">
+         </command>
+         <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
+         		label="Project Preferences..."
+         		style="push">
+         	<visibleWhen>
+         		<with
+         				variable="selection">
+         			<iterate
+         					ifEmpty="false">
+         				<adapt
+         						type="org.eclipse.core.resources.IProject">
+         					<test
+         							property="org.eclipse.core.resources.projectNature"
+         							value="org.eclipse.jdt.core.javanature">
+         					</test>
+         				</adapt>
+         			</iterate>
+         		</with>
+         	</visibleWhen>	
          </command>
       </menuContribution>
       <menuContribution
@@ -34,19 +74,29 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
+      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenBlackDuckAuthorizationDialog"
+      		id="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
+      		name="Open Black Duck Authorization Dialog">
+      </command>
+      <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenWarningView"
-            id="com.blackduck.integration.popupmenu.OpenWarningView"
+            id="com.blackducksoftware.integration.popupmenu.OpenWarningView"
             name="Open Warning View">
       </command>
       <command
-            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.RunScan"
-            id="com.blackduck.integration.popupmenu.RunScan"
-            name="Run Scan">
+            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenPreferences"
+            id="com.blackducksoftware.integration.popupmenu.OpenPreferences"
+            name="Open Preferences">
       </command>
       <command
-            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenPreferences"
-            id="com.blackduck.integration.popupmenu.OpenPreferences"
-            name="Open Preferences">
+      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenProjectPreferences"
+      		id="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
+      		name="Open Project Preferences">
+      </command>
+      <command
+      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenBlackDuckProxyInfoDialog"
+      		id="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
+      		name="Open Proxy Server Settings Dialog">
       </command>
    </extension>
    <extension
@@ -57,8 +107,8 @@
       >
       </category>
       <view
-            class="com.blackducksoftware.integration.eclipseplugin.views.WarningView"
-            id="com.blackduck.integration.eclipseplugin.views.WarningView"
+            class="com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView"
+            id="com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView"
             name="Warning View"
             category="com.blackducksoftware.integration.eclipseplugin.views"
             restorable="true">
@@ -67,11 +117,21 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.blackducksoftware.integration.eclipseplugin.preferences.ScanningPreferences"
-            id="com.blackduck.integration.eclipseplugin.preferences.ScanningPreferences"
-            name="Scanning Preferences">
+            class="com.blackducksoftware.integration.eclipseplugin.preferences.BlackDuckPreferences"
+            id="BlackDuck"
+            name="Black Duck">
+      </page>
+      <page
+      		class="com.blackducksoftware.integration.eclipseplugin.preferences.ActiveJavaProjects"
+      		id="ActiveJavaProjects"
+      		name="Active Java Projects"
+      		category="BlackDuck">
+      </page>
+      <page
+      		class="com.blackducksoftware.integration.eclipseplugin.preferences.ProjectSpecificPreferenceDefaults"
+      		id="ProjectSpecificPreferenceDefaults"
+      		name="Project Specific Preference Defaults"
+      		category="BlackDuck">
       </page>
    </extension>
-
-
 </plugin>

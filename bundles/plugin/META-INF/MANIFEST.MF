@@ -11,7 +11,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: ./target/dependencies, ., ./lib/build-tool-common.jar, ./lib/hub-common.jar, ./lib/org.restlet.ext.httpclient.jar, ./lib/org.restlet.jar, ./lib/integration-common.jar
+Bundle-ClassPath: .,
+ target/dependencies/, 
+ lib/
 Import-Package: com.google.gson;version="2.2.4",
  com.google.gson.reflect;version="2.2.4",
  org.apache.commons.codec;version="1.6.0",

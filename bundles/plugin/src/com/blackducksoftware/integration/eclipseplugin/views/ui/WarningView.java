@@ -46,7 +46,7 @@ public class WarningView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		display = PlatformUI.getWorkbench().getDisplay();
-		preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this);
+		preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this, display);
 		projectDeletedListener = new ProjectDeletedListener(this, display);
 		projectDependenciesChangeListener = new ProjectDependenciesChangeListener(this, display);
 		projectSelectionListener = new ProjectSelectionListener(this);
