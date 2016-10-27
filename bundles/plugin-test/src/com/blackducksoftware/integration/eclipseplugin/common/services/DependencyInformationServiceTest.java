@@ -3,6 +3,8 @@ package com.blackducksoftware.integration.eclipseplugin.common.services;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.JavaCore;
@@ -44,24 +46,32 @@ public class DependencyInformationServiceTest {
 	public void testIsMavenDependency() {
 		PowerMockito.mockStatic(JavaCore.class);
 		Mockito.when(JavaCore.getClasspathVariable(ClasspathVariables.MAVEN)).thenReturn(mavenPath);
-		Mockito.when(mavenPath.toString()).thenReturn(fakeMavenClasspathVariable);
+		Mockito.when(mavenPath.toString()).thenReturn(getSystemSpecificFilepath(fakeMavenClasspathVariable, "/"));
 		for (final String dependency : MAVEN_DEPENDENCIES_TO_TEST) {
-			final String test = StringUtils.join(new String[] { fakeMavenClasspathVariable, dependency }, "/");
+			final String test = StringUtils.join(
+					new String[] { fakeMavenClasspathVariable, getSystemSpecificFilepath(dependency, "/") },
+					File.separator);
 			assertTrue(test + " is not a maven dependency", service.isMavenDependency(test));
 		}
+	}
+
+	private String getSystemSpecificFilepath(final String path, final String separator) {
+		return path.replaceAll(separator, File.separator);
 	}
 
 	@Test
 	public void testIsGradleDependency() {
 		for (final String dependency : GRADLE_DEPENDENCIES_TO_TEST) {
-			assertTrue(dependency + " is not a gradle dependency", service.isGradleDependency(dependency));
+			assertTrue(dependency + " is not a gradle dependency",
+					service.isGradleDependency(getSystemSpecificFilepath(dependency, "/")));
 		}
 	}
 
 	@Test
 	public void testIsNotGradleDependency() {
 		for (final String dependency : NON_GRADLE_DEPENDENCIES_TO_TEST) {
-			assertFalse(dependency + " is a gradle dependency", service.isGradleDependency(dependency));
+			assertFalse(dependency + " is a gradle dependency",
+					service.isGradleDependency(getSystemSpecificFilepath(dependency, "/")));
 		}
 	}
 
