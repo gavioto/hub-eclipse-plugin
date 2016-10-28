@@ -16,6 +16,8 @@
   <modules>
     <module>bundles/plugin</module>
     <module>bundles/plugin-test</module>
+    <module>bundles/plugin-feature</module>
+    <module>bundles/plugin-update-site</module>
   </modules>
 
   <properties>
