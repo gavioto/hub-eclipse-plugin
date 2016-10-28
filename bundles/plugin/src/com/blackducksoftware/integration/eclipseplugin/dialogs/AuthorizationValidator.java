@@ -62,13 +62,10 @@ public class AuthorizationValidator {
 		String errorMessage = null;
 		while (keyIt.hasNext()) {
 			final GlobalFieldKey k = keyIt.next();
-			System.out.println("Key: " + k);
 			final List<ValidationResult> resultList = resultMap.get(k);
 			final Iterator<ValidationResult> resultIt = resultList.iterator();
 			while (resultIt.hasNext()) {
 				final ValidationResult result = resultIt.next();
-				System.out.println("type: " + result.getResultType());
-				System.out.println("message: " + result.getMessage());
 				if (result.getResultType() == ValidationResultEnum.ERROR) {
 					if (errorMessage == null && result.getMessage() != null) {
 						errorMessage = result.getMessage();
@@ -77,9 +74,7 @@ public class AuthorizationValidator {
 					}
 				}
 			}
-			System.out.println();
 		}
-		System.out.println("---------------------------------");
 		return errorMessage;
 	}
 
