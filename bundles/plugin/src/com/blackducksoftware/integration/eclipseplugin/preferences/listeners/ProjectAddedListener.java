@@ -36,7 +36,7 @@ public class ProjectAddedListener implements IResourceChangeListener {
 										service.setAllProjectSpecificDefaults(projectName);
 									}
 								} catch (final CoreException e) {
-									e.printStackTrace();
+
 								}
 							}
 						}

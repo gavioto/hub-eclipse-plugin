@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.eclipseplugin.views.ui;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -13,7 +12,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -81,22 +79,20 @@ public class WarningViewBotTest {
 		assertTrue(true);
 	}
 
-	@Ignore
+	@Test
 	public void testThatWarningViewOpensFromContextMenu() {
 		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
 		node.setFocus();
 		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
 		final SWTBotMenu warningViewMenu = blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW);
 		warningViewMenu.click();
-		assertNotNull(bot.viewByTitle(ViewNames.WARNING));
-		assertTrue(bot.viewById(ViewIds.WARNING).isActive());
 		bot.viewByTitle(ViewNames.WARNING).close();
 	}
 
-	@Ignore
+	@Test
 	public void testThatWarningViewOpensFromWindowMenu() {
 		bot.menu("Window").menu("Show View").menu("Other...").click();
-		bot.waitUntil(Conditions.shellIsActive("Show View"));
+		bot.shell("Show View").activate();
 		bot.tree().expandNode(ViewNames.BLACK_DUCK).expandNode(ViewNames.WARNING).select();
 		bot.waitUntil(new DefaultCondition() {
 			@Override
@@ -110,9 +106,7 @@ public class WarningViewBotTest {
 			}
 		});
 		bot.button("OK").click();
-		assertNotNull(bot.viewByTitle(ViewNames.WARNING));
-		assertTrue(bot.viewByTitle(ViewNames.WARNING).isActive());
-		bot.viewByTitle(ViewNames.WARNING).close();
+		bot.viewById(ViewIds.WARNING).close();
 	}
 
 	@AfterClass
