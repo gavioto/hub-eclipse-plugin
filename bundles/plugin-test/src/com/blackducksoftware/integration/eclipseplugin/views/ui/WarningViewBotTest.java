@@ -25,13 +25,15 @@ import com.blackducksoftware.integration.eclipseplugin.common.constants.MenuLabe
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewIds;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewNames;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class WarningViewBotTest {
 
 	public static SWTWorkbenchBot bot;
 
-	private static final String TEST_PROJECT_NAME = "warning-view-test-project";
+	private static final String TEST_JAVA_PROJECT_NAME = "warning-view-test-java-project";
+	private static final String TEST_NON_JAVA_PROJECT_NAME = "warning-view-test-non-java-project";
 
 	@BeforeClass
 	public static void setUpWorkspaceBot() {
@@ -40,12 +42,12 @@ public class WarningViewBotTest {
 			bot.viewByTitle("Welcome").close();
 		} catch (final RuntimeException e) {
 		}
-		final SWTBotMenu fileMenu = bot.menu("File");
-		final SWTBotMenu projectMenu = fileMenu.menu("New");
-		final SWTBotMenu newMenu = projectMenu.menu("Project...");
+		SWTBotMenu fileMenu = bot.menu("File");
+		SWTBotMenu projectMenu = fileMenu.menu("New");
+		SWTBotMenu newMenu = projectMenu.menu("Project...");
 		newMenu.click();
 		bot.waitUntil(Conditions.shellIsActive("New Project"));
-		final SWTBotTree optionTree = bot.tree();
+		SWTBotTree optionTree = bot.tree();
 		final SWTBotTreeItem javaNode = optionTree.expandNode("Java");
 		bot.waitUntil(new DefaultCondition() {
 			@Override
@@ -72,7 +74,46 @@ public class WarningViewBotTest {
 
 		});
 		bot.button("Next >").click();
-		bot.textWithLabel("Project name:").setText(TEST_PROJECT_NAME);
+		bot.textWithLabel("Project name:").setText(TEST_JAVA_PROJECT_NAME);
+		bot.button("Finish").click();
+		try {
+			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
+			bot.button("Yes").click();
+		} catch (final TimeoutException e) {
+		}
+		fileMenu = bot.menu("File");
+		projectMenu = fileMenu.menu("New");
+		newMenu = projectMenu.menu("Project...");
+		newMenu.click();
+		bot.waitUntil(Conditions.shellIsActive("New Project"));
+		optionTree = bot.tree();
+		final SWTBotTreeItem generalNode = optionTree.expandNode("General");
+		bot.waitUntil(new DefaultCondition() {
+			@Override
+			public String getFailureMessage() {
+				return "Java Project node unavailable";
+			}
+
+			@Override
+			public boolean test() throws Exception {
+				return generalNode.isExpanded();
+			}
+		});
+		generalNode.expandNode("Project").select();
+		bot.waitUntil(new DefaultCondition() {
+			@Override
+			public String getFailureMessage() {
+				return "unable to select Next button";
+			}
+
+			@Override
+			public boolean test() throws Exception {
+				return bot.button("Next >").isEnabled();
+			}
+
+		});
+		bot.button("Next >").click();
+		bot.textWithLabel("Project name:").setText(TEST_NON_JAVA_PROJECT_NAME);
 		bot.button("Finish").click();
 		try {
 			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
@@ -83,7 +124,8 @@ public class WarningViewBotTest {
 
 	@Test
 	public void testThatWarningViewOpensFromContextMenu() {
-		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
+		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_JAVA_PROJECT_NAME);
 		node.setFocus();
 		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
 		final SWTBotMenu warningViewMenu = blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW);
@@ -121,7 +163,8 @@ public class WarningViewBotTest {
 
 	@Test
 	public void testWarningViewLabels() {
-		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
+		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_JAVA_PROJECT_NAME);
 		node.setFocus();
 		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
 		final SWTBotMenu warningViewMenu = blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW);
@@ -155,18 +198,98 @@ public class WarningViewBotTest {
 			}
 			i++;
 		}
+		bot.viewByTitle(ViewNames.WARNING).close();
+	}
+
+	@Test
+	public void testWhenProjectDeleted() {
+		final SWTBotTreeItem javaProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_JAVA_PROJECT_NAME);
+		javaProjectNode.setFocus();
+		final SWTBotMenu blackDuckMenu = javaProjectNode.select().contextMenu(MenuLabels.BLACK_DUCK);
+		final SWTBotMenu warningViewMenu = blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW);
+		warningViewMenu.click();
+		final SWTBotTreeItem nonJavaProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_NON_JAVA_PROJECT_NAME);
+		nonJavaProjectNode.contextMenu().menu("Delete").click();
+		bot.waitUntil(Conditions.shellIsActive("Delete Resources"));
+		bot.checkBox().select();
+		bot.button("OK").click();
+		bot.waitUntil(Conditions.shellCloses(bot.shell("Delete Resources")));
+		final SWTBotView warningView = bot.viewByTitle(ViewNames.WARNING);
+		assertEquals(WarningContentProvider.NO_SELECTED_PROJECT[0], warningView.bot().table().cell(0, 0));
+		bot.viewByTitle(ViewNames.WARNING);
+		final SWTBotMenu fileMenu = bot.menu("File");
+		final SWTBotMenu projectMenu = fileMenu.menu("New");
+		final SWTBotMenu newMenu = projectMenu.menu("Project...");
+		newMenu.click();
+		bot.waitUntil(Conditions.shellIsActive("New Project"));
+		final SWTBotTree optionTree = bot.tree();
+		final SWTBotTreeItem generalNode = optionTree.expandNode("General");
+		bot.waitUntil(new DefaultCondition() {
+			@Override
+			public String getFailureMessage() {
+				return "Java Project node unavailable";
+			}
+
+			@Override
+			public boolean test() throws Exception {
+				return generalNode.isExpanded();
+			}
+		});
+		generalNode.expandNode("Project").select();
+		bot.waitUntil(new DefaultCondition() {
+			@Override
+			public String getFailureMessage() {
+				return "unable to select Next button";
+			}
+
+			@Override
+			public boolean test() throws Exception {
+				return bot.button("Next >").isEnabled();
+			}
+
+		});
+		bot.button("Next >").click();
+		bot.textWithLabel("Project name:").setText(TEST_NON_JAVA_PROJECT_NAME);
+		bot.button("Finish").click();
+		try {
+			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
+			bot.button("Yes").click();
+		} catch (final TimeoutException e) {
+		}
+	}
+
+	@Test
+	public void testForNonJavaProject() {
+		final SWTBotTreeItem javaProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_JAVA_PROJECT_NAME);
+		javaProjectNode.setFocus();
+		final SWTBotMenu blackDuckMenu = javaProjectNode.select().contextMenu(MenuLabels.BLACK_DUCK);
+		final SWTBotMenu warningViewMenu = blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW);
+		warningViewMenu.click();
+		final SWTBotTreeItem nonJavaProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_NON_JAVA_PROJECT_NAME);
+		nonJavaProjectNode.click();
+		final SWTBotView warningView = bot.viewByTitle(ViewNames.WARNING);
+		assertEquals(WarningContentProvider.PROJECT_NOT_ACTIVATED[0], warningView.bot().table().cell(0, 0));
+		bot.viewById(ViewIds.WARNING).close();
 	}
 
 	@Test
 	public void testColumnContents() {
-		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(TEST_PROJECT_NAME);
+		final SWTBotTreeItem node = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_JAVA_PROJECT_NAME);
 		node.setFocus();
 		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
 		final SWTBotMenu warningViewMenu = blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW);
 		warningViewMenu.click();
 		final SWTBotView warningView = bot.viewByTitle(ViewNames.WARNING);
-		node.click();
-		System.out.println(warningView.bot().table().rowCount());
+		final SWTBotTreeItem nonJavaProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(TEST_NON_JAVA_PROJECT_NAME);
+		nonJavaProjectNode.click();
+		System.out.println(warningView.bot().table().cell(0, Warning.COMPONENT_COLUMN_INDEX));
+		bot.viewByTitle(ViewNames.WARNING).close();
 	}
 
 	@AfterClass
