@@ -34,12 +34,6 @@ public class AuthorizationValidator {
 	public String validateCredentials(final String username, final String password, final String hubUrl,
 			final String proxyUsername, final String proxyPassword, final String proxyPort, final String proxyHost,
 			final String ignoredProxyHosts, final String timeout) {
-		/*
-		 * if (hubUrl == null || hubUrl.equals("") || username == null ||
-		 * username.equals("") || password == null || password.equals("")) {
-		 * return CREDENTIAL_MISSING_MESSAGE; } if (timeout == null ||
-		 * timeout.equals("")) { return TIMEOUT_MISSING_MESSAGE; }
-		 */
 		final HubServerConfigBuilder builder = new HubServerConfigBuilder();
 		setHubServerConfigBuilderFields(builder, username, password, hubUrl, proxyUsername, proxyPassword, proxyPort,
 				proxyHost, ignoredProxyHosts, timeout);
