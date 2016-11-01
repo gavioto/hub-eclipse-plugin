@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.eclipseplugin.preferences;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -41,22 +40,16 @@ public class ActiveJavaProjects extends PreferencePage implements IWorkbenchPref
 		final FilePathGavExtractor extractor = new FilePathGavExtractor();
 		final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
 		final WorkspaceInformationService workspaceService = new WorkspaceInformationService(projService);
-
-		try {
-			final String[] names = workspaceService.getJavaProjectNames();
-			activeProjectPreferences = new BooleanFieldEditor[names.length];
-			for (int i = 0; i < names.length; i++) {
-				final BooleanFieldEditor isActive = new BooleanFieldEditor(names[i], names[i], activeProjectsComposite);
-				isActive.setPage(this);
-				isActive.setPreferenceStore(getPreferenceStore());
-				isActive.load();
-				activeProjectPreferences[i] = isActive;
-			}
-			return activeProjectsComposite;
-		} catch (final CoreException e) {
-			e.printStackTrace();
-			return activeProjectsComposite;
+		final String[] names = workspaceService.getJavaProjectNames();
+		activeProjectPreferences = new BooleanFieldEditor[names.length];
+		for (int i = 0; i < names.length; i++) {
+			final BooleanFieldEditor isActive = new BooleanFieldEditor(names[i], names[i], activeProjectsComposite);
+			isActive.setPage(this);
+			isActive.setPreferenceStore(getPreferenceStore());
+			isActive.load();
+			activeProjectPreferences[i] = isActive;
 		}
+		return activeProjectsComposite;
 	}
 
 	@Override
@@ -66,8 +59,8 @@ public class ActiveJavaProjects extends PreferencePage implements IWorkbenchPref
 
 	@Override
 	public boolean performOk() {
+		storeValues();
 		if (super.performOk()) {
-			storeValues();
 			return true;
 		} else {
 			return false;

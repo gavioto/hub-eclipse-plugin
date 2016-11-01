@@ -15,7 +15,7 @@ import com.blackducksoftware.integration.eclipseplugin.preferences.listeners.Pro
 
 public class Activator extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID = "com.blackduck.integration.eclipseplugin"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.blackduck.integration.eclipseplugin";
 
 	private static Activator plugin;
 
@@ -25,8 +25,8 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void start(final BundleContext context) throws Exception {
 
+		super.start(context);
 		plugin = this;
-
 		final DependencyInformationService depService = new DependencyInformationService();
 		final FilePathGavExtractor extractor = new FilePathGavExtractor();
 		final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
@@ -36,8 +36,6 @@ public class Activator extends AbstractUIPlugin {
 		final ProjectAddedListener projectAddedListener = new ProjectAddedListener(defaultPrefService);
 		final DefaultPreferenceChangeListener defaultPrefChangeListener = new DefaultPreferenceChangeListener(
 				defaultPrefService);
-
-		super.start(context);
 
 		defaultPrefService.setDefaultConfig();
 		final String[] projectNames = workspaceService.getJavaProjectNames();

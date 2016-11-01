@@ -10,7 +10,13 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 public class SWTBotUtils {
 
-	public void createJavaProject(final String projectName, final SWTWorkbenchBot bot) {
+	private final SWTWorkbenchBot bot;
+
+	public SWTBotUtils(final SWTWorkbenchBot bot) {
+		this.bot = bot;
+	}
+
+	public void createJavaProject(final String projectName) {
 		final SWTBotMenu fileMenu = bot.menu("File");
 		final SWTBotMenu projectMenu = fileMenu.menu("New");
 		final SWTBotMenu newMenu = projectMenu.menu("Project...");
@@ -52,7 +58,7 @@ public class SWTBotUtils {
 		}
 	}
 
-	public void createNonJavaProject(final String projectName, final SWTWorkbenchBot bot) {
+	public void createNonJavaProject(final String projectName) {
 		final SWTBotMenu fileMenu = bot.menu("File");
 		final SWTBotMenu projectMenu = fileMenu.menu("New");
 		final SWTBotMenu newMenu = projectMenu.menu("Project...");
@@ -94,7 +100,7 @@ public class SWTBotUtils {
 		}
 	}
 
-	public void createMavenProject(final String groupId, final String artifactId, final SWTWorkbenchBot bot) {
+	public void createMavenProject(final String groupId, final String artifactId) {
 		final SWTBotMenu fileMenu = bot.menu("File");
 		final SWTBotMenu projectMenu = fileMenu.menu("New");
 		final SWTBotMenu newMenu = projectMenu.menu("Project...");
@@ -150,9 +156,58 @@ public class SWTBotUtils {
 			bot.button("Yes").click();
 		} catch (final TimeoutException e) {
 		}
+		bot.sleep(2000);
 	}
 
-	public void deleteProjectFromDisk(final String projectName, final SWTWorkbenchBot bot) {
+	public void updateMavenProject(final String projectName) {
+		final SWTBotTreeItem mavenProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(projectName);
+		final SWTBotMenu mavenMenu = mavenProjectNode.contextMenu().menu("Maven");
+		mavenMenu.menu("Update Project...").click();
+		bot.waitUntil(Conditions.shellIsActive("Update Maven Project"));
+		bot.waitUntil(new DefaultCondition() {
+
+			@Override
+			public boolean test() throws Exception {
+				return bot.button("OK").isEnabled();
+			}
+
+			@Override
+			public String getFailureMessage() {
+				return "OK button not enabled";
+			}
+
+		});
+		bot.button("OK").click();
+	}
+
+	public void addMavenDependency(final String projectName, final String groupId, final String artifactId,
+			final String version) {
+		final SWTBotTreeItem mavenProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
+				.getTreeItem(projectName);
+		final SWTBotMenu mavenMenu = mavenProjectNode.contextMenu().menu("Maven");
+		mavenMenu.menu("Add Dependency").click();
+		bot.waitUntil(Conditions.shellIsActive("Add Dependency"));
+		bot.text(0).setText(groupId);
+		bot.text(1).setText(artifactId);
+		bot.text(2).setText(version);
+		bot.waitUntil(new DefaultCondition() {
+
+			@Override
+			public boolean test() throws Exception {
+				return bot.button("OK").isEnabled();
+			}
+
+			@Override
+			public String getFailureMessage() {
+				return "OK button not enabled";
+			}
+
+		});
+		bot.button("OK").click();
+	}
+
+	public void deleteProjectFromDisk(final String projectName) {
 		final SWTBotTreeItem nonJavaProjectNode = bot.viewByTitle("Package Explorer").bot().tree()
 				.getTreeItem(projectName);
 		nonJavaProjectNode.contextMenu().menu("Delete").click();

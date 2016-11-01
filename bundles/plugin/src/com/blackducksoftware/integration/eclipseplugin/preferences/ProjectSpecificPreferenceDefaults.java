@@ -1,22 +1,14 @@
 package com.blackducksoftware.integration.eclipseplugin.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.blackducksoftware.integration.eclipseplugin.common.constants.ProjectSpecificPreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 public class ProjectSpecificPreferenceDefaults extends PreferencePage implements IWorkbenchPreferencePage {
-
-	private RadioGroupFieldEditor activateAutomatically;
 
 	@Override
 	public void init(final IWorkbench workbench) {
@@ -25,19 +17,7 @@ public class ProjectSpecificPreferenceDefaults extends PreferencePage implements
 
 	@Override
 	protected Control createContents(final Composite parent) {
-		final Composite automaticActivationComposite = new Composite(parent, SWT.LEFT);
-		automaticActivationComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		automaticActivationComposite.setLayout(new GridLayout());
-
-		final Label automaticActivationLabel = new Label(automaticActivationComposite, SWT.HORIZONTAL);
-		automaticActivationLabel.setText("Activate Black Duck");
-		final String[][] labelsAndValues = new String[][] { { "Activate Scan Automatically", "true" },
-				{ "Do Not Activate Scan Automatically", "false" } };
-		activateAutomatically = new RadioGroupFieldEditor(ProjectSpecificPreferenceNames.ACTIVATE_PROJECT,
-				"Activate Scan Automatically for New Projects", 2, labelsAndValues, automaticActivationComposite);
-		activateAutomatically.setPage(this);
-		activateAutomatically.setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		activateAutomatically.load();
+		// implement when project-specific preferences are fleshed out
 		return null;
 	}
 
@@ -57,12 +37,12 @@ public class ProjectSpecificPreferenceDefaults extends PreferencePage implements
 	}
 
 	private void storeValues() {
-		activateAutomatically.store();
+		// implement when project-specific preferences are fleshed out
 	}
 
 	@Override
 	protected void performDefaults() {
-		activateAutomatically.loadDefault();
+		// implement when project-specific preferences are fleshed out
 	}
 
 }

@@ -22,7 +22,7 @@ public class WorkspaceInformationService {
 		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
 	}
 
-	public int getNumJavaProjects() throws CoreException {
+	public int getNumJavaProjects() {
 		final IProject[] projects = getAllProjects();
 		int numJava = 0;
 		for (final IProject project : projects) {
@@ -33,18 +33,22 @@ public class WorkspaceInformationService {
 		return numJava;
 	}
 
-	public String[] getJavaProjectNames() throws CoreException {
+	public String[] getJavaProjectNames() {
 		final IProject[] projects = getAllProjects();
 		final int numJavaProjects = getNumJavaProjects();
 		final String[] names = new String[numJavaProjects];
 		int javaIndex = 0;
 		for (final IProject project : projects) {
 			if (projectInformationService.isJavaProject(project)) {
-				final IProjectDescription projectDescription = project.getDescription();
-				if (projectDescription != null) {
-					final String projectName = projectDescription.getName();
-					names[javaIndex] = projectName;
-					javaIndex++;
+				try {
+					final IProjectDescription projectDescription = project.getDescription();
+					if (projectDescription != null) {
+						final String projectName = projectDescription.getName();
+						names[javaIndex] = projectName;
+						javaIndex++;
+					}
+				} catch (final CoreException e) {
+
 				}
 			}
 		}

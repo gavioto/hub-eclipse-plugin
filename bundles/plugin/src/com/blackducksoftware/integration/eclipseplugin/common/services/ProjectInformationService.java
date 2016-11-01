@@ -1,7 +1,6 @@
 package com.blackducksoftware.integration.eclipseplugin.common.services;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.core.internal.resources.ResourceException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -9,6 +8,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
@@ -25,42 +25,70 @@ public class ProjectInformationService {
 		this.extractor = extractor;
 	}
 
-	public boolean isJavaProject(final IProject project) throws CoreException {
+	public boolean isJavaProject(final IProject project) {
 		try {
 			return project.hasNature(JavaCore.NATURE_ID);
-		} catch (final ResourceException e) {
+		} catch (final CoreException e) {
 			return false;
 		}
 	}
 
-	public int getNumBinaryDependencies(final IPackageFragmentRoot[] packageFragmentRoots) throws CoreException {
+	public int getNumBinaryDependencies(final IPackageFragmentRoot[] packageFragmentRoots) {
 		int numBinary = 0;
 		for (final IPackageFragmentRoot root : packageFragmentRoots) {
-			if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
-				numBinary++;
+			try {
+				if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
+					numBinary++;
+				}
+			} catch (final JavaModelException e) {
 			}
 		}
 		return numBinary;
 	}
 
-	public String[] getBinaryDependencyFilepaths(final IPackageFragmentRoot[] packageFragmentRoots)
-			throws CoreException {
+	public String[] getBinaryDependencyFilepaths(final IPackageFragmentRoot[] packageFragmentRoots) {
 		final int numBinary = getNumBinaryDependencies(packageFragmentRoots);
 		final String[] dependencyFilepaths = new String[numBinary];
 		int i = 0;
 		for (final IPackageFragmentRoot root : packageFragmentRoots) {
-			if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
-				final IPath path = root.getPath();
-				final String device = path.getDevice();
-				String osString = path.toOSString();
-				if (device != null) {
-					osString = osString.replaceFirst(device, "");
+			try {
+				if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
+					final IPath path = root.getPath();
+					final String device = path.getDevice();
+					String osString = path.toOSString();
+					if (device != null) {
+						osString = osString.replaceFirst(device, "");
+					}
+					dependencyFilepaths[i] = osString;
+					i++;
 				}
-				dependencyFilepaths[i] = osString;
-				i++;
+			} catch (final JavaModelException e) {
 			}
 		}
 		return dependencyFilepaths;
+	}
+
+	public String[] getMavenAndGradleDependencies(final String projectName) {
+		if (projectName.equals("")) {
+			return new String[0];
+		}
+		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		if (project == null) {
+			return new String[0];
+		}
+		if (isJavaProject(project)) {
+			final IJavaProject javaProject = JavaCore.create(project);
+			IPackageFragmentRoot[] packageFragmentRoots;
+			try {
+				packageFragmentRoots = javaProject.getPackageFragmentRoots();
+				final String[] dependencyFilepaths = getBinaryDependencyFilepaths(packageFragmentRoots);
+				return getGavsFromFilepaths(dependencyFilepaths);
+			} catch (final JavaModelException e) {
+				return new String[0];
+			}
+		} else {
+			return new String[0];
+		}
 	}
 
 	public int getNumMavenAndGradleDependencies(final String[] dependencyFilepaths) {
@@ -99,23 +127,5 @@ public class ProjectInformationService {
 		final String[] elements = new String[] { "group: " + gav.getGroupId(), "artifact: " + gav.getArtifactId(),
 				"version: " + gav.getVersion() };
 		return StringUtils.join(elements, ", ");
-	}
-
-	public String[] getMavenAndGradleDependencies(final String projectName) throws CoreException {
-		if (projectName.equals("")) {
-			return new String[0];
-		}
-		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (project == null) {
-			return new String[0];
-		}
-		if (isJavaProject(project)) {
-			final IJavaProject javaProject = JavaCore.create(project);
-			final IPackageFragmentRoot[] packageFragmentRoots = javaProject.getPackageFragmentRoots();
-			final String[] dependencyFilepaths = getBinaryDependencyFilepaths(packageFragmentRoots);
-			return getGavsFromFilepaths(dependencyFilepaths);
-		} else {
-			return new String[0];
-		}
 	}
 }

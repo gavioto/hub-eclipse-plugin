@@ -35,17 +35,21 @@ public class WarningViewBotTest {
 	private static final String TEST_NON_JAVA_PROJECT_NAME = "warning-view-test-non-java-project";
 	private static final String TEST_MAVEN_PROJECT_GROUP_ID = "test.group.id";
 	private static final String TEST_MAVEN_PROJECT_ARTIFACT_ID = "test.artifact.id";
+	private static final String[][] TEST_GAVS = new String[][] { new String[] { "junit", "junit", "4.12" },
+			new String[] { "org.hamcrest", "hamcrest-core", "1.3" },
+			new String[] { "org.mockito", "mockito-all", "1.10.19" },
+			new String[] { "nl.jqno.equalsverifier", "equalsverifier", "2.1.6" } };
 
 	@BeforeClass
 	public static void setUpWorkspaceBot() {
 		bot = new SWTWorkbenchBot();
-		botUtils = new SWTBotUtils();
+		botUtils = new SWTBotUtils(bot);
 		try {
 			bot.viewByTitle("Welcome").close();
 		} catch (final RuntimeException e) {
 		}
-		botUtils.createJavaProject(TEST_JAVA_PROJECT_NAME, bot);
-		botUtils.createNonJavaProject(TEST_NON_JAVA_PROJECT_NAME, bot);
+		botUtils.createJavaProject(TEST_JAVA_PROJECT_NAME);
+		botUtils.createNonJavaProject(TEST_NON_JAVA_PROJECT_NAME);
 	}
 
 	private void openWarningViewFromContextMenu(final String projectName) {
@@ -132,12 +136,12 @@ public class WarningViewBotTest {
 
 	@Test
 	public void testWhenProjectDeleted() {
-		botUtils.deleteProjectFromDisk(TEST_NON_JAVA_PROJECT_NAME, bot);
+		botUtils.deleteProjectFromDisk(TEST_NON_JAVA_PROJECT_NAME);
 		openWarningViewFromWindowMenu();
 		final SWTBotView warningView = bot.viewByTitle(ViewNames.WARNING);
 		assertEquals(WarningContentProvider.NO_SELECTED_PROJECT[0], warningView.bot().table().cell(0, 0));
 		bot.viewByTitle(ViewNames.WARNING).close();
-		botUtils.createNonJavaProject(TEST_NON_JAVA_PROJECT_NAME, bot);
+		botUtils.createNonJavaProject(TEST_NON_JAVA_PROJECT_NAME);
 	}
 
 	@Test
@@ -153,7 +157,14 @@ public class WarningViewBotTest {
 
 	@Test
 	public void testDisplayingMavenProjectDependencies() {
-		botUtils.createMavenProject(TEST_MAVEN_PROJECT_GROUP_ID, TEST_MAVEN_PROJECT_ARTIFACT_ID, bot);
+		botUtils.createMavenProject(TEST_MAVEN_PROJECT_GROUP_ID, TEST_MAVEN_PROJECT_ARTIFACT_ID);
+		for (final String[] gav : TEST_GAVS) {
+			botUtils.addMavenDependency(TEST_MAVEN_PROJECT_ARTIFACT_ID, gav[0], gav[1], gav[2]);
+		}
+		botUtils.updateMavenProject(TEST_MAVEN_PROJECT_ARTIFACT_ID);
+		openWarningViewFromContextMenu(TEST_MAVEN_PROJECT_ARTIFACT_ID);
+		bot.sleep(10000);
+		bot.viewById(ViewIds.WARNING).close();
 	}
 
 	@AfterClass

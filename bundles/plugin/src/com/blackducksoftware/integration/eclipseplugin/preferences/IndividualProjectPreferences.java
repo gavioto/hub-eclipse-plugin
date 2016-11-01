@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.eclipseplugin.preferences;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -13,7 +12,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.blackducksoftware.integration.eclipseplugin.common.constants.ProjectSpecificPreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 /*
@@ -44,7 +42,6 @@ public class IndividualProjectPreferences extends PreferencePage implements IWor
 
 	@Override
 	public void init(final IWorkbench workbench) {
-		// TODO Auto-generated method stub
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 	}
 
@@ -53,14 +50,7 @@ public class IndividualProjectPreferences extends PreferencePage implements IWor
 		final Composite displayWarningsComposite = new Composite(parent, SWT.LEFT);
 		displayWarningsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		displayWarningsComposite.setLayout(new GridLayout());
-
-		final String displayWarningsPropertyId = StringUtils
-				.join(new String[] { projectId, ProjectSpecificPreferenceNames.ACTIVATE_PROJECT }, ':');
-		displayWarnings = new BooleanFieldEditor(displayWarningsPropertyId, "Activate Black Duck scan",
-				displayWarningsComposite);
-		displayWarnings.setPage(this);
-		displayWarnings.setPreferenceStore(getPreferenceStore());
-		displayWarnings.load();
+		// implement this
 		return displayWarningsComposite;
 	}
 
@@ -81,12 +71,11 @@ public class IndividualProjectPreferences extends PreferencePage implements IWor
 
 	private void storeValues() {
 		final IPreferenceStore prefStore = getPreferenceStore();
-		prefStore.setValue(displayWarnings.getPreferenceName(), displayWarnings.getBooleanValue());
+		// implement this
 	}
 
 	@Override
 	protected void performDefaults() {
-
 		displayWarnings.loadDefault();
 		super.performDefaults();
 	}

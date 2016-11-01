@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.eclipseplugin.preferences.listeners;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
@@ -28,13 +27,9 @@ public class DefaultPreferenceChangeListener implements IPropertyChangeListener 
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		try {
-			final String[] projectNames = workspaceService.getJavaProjectNames();
-			for (final String projectName : projectNames) {
-				defaultPreferencesService.setAllProjectSpecificDefaults(projectName);
-			}
-		} catch (final CoreException e) {
-			e.printStackTrace();
+		final String[] projectNames = workspaceService.getJavaProjectNames();
+		for (final String projectName : projectNames) {
+			defaultPreferencesService.setAllProjectSpecificDefaults(projectName);
 		}
 	}
 }

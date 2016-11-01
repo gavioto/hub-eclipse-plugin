@@ -1,10 +1,8 @@
 package com.blackducksoftware.integration.eclipseplugin.common.services;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
-import com.blackducksoftware.integration.eclipseplugin.common.constants.ProjectSpecificPreferenceNames;
 
 public class DefaultPreferencesService {
 
@@ -15,22 +13,11 @@ public class DefaultPreferencesService {
 	}
 
 	public void setDefaultConfig() {
-		prefStore.setDefault(ProjectSpecificPreferenceNames.ACTIVATE_PROJECT, "true");
 		prefStore.setDefault(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT, "true");
 	}
 
 	public void setAllProjectSpecificDefaults(final String projectName) {
-		prefStore.setValue(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT, "true");
-		final String activateProject = StringUtils
-				.join(new String[] { projectName, ProjectSpecificPreferenceNames.ACTIVATE_PROJECT }, ':');
-		if (prefStore.getString(ProjectSpecificPreferenceNames.ACTIVATE_PROJECT) != null
-				&& prefStore.getString(ProjectSpecificPreferenceNames.ACTIVATE_PROJECT).equals("true")) {
-			prefStore.setDefault(activateProject, true);
-		} else {
-			prefStore.setDefault(activateProject, false);
-		}
-		if (prefStore.getString(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT) != null
-				&& prefStore.getString(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT).equals("true")) {
+		if (prefStore.getString(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT).equals("true")) {
 			prefStore.setDefault(projectName, true);
 		} else {
 			prefStore.setDefault(projectName, false);
