@@ -33,6 +33,8 @@ public class WarningViewBotTest {
 
 	private static final String TEST_JAVA_PROJECT_NAME = "warning-view-test-java-project";
 	private static final String TEST_NON_JAVA_PROJECT_NAME = "warning-view-test-non-java-project";
+	private static final String TEST_MAVEN_PROJECT_GROUP_ID = "test.group.id";
+	private static final String TEST_MAVEN_PROJECT_ARTIFACT_ID = "test.artifact.id";
 
 	@BeforeClass
 	public static void setUpWorkspaceBot() {
@@ -147,6 +149,11 @@ public class WarningViewBotTest {
 		final SWTBotView warningView = bot.viewByTitle(ViewNames.WARNING);
 		assertEquals(WarningContentProvider.PROJECT_NOT_ACTIVATED[0], warningView.bot().table().cell(0, 0));
 		bot.viewById(ViewIds.WARNING).close();
+	}
+
+	@Test
+	public void testDisplayingMavenProjectDependencies() {
+		botUtils.createMavenProject(TEST_MAVEN_PROJECT_GROUP_ID, TEST_MAVEN_PROJECT_ARTIFACT_ID, bot);
 	}
 
 	@AfterClass

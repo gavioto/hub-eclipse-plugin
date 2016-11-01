@@ -129,8 +129,8 @@ public class SWTBotUtils {
 		bot.button("Next >").click();
 		bot.checkBox("Create a simple project (skip archetype selection)").select();
 		bot.button("Next >").click();
-		bot.textWithLabel("Group Id").setText(groupId);
-		bot.textWithLabel("Artifact Id").setText(artifactId);
+		bot.comboBox(0).setText(groupId);
+		bot.comboBox(1).setText(artifactId);
 		bot.waitUntil(new DefaultCondition() {
 
 			@Override
