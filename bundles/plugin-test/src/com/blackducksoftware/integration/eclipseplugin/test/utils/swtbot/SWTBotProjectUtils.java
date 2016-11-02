@@ -1,6 +1,7 @@
-package com.blackducksoftware.integration.eclipseplugin.test.utils;
+package com.blackducksoftware.integration.eclipseplugin.test.utils.swtbot;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -8,11 +9,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
-public class SWTBotUtils {
+public class SWTBotProjectUtils {
 
 	private final SWTWorkbenchBot bot;
 
-	public SWTBotUtils(final SWTWorkbenchBot bot) {
+	public SWTBotProjectUtils(final SWTWorkbenchBot bot) {
 		this.bot = bot;
 	}
 
@@ -214,7 +215,10 @@ public class SWTBotUtils {
 		bot.waitUntil(Conditions.shellIsActive("Delete Resources"));
 		bot.checkBox().select();
 		bot.button("OK").click();
-		bot.waitUntil(Conditions.shellCloses(bot.shell("Delete Resources")));
+		try {
+			bot.waitUntil(Conditions.shellCloses(bot.shell("Delete Resources")));
+		} catch (final WidgetNotFoundException e) {
+		}
 	}
 
 	public void deleteProjectFromWorkspace(final String projectName, final SWTWorkbenchBot bot) {
@@ -223,7 +227,10 @@ public class SWTBotUtils {
 		nonJavaProjectNode.contextMenu().menu("Delete").click();
 		bot.waitUntil(Conditions.shellIsActive("Delete Resources"));
 		bot.button("OK").click();
-		bot.waitUntil(Conditions.shellCloses(bot.shell("Delete Resources")));
+		try {
+			bot.waitUntil(Conditions.shellCloses(bot.shell("Delete Resources")));
+		} catch (final WidgetNotFoundException e) {
+		}
 	}
 
 }

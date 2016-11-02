@@ -4,22 +4,21 @@ import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.MenuLabels;
+import com.blackducksoftware.integration.eclipseplugin.test.utils.swtbot.SWTBotProjectUtils;
 
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class PopupMenuTest {
 
 	public static SWTWorkbenchBot bot;
+	public static SWTBotProjectUtils botProjectUtils;
 
 	private static final String TEST_JAVA_PROJECT_NAME = "popup-menu-test-java-project";
 	private static final String TEST_NON_JAVA_PROJECT_NAME = "popup-menu-test-non-java-project";
@@ -27,88 +26,13 @@ public class PopupMenuTest {
 	@BeforeClass
 	public static void setUpWorkspaceBot() {
 		bot = new SWTWorkbenchBot();
+		botProjectUtils = new SWTBotProjectUtils(bot);
 		try {
 			bot.viewByTitle("Welcome").close();
 		} catch (final RuntimeException e) {
 		}
-		SWTBotMenu fileMenu = bot.menu("File");
-		SWTBotMenu projectMenu = fileMenu.menu("New");
-		SWTBotMenu newMenu = projectMenu.menu("Project...");
-		newMenu.click();
-		bot.waitUntil(Conditions.shellIsActive("New Project"));
-		SWTBotTree optionTree = bot.tree();
-		final SWTBotTreeItem javaNode = optionTree.expandNode("Java");
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "Java Project node unavailable";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return javaNode.isExpanded();
-			}
-		});
-		javaNode.expandNode("Java Project").select();
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "unable to select Next button";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("Next >").isEnabled();
-			}
-
-		});
-		bot.button("Next >").click();
-		bot.textWithLabel("Project name:").setText(TEST_JAVA_PROJECT_NAME);
-		bot.button("Finish").click();
-		try {
-			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
-			bot.button("Yes").click();
-		} catch (final TimeoutException e) {
-		}
-		fileMenu = bot.menu("File");
-		projectMenu = fileMenu.menu("New");
-		newMenu = projectMenu.menu("Project...");
-		newMenu.click();
-		bot.waitUntil(Conditions.shellIsActive("New Project"));
-		optionTree = bot.tree();
-		final SWTBotTreeItem generalNode = optionTree.expandNode("General");
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "Java Project node unavailable";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return generalNode.isExpanded();
-			}
-		});
-		generalNode.expandNode("Project").select();
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "unable to select Next button";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("Next >").isEnabled();
-			}
-
-		});
-		bot.button("Next >").click();
-		bot.textWithLabel("Project name:").setText(TEST_NON_JAVA_PROJECT_NAME);
-		bot.button("Finish").click();
-		try {
-			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
-			bot.button("Yes").click();
-		} catch (final TimeoutException e) {
-		}
+		botProjectUtils.createJavaProject(TEST_JAVA_PROJECT_NAME);
+		botProjectUtils.createNonJavaProject(TEST_NON_JAVA_PROJECT_NAME);
 	}
 
 	@Test
@@ -133,6 +57,13 @@ public class PopupMenuTest {
 		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_AUTHORIZATION));
 		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_PROXY_SETTINGS));
 		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.SCANNING_PREFERENCES));
+	}
+
+	@AfterClass
+	public static void tearDownWorkspace() {
+		botProjectUtils.deleteProjectFromDisk(TEST_JAVA_PROJECT_NAME);
+		botProjectUtils.deleteProjectFromDisk(TEST_NON_JAVA_PROJECT_NAME);
+		bot.resetWorkbench();
 	}
 
 }

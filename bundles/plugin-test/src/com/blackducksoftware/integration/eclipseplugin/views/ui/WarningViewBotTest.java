@@ -22,14 +22,14 @@ import com.blackducksoftware.integration.eclipseplugin.common.constants.MenuLabe
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewIds;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewNames;
 import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
-import com.blackducksoftware.integration.eclipseplugin.test.utils.SWTBotUtils;
+import com.blackducksoftware.integration.eclipseplugin.test.utils.swtbot.SWTBotProjectUtils;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class WarningViewBotTest {
 
 	private static SWTWorkbenchBot bot;
-	private static SWTBotUtils botUtils;
+	private static SWTBotProjectUtils botUtils;
 
 	private static final String TEST_JAVA_PROJECT_NAME = "warning-view-test-java-project";
 	private static final String TEST_NON_JAVA_PROJECT_NAME = "warning-view-test-non-java-project";
@@ -43,7 +43,7 @@ public class WarningViewBotTest {
 	@BeforeClass
 	public static void setUpWorkspaceBot() {
 		bot = new SWTWorkbenchBot();
-		botUtils = new SWTBotUtils(bot);
+		botUtils = new SWTBotProjectUtils(bot);
 		try {
 			bot.viewByTitle("Welcome").close();
 		} catch (final RuntimeException e) {
@@ -169,6 +169,9 @@ public class WarningViewBotTest {
 
 	@AfterClass
 	public static void tearDownWorkspaceBot() {
+		botUtils.deleteProjectFromDisk(TEST_JAVA_PROJECT_NAME);
+		botUtils.deleteProjectFromDisk(TEST_MAVEN_PROJECT_ARTIFACT_ID);
+		botUtils.deleteProjectFromDisk(TEST_NON_JAVA_PROJECT_NAME);
 		bot.resetWorkbench();
 	}
 

@@ -6,14 +6,10 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,59 +17,24 @@ import org.junit.runner.RunWith;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.DialogTitles;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.MenuLabels;
+import com.blackducksoftware.integration.eclipseplugin.test.utils.swtbot.SWTBotProjectUtils;
 
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class AuthorizationDialogBotTest {
 
 	private static SWTWorkbenchBot bot;
+	private static SWTBotProjectUtils botProjectUtils;
 	private final static String TEST_PROJECT_NAME = "authorization-dialog-test-project";
 
 	@BeforeClass
 	public static void setupWorkspaceBot() {
 		bot = new SWTWorkbenchBot();
+		botProjectUtils = new SWTBotProjectUtils(bot);
 		try {
 			bot.viewByTitle("Welcome").close();
 		} catch (final RuntimeException e) {
 		}
-		final SWTBotMenu fileMenu = bot.menu("File");
-		final SWTBotMenu projectMenu = fileMenu.menu("New");
-		final SWTBotMenu newMenu = projectMenu.menu("Project...");
-		newMenu.click();
-		bot.waitUntil(Conditions.shellIsActive("New Project"));
-		final SWTBotTree optionTree = bot.tree();
-		final SWTBotTreeItem javaNode = optionTree.expandNode("Java");
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "couldn't expand java node";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return javaNode.isExpanded();
-			}
-		});
-		javaNode.expandNode("Java Project").select();
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "unable to select Next button";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("Next >").isEnabled();
-			}
-
-		});
-		bot.button("Next >").click();
-		bot.textWithLabel("Project name:").setText(TEST_PROJECT_NAME);
-		bot.button("Finish").click();
-		try {
-			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
-			bot.button("Yes").click();
-		} catch (final TimeoutException e) {
-		}
+		botProjectUtils.createJavaProject(TEST_PROJECT_NAME);
 	}
 
 	@Test
@@ -148,6 +109,7 @@ public class AuthorizationDialogBotTest {
 
 	@AfterClass
 	public static void teardownWorkspaceBot() {
+		botProjectUtils.deleteProjectFromDisk(TEST_PROJECT_NAME);
 		bot.resetWorkbench();
 	}
 
