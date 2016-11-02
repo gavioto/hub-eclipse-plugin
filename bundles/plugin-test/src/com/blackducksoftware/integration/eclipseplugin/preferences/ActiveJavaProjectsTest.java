@@ -11,7 +11,6 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -80,7 +79,7 @@ public class ActiveJavaProjectsTest {
 		bot.activeShell().close();
 	}
 
-	@Ignore
+	@Test
 	public void testThatBlackDuckDefaultWorks() {
 		botPrefUtils.restoreAllBlackDuckDefaults();
 		botPrefUtils.getActiveJavaProjectsPage();

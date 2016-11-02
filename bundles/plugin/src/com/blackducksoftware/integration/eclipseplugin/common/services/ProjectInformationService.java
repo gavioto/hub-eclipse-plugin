@@ -26,16 +26,9 @@ public class ProjectInformationService {
 	}
 
 	public boolean isJavaProject(final IProject project) {
-		System.out.println("Java Project?");
 		try {
-			if (project.hasNature(JavaCore.NATURE_ID)) {
-				System.out.println("true");
-			} else {
-				System.out.println("false");
-			}
 			return project.hasNature(JavaCore.NATURE_ID);
 		} catch (final CoreException e) {
-			System.out.println("issue determining");
 			return false;
 		}
 	}
