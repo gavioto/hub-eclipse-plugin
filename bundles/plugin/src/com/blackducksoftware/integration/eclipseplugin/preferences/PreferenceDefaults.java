@@ -15,10 +15,11 @@ import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
 
 public class PreferenceDefaults extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private final String ACTIVATE_BY_DEFAULT_LABEL = "Default Scan Activation Settings";
+	public static final String ACTIVATE_BY_DEFAULT_LABEL = "Default Scan Activation Settings";
+	public static final String ACTIVATE_BY_DEFAULT = "Activate Scan by Default";
+	public static final String DO_NOT_ACTIVATE_BY_DEFAULT = "Do Not Activate Scan by Default";
 	private final String[][] DEFAULT_ACTIVATION_LABELS_AND_VALUES = new String[][] {
-			new String[] { "Activate Scan by Default", "true" },
-			new String[] { "Do Not Activate Scan by Default", "false" } };
+			new String[] { ACTIVATE_BY_DEFAULT, "true" }, new String[] { DO_NOT_ACTIVATE_BY_DEFAULT, "false" } };
 	private RadioGroupFieldEditor activateByDefault;
 
 	@Override
