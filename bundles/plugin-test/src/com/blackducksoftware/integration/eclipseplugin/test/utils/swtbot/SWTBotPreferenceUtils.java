@@ -108,6 +108,7 @@ public class SWTBotPreferenceUtils {
 		getDefaultSettingsPage();
 		final SWTBot pageBot = bot.activeShell().bot();
 		pageBot.button("Restore Defaults").click();
+		bot.sleep(5000);
 		pageBot.button("OK").click();
 		try {
 			bot.waitUntil(Conditions.shellCloses(bot.shell("Preferences")));

@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
+import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
 
 /*
  * Class that implements the general Black Duck preferences page

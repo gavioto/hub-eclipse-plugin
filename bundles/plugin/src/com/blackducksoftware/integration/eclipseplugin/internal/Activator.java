@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.popupmenu;
+package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;

@@ -11,7 +11,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
-import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
+import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
 
 public class PreferenceDefaults extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -47,7 +47,6 @@ public class PreferenceDefaults extends PreferencePage implements IWorkbenchPref
 
 	private void storeValues() {
 		activateByDefault.store();
-		System.out.println(getPreferenceStore().getString(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT));
 	}
 
 	@Override

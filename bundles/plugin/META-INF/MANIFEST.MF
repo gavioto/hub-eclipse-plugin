@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Plugin
 Bundle-SymbolicName: hub-eclipse-plugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator
+Bundle-Activator: com.blackducksoftware.integration.eclipseplugin.internal.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,

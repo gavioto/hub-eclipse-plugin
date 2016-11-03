@@ -16,7 +16,7 @@ import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
-import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
+import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
 
 public class ActiveJavaProjects extends PreferencePage implements IWorkbenchPreferencePage {
 

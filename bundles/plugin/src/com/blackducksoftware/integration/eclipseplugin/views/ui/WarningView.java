@@ -19,7 +19,7 @@ import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
-import com.blackducksoftware.integration.eclipseplugin.popupmenu.Activator;
+import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.PreferenceChangeDisplayUpdateListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDeletedListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDependenciesChangeListener;

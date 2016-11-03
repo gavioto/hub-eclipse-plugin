@@ -26,7 +26,7 @@ public class ProjectAddedListener implements IResourceChangeListener {
 				final IResourceDelta[] childrenDeltas = event.getDelta().getAffectedChildren();
 				if (childrenDeltas != null) {
 					for (final IResourceDelta delta : childrenDeltas) {
-						if (delta.getKind() == IResourceDelta.ADDED) {
+						if (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED) {
 							if (delta.getResource() != null) {
 								final IResource resource = delta.getResource();
 								try {
@@ -36,7 +36,6 @@ public class ProjectAddedListener implements IResourceChangeListener {
 										service.setAllProjectSpecificDefaults(projectName);
 									}
 								} catch (final CoreException e) {
-
 								}
 							}
 						}
