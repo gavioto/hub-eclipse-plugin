@@ -1,14 +1,7 @@
 package com.blackducksoftware.integration.eclipseplugin.dialogs;
 
 import java.net.URISyntaxException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.blackducksoftware.integration.builder.ValidationResult;
 import com.blackducksoftware.integration.builder.ValidationResultEnum;
 import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
@@ -49,27 +42,7 @@ public class AuthorizationValidator {
 				return e.getMessage();
 			}
 		}
-
-		final Map<GlobalFieldKey, List<ValidationResult>> resultMap = results.getResultMap();
-		final Set<GlobalFieldKey> keySet = resultMap.keySet();
-		final Iterator<GlobalFieldKey> keyIt = keySet.iterator();
-		String errorMessage = null;
-		while (keyIt.hasNext()) {
-			final GlobalFieldKey k = keyIt.next();
-			final List<ValidationResult> resultList = resultMap.get(k);
-			final Iterator<ValidationResult> resultIt = resultList.iterator();
-			while (resultIt.hasNext()) {
-				final ValidationResult result = resultIt.next();
-				if (result.getResultType() == ValidationResultEnum.ERROR) {
-					if (errorMessage == null && result.getMessage() != null) {
-						errorMessage = result.getMessage();
-					} else {
-						errorMessage = StringUtils.join(new String[] { errorMessage, result.getMessage() }, '\n');
-					}
-				}
-			}
-		}
-		return errorMessage;
+		return results.getAllResultString(ValidationResultEnum.ERROR);
 	}
 
 	private void setHubServerConfigBuilderFields(final HubServerConfigBuilder builder, final String username,
