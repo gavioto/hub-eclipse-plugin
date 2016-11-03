@@ -40,6 +40,8 @@ public class SWTBotPreferenceUtils {
 				if (window != null) {
 					final Menu appMenu = workbench.getDisplay().getSystemMenu();
 					for (final MenuItem item : appMenu.getItems()) {
+						System.out.println("ITEMS:");
+						System.out.println(item.getText());
 						if (item.getText().startsWith("Preferences")) {
 							final Event event = new Event();
 							event.time = (int) System.currentTimeMillis();
