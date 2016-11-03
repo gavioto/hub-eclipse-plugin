@@ -32,14 +32,17 @@ public class SWTBotPreferenceUtils {
 
 	public void openBlackDuckPreferencesFromEclipseMenu() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
+		System.out.println("ATTEMPTING TO OPEN PREFERENCES FROM ECLIPSE APP MENU");
 		workbench.getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+				System.out.println("----------------");
+				System.out.println("RUNNING");
 				final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 				if (window != null) {
 					final Menu appMenu = workbench.getDisplay().getSystemMenu();
+					System.out.println("ITEMS:");
 					for (final MenuItem item : appMenu.getItems()) {
-						System.out.println("ITEMS:");
 						System.out.println(item.getText());
 						if (item.getText().startsWith("Preferences")) {
 							final Event event = new Event();
@@ -54,6 +57,7 @@ public class SWTBotPreferenceUtils {
 				} else {
 					System.out.println("WINDOW WAS NULL");
 				}
+				System.out.println("----------------");
 			}
 		});
 		bot.waitUntil(Conditions.shellIsActive("Preferences"));
