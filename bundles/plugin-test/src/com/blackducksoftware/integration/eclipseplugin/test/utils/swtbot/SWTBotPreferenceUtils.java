@@ -8,7 +8,6 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -123,19 +122,7 @@ public class SWTBotPreferenceUtils {
 		openBlackDuckPreferencesFromEclipseMenu();
 		final SWTBot prefBot = bot.activeShell().bot();
 		final SWTBotTreeItem blackDuck = prefBot.tree().expandNode(PreferencePageNames.BLACK_DUCK);
-		bot.waitUntil(new DefaultCondition() {
-
-			@Override
-			public boolean test() throws Exception {
-				return blackDuck.isExpanded();
-			}
-
-			@Override
-			public String getFailureMessage() {
-				return "could not expand Black Duck preference node";
-			}
-
-		});
+		bot.waitUntil(new TreeItemIsExpandedCondition(blackDuck));
 		blackDuck.getNode(PreferencePageNames.ACTIVE_JAVA_PROJECTS).click();
 	}
 
@@ -143,19 +130,7 @@ public class SWTBotPreferenceUtils {
 		openBlackDuckPreferencesFromEclipseMenu();
 		final SWTBot pageBot = bot.activeShell().bot();
 		final SWTBotTreeItem blackDuck = pageBot.tree().expandNode(PreferencePageNames.BLACK_DUCK);
-		bot.waitUntil(new DefaultCondition() {
-
-			@Override
-			public boolean test() throws Exception {
-				return blackDuck.isExpanded();
-			}
-
-			@Override
-			public String getFailureMessage() {
-				return "Could not expand Black Duck preference node";
-			}
-
-		});
+		bot.waitUntil(new TreeItemIsExpandedCondition(blackDuck));
 		blackDuck.getNode(PreferencePageNames.BLACK_DUCK_DEFAULTS).click();
 	}
 

@@ -3,7 +3,7 @@ package com.blackducksoftware.integration.eclipseplugin.test.utils.swtbot;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -25,31 +25,11 @@ public class SWTBotProjectUtils {
 		bot.waitUntil(Conditions.shellIsActive("New Project"));
 		final SWTBotTree optionTree = bot.tree();
 		final SWTBotTreeItem javaNode = optionTree.expandNode("Java");
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "Java Project node unavailable";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return javaNode.isExpanded();
-			}
-		});
+		bot.waitUntil(new TreeItemIsExpandedCondition(javaNode));
 		javaNode.expandNode("Java Project").select();
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "unable to select Next button";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("Next >").isEnabled();
-			}
-
-		});
-		bot.button("Next >").click();
+		final SWTBotButton nextButton = bot.button("Next >");
+		bot.waitUntil(new ButtonIsEnabledCondition(nextButton));
+		nextButton.click();
 		bot.textWithLabel("Project name:").setText(projectName);
 		bot.button("Finish").click();
 		try {
@@ -67,31 +47,11 @@ public class SWTBotProjectUtils {
 		bot.waitUntil(Conditions.shellIsActive("New Project"));
 		final SWTBotTree optionTree = bot.tree();
 		final SWTBotTreeItem generalNode = optionTree.expandNode("General");
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "General node unavailable";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return generalNode.isExpanded();
-			}
-		});
+		bot.waitUntil(new TreeItemIsExpandedCondition(generalNode));
 		generalNode.expandNode("Project").select();
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "unable to select Next button";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("Next >").isEnabled();
-			}
-
-		});
-		bot.button("Next >").click();
+		final SWTBotButton nextButton = bot.button("Next >");
+		bot.waitUntil(new ButtonIsEnabledCondition(nextButton));
+		nextButton.click();
 		bot.textWithLabel("Project name:").setText(projectName);
 		bot.button("Finish").click();
 		try {
@@ -109,49 +69,18 @@ public class SWTBotProjectUtils {
 		bot.waitUntil(Conditions.shellIsActive("New Project"));
 		final SWTBotTree optionTree = bot.tree();
 		final SWTBotTreeItem mavenNode = optionTree.expandNode("Maven");
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "Maven node unavailable";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return mavenNode.isExpanded();
-			}
-		});
+		bot.waitUntil(new TreeItemIsExpandedCondition(mavenNode));
 		mavenNode.expandNode("Maven Project").select();
-		bot.waitUntil(new DefaultCondition() {
-			@Override
-			public String getFailureMessage() {
-				return "unable to select Next button";
-			}
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("Next >").isEnabled();
-			}
-
-		});
-		bot.button("Next >").click();
+		final SWTBotButton nextButton = bot.button("Next >");
+		bot.waitUntil(new ButtonIsEnabledCondition(nextButton));
+		nextButton.click();
 		bot.checkBox("Create a simple project (skip archetype selection)").select();
 		bot.button("Next >").click();
 		bot.comboBox(0).setText(groupId);
 		bot.comboBox(1).setText(artifactId);
-		bot.waitUntil(new DefaultCondition() {
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("Finish").isEnabled();
-			}
-
-			@Override
-			public String getFailureMessage() {
-				return "unable to select Finish button";
-			}
-
-		});
-		bot.button("Finish").click();
+		final SWTBotButton finishButton = bot.button("Finish");
+		bot.waitUntil(new ButtonIsEnabledCondition(finishButton));
+		finishButton.click();
 		try {
 			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
 			bot.button("Yes").click();
@@ -166,20 +95,9 @@ public class SWTBotProjectUtils {
 		final SWTBotMenu mavenMenu = mavenProjectNode.contextMenu().menu("Maven");
 		mavenMenu.menu("Update Project...").click();
 		bot.waitUntil(Conditions.shellIsActive("Update Maven Project"));
-		bot.waitUntil(new DefaultCondition() {
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("OK").isEnabled();
-			}
-
-			@Override
-			public String getFailureMessage() {
-				return "OK button not enabled";
-			}
-
-		});
-		bot.button("OK").click();
+		final SWTBotButton okButton = bot.button("OK");
+		bot.waitUntil(new ButtonIsEnabledCondition(okButton));
+		okButton.click();
 	}
 
 	public void addMavenDependency(final String projectName, final String groupId, final String artifactId,
@@ -192,20 +110,9 @@ public class SWTBotProjectUtils {
 		bot.text(0).setText(groupId);
 		bot.text(1).setText(artifactId);
 		bot.text(2).setText(version);
-		bot.waitUntil(new DefaultCondition() {
-
-			@Override
-			public boolean test() throws Exception {
-				return bot.button("OK").isEnabled();
-			}
-
-			@Override
-			public String getFailureMessage() {
-				return "OK button not enabled";
-			}
-
-		});
-		bot.button("OK").click();
+		final SWTBotButton okButton = bot.button("OK");
+		bot.waitUntil(new ButtonIsEnabledCondition(okButton));
+		okButton.click();
 	}
 
 	public void deleteProjectFromDisk(final String projectName) {
