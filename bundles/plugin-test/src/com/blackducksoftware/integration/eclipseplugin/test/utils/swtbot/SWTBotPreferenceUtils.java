@@ -51,6 +51,8 @@ public class SWTBotPreferenceUtils {
 							break;
 						}
 					}
+				} else {
+					System.out.println("WINDOW WAS NULL");
 				}
 			}
 		});
