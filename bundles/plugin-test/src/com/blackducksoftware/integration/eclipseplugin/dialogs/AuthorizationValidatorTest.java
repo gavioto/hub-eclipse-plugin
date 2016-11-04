@@ -2,17 +2,13 @@ package com.blackducksoftware.integration.eclipseplugin.dialogs;
 
 import static org.junit.Assert.assertEquals;
 
-import java.net.URISyntaxException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
-import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -82,29 +78,5 @@ public class AuthorizationValidatorTest {
 				null, null, FAKE_TIMEOUT);
 		assertEquals(AuthorizationValidator.LOGIN_SUCCESS_MESSAGE, message);
 
-	}
-
-	@Test
-	public void testWhenSetCookiesThrowsBDRestException() throws URISyntaxException, BDRestException {
-		final AuthorizationValidator validator = new AuthorizationValidator(connectionService);
-		final BDRestException e = Mockito.mock(BDRestException.class);
-		Mockito.when(e.getMessage()).thenReturn(BD_REST_EXCEPTION_MESSAGE);
-		Mockito.when(connectionService.getRestConnection(FAKE_URL)).thenReturn(connection);
-		Mockito.doThrow(e).when(connectionService).setCookies(connection, FAKE_USERNAME, FAKE_PASSWORD);
-		final String message = validator.validateCredentials(FAKE_USERNAME, FAKE_PASSWORD, FAKE_URL, null, null, null,
-				null, null, FAKE_TIMEOUT);
-		assertEquals(BD_REST_EXCEPTION_MESSAGE, message);
-	}
-
-	@Test
-	public void testWhenSetCookiesThrowsURISyntaxException() throws URISyntaxException, BDRestException {
-		final AuthorizationValidator validator = new AuthorizationValidator(connectionService);
-		final URISyntaxException e = Mockito.mock(URISyntaxException.class);
-		Mockito.when(e.getMessage()).thenReturn(URI_SYNTAX_EXCEPTION_MESSAGE);
-		Mockito.when(connectionService.getRestConnection(FAKE_URL)).thenReturn(connection);
-		Mockito.doThrow(e).when(connectionService).setCookies(connection, FAKE_USERNAME, FAKE_PASSWORD);
-		final String message = validator.validateCredentials(FAKE_USERNAME, FAKE_PASSWORD, FAKE_URL, null, null, null,
-				null, null, FAKE_TIMEOUT);
-		assertEquals(URI_SYNTAX_EXCEPTION_MESSAGE, message);
 	}
 }

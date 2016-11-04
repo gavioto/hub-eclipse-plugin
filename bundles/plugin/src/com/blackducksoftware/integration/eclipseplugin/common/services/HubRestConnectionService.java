@@ -2,16 +2,14 @@ package com.blackducksoftware.integration.eclipseplugin.common.services;
 
 import java.net.URISyntaxException;
 
+import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.global.HubServerConfig;
+import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 
 public class HubRestConnectionService {
-	public RestConnection getRestConnection(final String url) {
-		return new RestConnection(url);
-	}
-
-	public void setCookies(final RestConnection connection, final String username, final String password)
-			throws URISyntaxException, BDRestException {
-		connection.setCookies(username, password);
+	public CredentialsRestConnection getCredentialsRestConnection(final HubServerConfig config)
+			throws IllegalArgumentException, URISyntaxException, BDRestException, EncryptionException {
+		return new CredentialsRestConnection(config);
 	}
 }

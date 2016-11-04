@@ -5,11 +5,11 @@ import java.net.URISyntaxException;
 import com.blackducksoftware.integration.builder.ValidationResultEnum;
 import com.blackducksoftware.integration.builder.ValidationResults;
 import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
+import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.exception.BDRestException;
 import com.blackducksoftware.integration.hub.global.GlobalFieldKey;
 import com.blackducksoftware.integration.hub.global.HubServerConfig;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class AuthorizationValidator {
 	private final HubRestConnectionService connectionService;
@@ -32,15 +32,19 @@ public class AuthorizationValidator {
 				proxyHost, ignoredProxyHosts, timeout);
 		final ValidationResults<GlobalFieldKey, HubServerConfig> results = builder.buildResults();
 		if (results.isSuccess()) {
-			final RestConnection connection = connectionService.getRestConnection(hubUrl);
 			try {
-				connectionService.setCookies(connection, username, password);
+				connectionService.getCredentialsRestConnection(results.getConstructedObject());
 				return LOGIN_SUCCESS_MESSAGE;
+			} catch (final IllegalArgumentException e) {
+				return e.getMessage();
 			} catch (final URISyntaxException e) {
 				return e.getMessage();
 			} catch (final BDRestException e) {
 				return e.getMessage();
+			} catch (final EncryptionException e) {
+				return e.getMessage();
 			}
+
 		}
 		return results.getAllResultString(ValidationResultEnum.ERROR);
 	}
