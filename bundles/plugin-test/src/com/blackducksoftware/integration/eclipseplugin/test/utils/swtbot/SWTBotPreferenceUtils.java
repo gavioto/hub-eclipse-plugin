@@ -63,9 +63,15 @@ public class SWTBotPreferenceUtils {
 		});
 		try {
 			bot.waitUntil(Conditions.shellIsActive("Preferences"));
-		} catch (final TimeoutException e) {
-			bot.menu("Window").menu("Preferences").click();
-			bot.waitUntil(Conditions.shellIsActive("Preferences"));
+		} catch (final TimeoutException e1) {
+			try {
+				bot.menu("Window").menu("Preferences").click();
+				bot.waitUntil(Conditions.shellIsActive("Preferences"));
+			} catch (final WidgetNotFoundException e2) {
+				bot.activeShell().close();
+				bot.menu("Window").menu("Preferences").click();
+				bot.waitUntil(Conditions.shellIsActive("Preferences"));
+			}
 		}
 	}
 
