@@ -9,7 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
-import com.blackducksoftware.integration.hub.rest.RestConnection;
+import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AuthorizationValidatorTest {
@@ -17,7 +17,7 @@ public class AuthorizationValidatorTest {
 	@Mock
 	HubRestConnectionService connectionService;
 	@Mock
-	RestConnection connection;
+	CredentialsRestConnection connection;
 
 	private final String FAKE_URL = "http://www.google.com/";
 	private final String FAKE_USERNAME = "fakeUsername";

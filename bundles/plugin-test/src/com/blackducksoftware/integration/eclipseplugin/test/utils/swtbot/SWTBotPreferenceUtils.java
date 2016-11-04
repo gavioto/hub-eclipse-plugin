@@ -9,6 +9,7 @@ import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -60,7 +61,12 @@ public class SWTBotPreferenceUtils {
 				System.out.println("----------------");
 			}
 		});
-		bot.waitUntil(Conditions.shellIsActive("Preferences"));
+		try {
+			bot.waitUntil(Conditions.shellIsActive("Preferences"));
+		} catch (final TimeoutException e) {
+			bot.menu("Window").menu("Preferences").click();
+			bot.waitUntil(Conditions.shellIsActive("Preferences"));
+		}
 	}
 
 	public void setPrefsToActivateScanByDefault() {
