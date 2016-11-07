@@ -6,23 +6,22 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
 import com.blackducksoftware.integration.build.Gav;
-import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
-import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
-import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
-import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
+import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependencyInformation;
 
 public class WarningContentProvider extends ArrayContentProvider implements IStructuredContentProvider {
 
 	private final IPreferenceStore prefs;
+	private final ProjectDependencyInformation information;
 
 	public static final String[] NO_SELECTED_PROJECT = new String[] { "No open project currently selected" };
 	public static final String[] PROJECT_NOT_ACTIVATED = new String[] {
 			"Black Duck scan not activated for current project" };
 	public static final String[] ERR_UNKNOWN_INPUT = new String[] { "Input is of unknown type" };
 
-	public WarningContentProvider(final IPreferenceStore prefs) {
+	public WarningContentProvider(final IPreferenceStore prefs, final ProjectDependencyInformation information) {
 		super();
 		this.prefs = prefs;
+		this.information = information;
 	}
 
 	@Override
@@ -35,19 +34,12 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 
 			final boolean isActivated = prefs.getBoolean((String) projectName);
 			if (isActivated) {
-				Gav[] dependencies;
-				final DependencyInformationService depService = new DependencyInformationService();
-				final FilePathGavExtractor extractor = new FilePathGavExtractor();
-				final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
-				dependencies = projService.getMavenAndGradleDependencies((String) projectName);
-				final Warning[] warnings = new Warning[dependencies.length];
-				for (int i = 0; i < dependencies.length; i++) {
-
-					// eventually this will call the REST API module instead
-					// to construct the warning
-					warnings[i] = new Warning(getGavMessage(dependencies[i]), 0, "", "", "", "", "");
+				final Gav[] gavs = information.getAllDependencyGavs((String) projectName);
+				final String[] messages = new String[gavs.length];
+				for (int i = 0; i < gavs.length; i++) {
+					messages[i] = getGavMessage(gavs[i]);
 				}
-				return warnings;
+				return messages;
 			} else {
 				return PROJECT_NOT_ACTIVATED;
 			}

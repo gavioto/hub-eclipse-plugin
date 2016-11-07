@@ -51,6 +51,10 @@ public class Activator extends AbstractUIPlugin {
 		defaultPrefService.setDefaultConfig();
 	}
 
+	public ProjectDependencyInformation getProjectInformation() {
+		return information;
+	}
+
 	@Override
 	public void stop(final BundleContext context) throws Exception {
 		plugin = null;

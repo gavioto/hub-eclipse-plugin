@@ -5,15 +5,27 @@ import java.util.Iterator;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
+import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
 
 public class ProjectDependencyInformation {
 
 	private final HashMap<String, HashMap<Gav, Warning>> projectInfo;
 	private final ProjectInformationService projService;
 
+	private WarningView warningView;
+
 	public ProjectDependencyInformation(final ProjectInformationService projService) {
 		projectInfo = new HashMap<String, HashMap<Gav, Warning>>();
 		this.projService = projService;
+		this.warningView = null;
+	}
+
+	public void setWarningView(final WarningView warningView) {
+		this.warningView = warningView;
+	}
+
+	public void removeWarningView() {
+		warningView = null;
 	}
 
 	public void addProject(final String projectName) {
@@ -30,6 +42,9 @@ public class ProjectDependencyInformation {
 		final HashMap<Gav, Warning> deps = projectInfo.get(projectName);
 		// API call to make warning
 		deps.put(gav, null);
+		if (warningView != null) {
+			warningView.resetInput();
+		}
 	}
 
 	public void removeProject(final String projectName) {
@@ -39,10 +54,22 @@ public class ProjectDependencyInformation {
 	public void removeWarningFromProject(final String projectName, final Gav gav) {
 		final HashMap<Gav, Warning> dependencies = projectInfo.get(projectName);
 		dependencies.remove(gav);
+		if (warningView != null) {
+			warningView.resetInput();
+		}
 	}
 
 	public boolean containsProject(final String projectName) {
 		return projectInfo.containsKey(projectName);
+	}
+
+	public Gav[] getAllDependencyGavs(final String projectName) {
+		final HashMap<Gav, Warning> dependencyInfo = projectInfo.get(projectName);
+		if (dependencyInfo != null) {
+			return dependencyInfo.keySet().toArray(new Gav[dependencyInfo.keySet().size()]);
+		} else {
+			return new Gav[0];
+		}
 	}
 
 	public void printAllInfo() {

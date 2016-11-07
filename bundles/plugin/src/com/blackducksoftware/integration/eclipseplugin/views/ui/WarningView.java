@@ -2,8 +2,6 @@ package com.blackducksoftware.integration.eclipseplugin.views.ui;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.jdt.core.ElementChangedEvent;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -22,7 +20,6 @@ import com.blackducksoftware.integration.eclipseplugin.common.services.Workspace
 import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.PreferenceChangeDisplayUpdateListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDeletedListener;
-import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDependenciesChangeListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectSelectionListener;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
@@ -36,7 +33,6 @@ public class WarningView extends ViewPart {
 	private String lastSelectedProjectName = "";
 	private PreferenceChangeDisplayUpdateListener preferenceChangeDisplayUpdateListener;
 	private ProjectDeletedListener projectDeletedListener;
-	private ProjectDependenciesChangeListener projectDependenciesChangeListener;
 	private ProjectSelectionListener projectSelectionListener;
 	private Display display;
 	private IPreferenceStore prefs;
@@ -48,22 +44,21 @@ public class WarningView extends ViewPart {
 		display = PlatformUI.getWorkbench().getDisplay();
 		preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this, display);
 		projectDeletedListener = new ProjectDeletedListener(this, display);
-		projectDependenciesChangeListener = new ProjectDependenciesChangeListener(this, display);
 		projectSelectionListener = new ProjectSelectionListener(this);
 		prefs = Activator.getDefault().getPreferenceStore();
 		workspaceInformationService = new WorkspaceInformationService(
 				new ProjectInformationService(new DependencyInformationService(), new FilePathGavExtractor()));
 
-		// add all listeners
-		getSite().getPage().addSelectionListener(projectSelectionListener); // keep
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeDisplayUpdateListener); // keep
+		getSite().getPage().addSelectionListener(projectSelectionListener);
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeDisplayUpdateListener);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeletedListener,
-				IResourceChangeEvent.PRE_DELETE); // keep
-		JavaCore.addElementChangedListener(projectDependenciesChangeListener, ElementChangedEvent.POST_CHANGE); // keep
+				IResourceChangeEvent.PRE_DELETE);
+		Activator.getDefault().getProjectInformation().setWarningView(this);
 
 		tableOfWarnings = new TableViewer(parent,
 				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		tableOfWarnings.setContentProvider(new WarningContentProvider(prefs));
+		tableOfWarnings
+				.setContentProvider(new WarningContentProvider(prefs, Activator.getDefault().getProjectInformation()));
 		createColumns(parent, tableOfWarnings);
 		lastSelectedProjectName = workspaceInformationService.getSelectedProject();
 		tableOfWarnings.setInput(lastSelectedProjectName);
@@ -71,6 +66,15 @@ public class WarningView extends ViewPart {
 		final Table table = tableOfWarnings.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+	}
+
+	public void resetInput() {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				tableOfWarnings.setInput(lastSelectedProjectName);
+			}
+		});
 	}
 
 	public void setLastSelectedProjectName(final String name) {
@@ -89,9 +93,6 @@ public class WarningView extends ViewPart {
 		return tableOfWarnings;
 	}
 
-	/*
-	 * Create the columns
-	 */
 	private void createColumns(final Composite parent, final TableViewer warningTable) {
 		final String[] labels = { "Component", "Match Count", "Match Type", "Usage", "License", "Security Risk",
 				"Operational Risk", };
@@ -123,6 +124,6 @@ public class WarningView extends ViewPart {
 		getSite().getPage().removeSelectionListener(projectSelectionListener);
 		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeDisplayUpdateListener);
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectDeletedListener);
-		JavaCore.removeElementChangedListener(projectDependenciesChangeListener);
+		Activator.getDefault().getProjectInformation().removeWarningView();
 	}
 }

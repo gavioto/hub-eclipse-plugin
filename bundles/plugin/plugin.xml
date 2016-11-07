@@ -59,7 +59,7 @@
          				</adapt>
          			</iterate>
          		</with>
-         	</visibleWhen>	
+         	</visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
