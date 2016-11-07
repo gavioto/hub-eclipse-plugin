@@ -12,12 +12,12 @@ import org.eclipse.jdt.core.JavaCore;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DefaultPreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependencyInformation;
 
-public class ProjectModificationListener implements IResourceChangeListener {
+public class NewJavaProjectListener implements IResourceChangeListener {
 
 	private final DefaultPreferencesService service;
 	private final ProjectDependencyInformation information;
 
-	public ProjectModificationListener(final DefaultPreferencesService service,
+	public NewJavaProjectListener(final DefaultPreferencesService service,
 			final ProjectDependencyInformation information) {
 		this.service = service;
 		this.information = information;
@@ -25,7 +25,6 @@ public class ProjectModificationListener implements IResourceChangeListener {
 
 	@Override
 	public void resourceChanged(final IResourceChangeEvent event) {
-		System.out.println("I_RESOURCE_CHANGE_EVENT");
 		if (event.getSource() != null && event.getSource().equals(ResourcesPlugin.getWorkspace())) {
 			if (event.getDelta() != null) {
 				final IResourceDelta[] childrenDeltas = event.getDelta().getAffectedChildren();
@@ -41,24 +40,10 @@ public class ProjectModificationListener implements IResourceChangeListener {
 										service.setAllProjectSpecificDefaults(projectName);
 										if (!information.containsProject(projectName)) {
 											information.addProject(projectName);
-											System.out.println("PROJECT ADDED: " + projectName);
+											information.printAllInfo();
 										}
 									}
 								} catch (final CoreException e) {
-								}
-							}
-						} else if (delta.getKind() == IResourceDelta.REMOVED) {
-							if (delta.getResource() != null) {
-								final IResource resource = delta.getResource();
-								try {
-									if (resource instanceof IProject
-											&& ((IProject) resource).hasNature(JavaCore.NATURE_ID)) {
-										final String projectName = resource.getName();
-										System.out.println("PROJECT REMOVED: " + projectName);
-										information.removeProject(projectName);
-									}
-								} catch (final CoreException e) {
-
 								}
 							}
 						}
@@ -66,8 +51,6 @@ public class ProjectModificationListener implements IResourceChangeListener {
 				}
 			}
 		}
-		System.out.println("----------------");
-		System.out.flush();
 	}
 
 }

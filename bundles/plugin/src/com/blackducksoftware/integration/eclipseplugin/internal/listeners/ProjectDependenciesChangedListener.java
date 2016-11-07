@@ -47,29 +47,19 @@ public class ProjectDependenciesChangedListener implements IElementChangedListen
 		}
 		case IJavaElement.PACKAGE_FRAGMENT_ROOT: {
 			final String OSSpecificFilepath = el.getPath().toOSString();
-			if (delta.getKind() == IJavaElementDelta.ADDED) {
+			if (delta.getKind() == IJavaElementDelta.ADDED || delta.getKind() == IJavaElementDelta.CHANGED) {
 				if (depService.isMavenDependency(OSSpecificFilepath)) {
 					final IPath mavenPath = JavaCore.getClasspathVariable(ClasspathVariables.MAVEN);
 					if (mavenPath != null) {
 						final String mavenPathString = mavenPath.toOSString();
 						final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPathString);
 						information.addWarningToProject(projectName, gav);
+						information.printAllInfo();
 					}
 				} else if (depService.isGradleDependency(OSSpecificFilepath)) {
 					final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
 					information.addWarningToProject(projectName, gav);
-				}
-			} else if (delta.getKind() == IJavaElementDelta.CHANGED) {
-				if (depService.isMavenDependency(OSSpecificFilepath)) {
-					final IPath mavenPath = JavaCore.getClasspathVariable(ClasspathVariables.MAVEN);
-					if (mavenPath != null) {
-						final String mavenPathString = mavenPath.toOSString();
-						final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPathString);
-						information.addWarningToProject(projectName, gav);
-					}
-				} else if (depService.isGradleDependency(OSSpecificFilepath)) {
-					final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
-					information.addWarningToProject(projectName, gav);
+					information.printAllInfo();
 				}
 			} else if (delta.getKind() == IJavaElementDelta.REMOVED) {
 				if (depService.isMavenDependency(OSSpecificFilepath)) {
@@ -78,10 +68,12 @@ public class ProjectDependenciesChangedListener implements IElementChangedListen
 						final String mavenPathString = mavenPath.toOSString();
 						final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPathString);
 						information.removeWarningFromProject(projectName, gav);
+						information.printAllInfo();
 					}
 				} else if (depService.isGradleDependency(OSSpecificFilepath)) {
 					final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
 					information.removeWarningFromProject(projectName, gav);
+					information.printAllInfo();
 				}
 			}
 			break;

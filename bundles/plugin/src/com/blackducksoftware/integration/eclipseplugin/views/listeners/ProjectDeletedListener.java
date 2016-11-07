@@ -12,7 +12,6 @@ public class ProjectDeletedListener implements IResourceChangeListener {
 	private final Display display;
 
 	public ProjectDeletedListener(final WarningView warningView, final Display display) {
-		super();
 		this.warningView = warningView;
 		this.display = display;
 	}

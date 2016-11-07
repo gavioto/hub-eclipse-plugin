@@ -1,6 +1,7 @@
 package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
@@ -42,6 +43,23 @@ public class ProjectDependencyInformation {
 
 	public boolean containsProject(final String projectName) {
 		return projectInfo.containsKey(projectName);
+	}
+
+	public void printAllInfo() {
+		final Iterator<String> nameIt = projectInfo.keySet().iterator();
+		System.out.println("WORKSPACE INFO:");
+		System.out.println("----------------");
+		while (nameIt.hasNext()) {
+			final String name = nameIt.next();
+			System.out.println("PROJECT: " + name);
+			final Iterator<Gav> gavIt = projectInfo.get(name).keySet().iterator();
+			System.out.println("DEPENDENCIES:");
+			while (gavIt.hasNext()) {
+				final Gav gav = gavIt.next();
+				System.out.println(gav.getGroupId() + ":" + gav.getArtifactId() + ":" + gav.getVersion());
+			}
+			System.out.println("----------------");
+		}
 	}
 
 }
