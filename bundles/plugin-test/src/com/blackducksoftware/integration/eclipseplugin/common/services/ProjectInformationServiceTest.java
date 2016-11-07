@@ -98,19 +98,19 @@ public class ProjectInformationServiceTest {
 	private final String MAVEN_1_GROUP = "maven.1.group";
 	private final String MAVEN_1_ARTIFACT = "maven.1.artifact";
 	private final String MAVEN_1_VERSION = "maven.1.version";
-	private final String MAVEN_1_GAV_MESSAGE = "group: maven.1.group, artifact: maven.1.artifact, version: maven.1.version";
+	private final Gav MAVEN_1_GAV = new Gav(MAVEN_1_GROUP, MAVEN_1_ARTIFACT, MAVEN_1_VERSION);
 	private final String MAVEN_2_GROUP = "maven.2.group";
 	private final String MAVEN_2_ARTIFACT = "maven.2.artifact";
 	private final String MAVEN_2_VERSION = "maven.2.version";
-	private final String MAVEN_2_GAV_MESSAGE = "group: maven.2.group, artifact: maven.2.artifact, version: maven.2.version";
+	private final Gav MAVEN_2_GAV = new Gav(MAVEN_2_GROUP, MAVEN_2_ARTIFACT, MAVEN_2_VERSION);
 	private final String GRADLE_1_GROUP = "gradle.1.group";
 	private final String GRADLE_1_ARTIFACT = "gradle.1.artifact";
 	private final String GRADLE_1_VERSION = "gradle.1.version";
-	private final String GRADLE_1_GAV_MESSAGE = "group: gradle.1.group, artifact: gradle.1.artifact, version: gradle.1.version";
+	private final Gav GRADLE_1_GAV = new Gav(GRADLE_1_GROUP, GRADLE_1_ARTIFACT, GRADLE_1_VERSION);
 	private final String GRADLE_2_GROUP = "gradle.2.group";
 	private final String GRADLE_2_ARTIFACT = "gradle.2.artifact";
 	private final String GRADLE_2_VERSION = "gradle.2.version";
-	private final String GRADLE_2_GAV_MESSAGE = "group: gradle.2.group, artifact: gradle.2.artifact, version: gradle.2.version";
+	private final Gav GRADLE_2_GAV = new Gav(GRADLE_2_GROUP, GRADLE_2_ARTIFACT, GRADLE_2_VERSION);
 
 	@Test
 	public void testGettingNumBinaryDependencies() {
@@ -231,10 +231,10 @@ public class ProjectInformationServiceTest {
 	}
 
 	private void prepareExtractor() {
-		Mockito.when(extractor.getMavenPathGav(MAVEN_1, MAVEN_REPO_PATH)).thenReturn(mavenGav1);
-		Mockito.when(extractor.getMavenPathGav(MAVEN_2, MAVEN_REPO_PATH)).thenReturn(mavenGav2);
-		Mockito.when(extractor.getGradlePathGav(GRADLE_1)).thenReturn(gradleGav1);
-		Mockito.when(extractor.getGradlePathGav(GRADLE_2)).thenReturn(gradleGav2);
+		Mockito.when(extractor.getMavenPathGav(MAVEN_1, MAVEN_REPO_PATH)).thenReturn(MAVEN_1_GAV);
+		Mockito.when(extractor.getMavenPathGav(MAVEN_2, MAVEN_REPO_PATH)).thenReturn(MAVEN_2_GAV);
+		Mockito.when(extractor.getGradlePathGav(GRADLE_1)).thenReturn(GRADLE_1_GAV);
+		Mockito.when(extractor.getGradlePathGav(GRADLE_2)).thenReturn(GRADLE_2_GAV);
 	}
 
 	@Test
@@ -256,24 +256,9 @@ public class ProjectInformationServiceTest {
 		Mockito.when(mavenPath.toString()).thenReturn(MAVEN_REPO_PATH);
 		prepareExtractor();
 		final String[] dependencies = new String[] { MAVEN_1, MAVEN_2, GRADLE_1, GRADLE_2, NOT_GRAVEN_1, NOT_GRAVEN_2 };
-		final String[] gavMessages = service.getGavsFromFilepaths(dependencies);
-		final String[] expectedGavMessages = new String[] { MAVEN_1_GAV_MESSAGE, MAVEN_2_GAV_MESSAGE,
-				GRADLE_1_GAV_MESSAGE, GRADLE_2_GAV_MESSAGE };
-		assertArrayEquals(expectedGavMessages, gavMessages);
-	}
-
-	@Test
-	public void testGettingGavMessage() {
-		final ProjectInformationService service = new ProjectInformationService(depService, extractor);
-		prepareGavElements();
-		final String mavenGavMessage1 = service.getGavMessage(mavenGav1);
-		assertEquals(MAVEN_1_GAV_MESSAGE, mavenGavMessage1);
-		final String mavenGavMessage2 = service.getGavMessage(mavenGav2);
-		assertEquals(MAVEN_2_GAV_MESSAGE, mavenGavMessage2);
-		final String gradleGavMessage1 = service.getGavMessage(gradleGav1);
-		assertEquals(GRADLE_1_GAV_MESSAGE, gradleGavMessage1);
-		final String gradleGavMessage2 = service.getGavMessage(gradleGav2);
-		assertEquals(GRADLE_2_GAV_MESSAGE, gradleGavMessage2);
+		final Gav[] gavs = service.getGavsFromFilepaths(dependencies);
+		final Gav[] expectedGavMessages = new Gav[] { MAVEN_1_GAV, MAVEN_2_GAV, GRADLE_1_GAV, GRADLE_2_GAV };
+		assertArrayEquals(expectedGavMessages, gavs);
 	}
 
 	@Test
@@ -289,8 +274,7 @@ public class ProjectInformationServiceTest {
 			prepareExtractor();
 			final IPackageFragmentRoot[] roots = new IPackageFragmentRoot[] { mavenRoot1, mavenRoot2, gradleRoot1,
 					gradleRoot2 };
-			final String[] expectedGavMessages = new String[] { MAVEN_1_GAV_MESSAGE, MAVEN_2_GAV_MESSAGE,
-					GRADLE_1_GAV_MESSAGE, GRADLE_2_GAV_MESSAGE };
+			final Gav[] expectedGavMessages = new Gav[] { MAVEN_1_GAV, MAVEN_2_GAV, GRADLE_1_GAV, GRADLE_2_GAV };
 			Mockito.when(ResourcesPlugin.getWorkspace()).thenReturn(workspace);
 			Mockito.when(workspace.getRoot()).thenReturn(workspaceRoot);
 			Mockito.when(workspaceRoot.getProject(TEST_PROJECT_NAME)).thenReturn(testProject);
@@ -299,9 +283,9 @@ public class ProjectInformationServiceTest {
 			Mockito.when(JavaCore.getClasspathVariable(ClasspathVariables.MAVEN)).thenReturn(mavenPath);
 			Mockito.when(mavenPath.toString()).thenReturn(MAVEN_REPO_PATH);
 			Mockito.when(testJavaProject.getPackageFragmentRoots()).thenReturn(roots);
-			final String[] noDeps = service.getMavenAndGradleDependencies("");
-			assertArrayEquals(new String[0], noDeps);
-			final String[] deps = service.getMavenAndGradleDependencies(TEST_PROJECT_NAME);
+			final Gav[] noDeps = service.getMavenAndGradleDependencies("");
+			assertArrayEquals(new Gav[0], noDeps);
+			final Gav[] deps = service.getMavenAndGradleDependencies(TEST_PROJECT_NAME);
 			assertArrayEquals(expectedGavMessages, deps);
 		} catch (final CoreException e) {
 		}

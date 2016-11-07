@@ -87,6 +87,7 @@
                 <type>eclipse-feature</type>
                 <id>org.eclipse.m2e.feature</id>
                 <versionRange>1.7.0.20160603-1933</versionRange>
+
               </requirement>
             </extraRequirements>
           </dependency-resolution>

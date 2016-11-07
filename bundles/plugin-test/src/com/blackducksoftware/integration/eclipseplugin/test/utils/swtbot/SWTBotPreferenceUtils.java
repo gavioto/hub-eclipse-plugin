@@ -33,18 +33,13 @@ public class SWTBotPreferenceUtils {
 
 	public void openBlackDuckPreferencesFromEclipseMenu() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
-		System.out.println("ATTEMPTING TO OPEN PREFERENCES FROM ECLIPSE APP MENU");
 		workbench.getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("----------------");
-				System.out.println("RUNNING");
 				final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 				if (window != null) {
 					final Menu appMenu = workbench.getDisplay().getSystemMenu();
-					System.out.println("ITEMS:");
 					for (final MenuItem item : appMenu.getItems()) {
-						System.out.println(item.getText());
 						if (item.getText().startsWith("Preferences")) {
 							final Event event = new Event();
 							event.time = (int) System.currentTimeMillis();
@@ -55,10 +50,7 @@ public class SWTBotPreferenceUtils {
 							break;
 						}
 					}
-				} else {
-					System.out.println("WINDOW WAS NULL");
 				}
-				System.out.println("----------------");
 			}
 		});
 		try {
@@ -127,7 +119,6 @@ public class SWTBotPreferenceUtils {
 		getDefaultSettingsPage();
 		final SWTBot pageBot = bot.activeShell().bot();
 		pageBot.button("Restore Defaults").click();
-		bot.sleep(5000);
 		pageBot.button("OK").click();
 		try {
 			bot.waitUntil(Conditions.shellCloses(bot.shell("Preferences")));

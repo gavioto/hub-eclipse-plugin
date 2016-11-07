@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.eclipseplugin.common.services;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -68,13 +67,13 @@ public class ProjectInformationService {
 		return dependencyFilepaths;
 	}
 
-	public String[] getMavenAndGradleDependencies(final String projectName) {
+	public Gav[] getMavenAndGradleDependencies(final String projectName) {
 		if (projectName.equals("")) {
-			return new String[0];
+			return new Gav[0];
 		}
 		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (project == null) {
-			return new String[0];
+			return new Gav[0];
 		}
 		if (isJavaProject(project)) {
 			final IJavaProject javaProject = JavaCore.create(project);
@@ -84,10 +83,10 @@ public class ProjectInformationService {
 				final String[] dependencyFilepaths = getBinaryDependencyFilepaths(packageFragmentRoots);
 				return getGavsFromFilepaths(dependencyFilepaths);
 			} catch (final JavaModelException e) {
-				return new String[0];
+				return new Gav[0];
 			}
 		} else {
-			return new String[0];
+			return new Gav[0];
 		}
 	}
 
@@ -102,30 +101,23 @@ public class ProjectInformationService {
 		return numDeps;
 	}
 
-	public String[] getGavsFromFilepaths(final String[] dependencyFilepaths) {
+	public Gav[] getGavsFromFilepaths(final String[] dependencyFilepaths) {
 		final int numDeps = getNumMavenAndGradleDependencies(dependencyFilepaths);
-		final String[] gavs = new String[numDeps];
+		final Gav[] gavs = new Gav[numDeps];
 		int gavsIndex = 0;
 		for (int j = 0; j < dependencyFilepaths.length; j++) {
 			if (dependencyInformationService.isMavenDependency(dependencyFilepaths[j])) {
 				final Gav gav = extractor.getMavenPathGav(dependencyFilepaths[j],
 						JavaCore.getClasspathVariable(ClasspathVariables.MAVEN).toString());
 
-				gavs[gavsIndex] = getGavMessage(gav);
+				gavs[gavsIndex] = gav;
 				gavsIndex++;
 			} else if (dependencyInformationService.isGradleDependency(dependencyFilepaths[j])) {
 				final Gav gav = extractor.getGradlePathGav(dependencyFilepaths[j]);
-				gavs[gavsIndex] = getGavMessage(gav);
+				gavs[gavsIndex] = gav;
 				gavsIndex++;
 			}
 		}
 		return gavs;
-
-	}
-
-	public String getGavMessage(final Gav gav) {
-		final String[] elements = new String[] { "group: " + gav.getGroupId(), "artifact: " + gav.getArtifactId(),
-				"version: " + gav.getVersion() };
-		return StringUtils.join(elements, ", ");
 	}
 }

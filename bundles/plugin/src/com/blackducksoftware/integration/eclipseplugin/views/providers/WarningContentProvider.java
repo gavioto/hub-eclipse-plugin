@@ -1,9 +1,11 @@
 package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
+import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
@@ -33,7 +35,7 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 
 			final boolean isActivated = prefs.getBoolean((String) projectName);
 			if (isActivated) {
-				String[] dependencies;
+				Gav[] dependencies;
 				final DependencyInformationService depService = new DependencyInformationService();
 				final FilePathGavExtractor extractor = new FilePathGavExtractor();
 				final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
@@ -43,7 +45,7 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 
 					// eventually this will call the REST API module instead
 					// to construct the warning
-					warnings[i] = new Warning(dependencies[i], 0, "", "", "", "", "");
+					warnings[i] = new Warning(getGavMessage(dependencies[i]), 0, "", "", "", "", "");
 				}
 				return warnings;
 			} else {
@@ -53,6 +55,12 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 		} else {
 			return ERR_UNKNOWN_INPUT;
 		}
+	}
+
+	public String getGavMessage(final Gav gav) {
+		final String[] elements = new String[] { "group: " + gav.getGroupId(), "artifact: " + gav.getArtifactId(),
+				"version: " + gav.getVersion() };
+		return StringUtils.join(elements, ", ");
 	}
 
 }

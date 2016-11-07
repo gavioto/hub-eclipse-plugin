@@ -55,11 +55,11 @@ public class WarningView extends ViewPart {
 				new ProjectInformationService(new DependencyInformationService(), new FilePathGavExtractor()));
 
 		// add all listeners
-		getSite().getPage().addSelectionListener(projectSelectionListener);
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeDisplayUpdateListener);
+		getSite().getPage().addSelectionListener(projectSelectionListener); // keep
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeDisplayUpdateListener); // keep
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeletedListener,
-				IResourceChangeEvent.PRE_DELETE);
-		JavaCore.addElementChangedListener(projectDependenciesChangeListener, ElementChangedEvent.POST_CHANGE);
+				IResourceChangeEvent.PRE_DELETE); // keep
+		JavaCore.addElementChangedListener(projectDependenciesChangeListener, ElementChangedEvent.POST_CHANGE); // keep
 
 		tableOfWarnings = new TableViewer(parent,
 				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);

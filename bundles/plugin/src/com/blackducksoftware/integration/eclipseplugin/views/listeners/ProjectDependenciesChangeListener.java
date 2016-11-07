@@ -26,10 +26,11 @@ public class ProjectDependenciesChangeListener implements IElementChangedListene
 	private void visit(final IJavaElementDelta delta) {
 		final IJavaElement el = delta.getElement();
 		switch (el.getElementType()) {
-		case IJavaElement.JAVA_MODEL:
+		case IJavaElement.JAVA_MODEL: {
 			visitChildren(delta);
 			break;
-		case IJavaElement.JAVA_PROJECT:
+		}
+		case IJavaElement.JAVA_PROJECT: {
 			if (isClasspathChanged(delta.getFlags())) {
 				display.asyncExec(new Runnable() {
 					@Override
@@ -41,8 +42,10 @@ public class ProjectDependenciesChangeListener implements IElementChangedListene
 				});
 			}
 			break;
-		default:
+		}
+		default: {
 			break;
+		}
 		}
 	}
 
