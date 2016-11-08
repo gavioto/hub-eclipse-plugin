@@ -40,7 +40,6 @@ public class NewJavaProjectListener implements IResourceChangeListener {
 										service.setAllProjectSpecificDefaults(projectName);
 										if (!information.containsProject(projectName)) {
 											information.addProject(projectName);
-											information.printAllInfo();
 										}
 									}
 								} catch (final CoreException e) {

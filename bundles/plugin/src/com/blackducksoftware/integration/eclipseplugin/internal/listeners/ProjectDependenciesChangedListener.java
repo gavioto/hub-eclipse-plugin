@@ -1,10 +1,14 @@
 package com.blackducksoftware.integration.eclipseplugin.internal.listeners;
 
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.runtime.CoreException;
+//import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.blackducksoftware.integration.build.Gav;
@@ -15,7 +19,6 @@ import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependenc
 
 public class ProjectDependenciesChangedListener implements IElementChangedListener {
 	private final ProjectDependencyInformation information;
-	private String projectName;
 	private final FilePathGavExtractor extractor;
 	private final DependencyInformationService depService;
 
@@ -31,6 +34,51 @@ public class ProjectDependenciesChangedListener implements IElementChangedListen
 		visit(event.getDelta());
 	}
 
+	public String getProjectNameFromElement(final IJavaElement el) throws CoreException {
+		final IJavaProject javaProj = el.getJavaProject();
+		if (javaProj != null) {
+			final IProject proj = javaProj.getProject();
+			if (proj != null) {
+				final IProjectDescription description = proj.getDescription();
+				if (description != null) {
+					return description.getName();
+				}
+			}
+		}
+		return null;
+	}
+
+	public void removeDependency(final IJavaElement el) throws CoreException {
+		final String projName = getProjectNameFromElement(el);
+		if (projName != null) {
+			final String OSSpecificFilepath = el.getPath().toOSString();
+			if (depService.isGradleDependency(OSSpecificFilepath)) {
+				final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
+				information.removeWarningFromProject(projName, gav);
+			} else if (depService.isMavenDependency(OSSpecificFilepath)) {
+				final String mavenPath = JavaCore.getClasspathVariable(ClasspathVariables.MAVEN).toOSString();
+				final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPath);
+				information.removeWarningFromProject(projName, gav);
+			}
+		}
+
+	}
+
+	public void addDependency(final IJavaElement el) throws CoreException {
+		final String projName = getProjectNameFromElement(el);
+		if (projName != null) {
+			final String OSSpecificFilepath = el.getPath().toOSString();
+			if (depService.isGradleDependency(OSSpecificFilepath)) {
+				final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
+				information.addWarningToProject(projName, gav);
+			} else if (depService.isMavenDependency(OSSpecificFilepath)) {
+				final String mavenPath = JavaCore.getClasspathVariable(ClasspathVariables.MAVEN).toOSString();
+				final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPath);
+				information.addWarningToProject(projName, gav);
+			}
+		}
+	}
+
 	private void visit(final IJavaElementDelta delta) {
 		final IJavaElement el = delta.getElement();
 		switch (el.getElementType()) {
@@ -40,40 +88,22 @@ public class ProjectDependenciesChangedListener implements IElementChangedListen
 		}
 		case IJavaElement.JAVA_PROJECT: {
 			if (isClasspathChanged(delta.getFlags())) {
-				projectName = el.getElementName();
 				visitChildren(delta);
 			}
 			break;
 		}
 		case IJavaElement.PACKAGE_FRAGMENT_ROOT: {
-			final String OSSpecificFilepath = el.getPath().toOSString();
-			if (delta.getKind() == IJavaElementDelta.ADDED || delta.getKind() == IJavaElementDelta.CHANGED) {
-				if (depService.isMavenDependency(OSSpecificFilepath)) {
-					final IPath mavenPath = JavaCore.getClasspathVariable(ClasspathVariables.MAVEN);
-					if (mavenPath != null) {
-						final String mavenPathString = mavenPath.toOSString();
-						final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPathString);
-						information.addWarningToProject(projectName, gav);
-						information.printAllInfo();
-					}
-				} else if (depService.isGradleDependency(OSSpecificFilepath)) {
-					final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
-					information.addWarningToProject(projectName, gav);
-					information.printAllInfo();
+			if ((delta.getFlags() & IJavaElementDelta.F_REMOVED_FROM_CLASSPATH) != 0) {
+				try {
+					removeDependency(el);
+				} catch (final CoreException e) {
+
 				}
-			} else if (delta.getKind() == IJavaElementDelta.REMOVED) {
-				if (depService.isMavenDependency(OSSpecificFilepath)) {
-					final IPath mavenPath = JavaCore.getClasspathVariable(ClasspathVariables.MAVEN);
-					if (mavenPath != null) {
-						final String mavenPathString = mavenPath.toOSString();
-						final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPathString);
-						information.removeWarningFromProject(projectName, gav);
-						information.printAllInfo();
-					}
-				} else if (depService.isGradleDependency(OSSpecificFilepath)) {
-					final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
-					information.removeWarningFromProject(projectName, gav);
-					information.printAllInfo();
+			} else if (delta.getKind() == IJavaElementDelta.ADDED || delta.getKind() == IJavaElementDelta.CHANGED) {
+				try {
+					addDependency(el);
+				} catch (final CoreException e) {
+
 				}
 			}
 			break;
@@ -82,15 +112,17 @@ public class ProjectDependenciesChangedListener implements IElementChangedListen
 			break;
 		}
 		}
+
 	}
 
 	private boolean isClasspathChanged(final int flags) {
 		return 0 != (flags & (IJavaElementDelta.F_CLASSPATH_CHANGED | IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED));
 	}
 
-	public void visitChildren(final IJavaElementDelta delta) {
+	private void visitChildren(final IJavaElementDelta delta) {
 		for (final IJavaElementDelta c : delta.getAffectedChildren()) {
 			visit(c);
 		}
 	}
+
 }

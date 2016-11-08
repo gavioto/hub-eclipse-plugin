@@ -42,7 +42,7 @@ public class WarningView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		display = PlatformUI.getWorkbench().getDisplay();
-		preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this, display);
+		preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this);
 		projectDeletedListener = new ProjectDeletedListener(this, display);
 		projectSelectionListener = new ProjectSelectionListener(this);
 		prefs = Activator.getDefault().getPreferenceStore();

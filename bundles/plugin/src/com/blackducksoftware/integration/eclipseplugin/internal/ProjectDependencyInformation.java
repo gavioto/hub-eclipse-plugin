@@ -33,17 +33,19 @@ public class ProjectDependencyInformation {
 		final HashMap<Gav, Warning> deps = new HashMap<Gav, Warning>();
 		for (final Gav gav : gavs) {
 			// API call to make warning
-			deps.put(gav, null);
+			deps.put(gav, new Warning("", 0, "", "", "", "", ""));
 		}
 		projectInfo.put(projectName, deps);
 	}
 
 	public void addWarningToProject(final String projectName, final Gav gav) {
 		final HashMap<Gav, Warning> deps = projectInfo.get(projectName);
-		// API call to make warning
-		deps.put(gav, null);
-		if (warningView != null) {
-			warningView.resetInput();
+		if (deps != null) {
+			// API call to make warning
+			deps.put(gav, new Warning("", 0, "", "", "", "", ""));
+			if (warningView != null) {
+				warningView.resetInput();
+			}
 		}
 	}
 
@@ -53,9 +55,11 @@ public class ProjectDependencyInformation {
 
 	public void removeWarningFromProject(final String projectName, final Gav gav) {
 		final HashMap<Gav, Warning> dependencies = projectInfo.get(projectName);
-		dependencies.remove(gav);
-		if (warningView != null) {
-			warningView.resetInput();
+		if (dependencies != null) {
+			dependencies.remove(gav);
+			if (warningView != null) {
+				warningView.resetInput();
+			}
 		}
 	}
 

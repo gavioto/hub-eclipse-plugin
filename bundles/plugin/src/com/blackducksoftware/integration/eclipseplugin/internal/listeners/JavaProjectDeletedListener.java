@@ -17,7 +17,6 @@ public class JavaProjectDeletedListener implements IResourceChangeListener {
 	public void resourceChanged(final IResourceChangeEvent event) {
 		if (event != null && event.getResource() != null) {
 			information.removeProject(event.getResource().getName());
-			information.printAllInfo();
 		}
 	}
 

@@ -30,6 +30,7 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
+		System.out.println("STARTING HUB ECLIPSE PLUGIN");
 		plugin = this;
 		final FilePathGavExtractor extractor = new FilePathGavExtractor();
 		final DependencyInformationService depService = new DependencyInformationService();
