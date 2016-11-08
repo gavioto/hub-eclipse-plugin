@@ -2,10 +2,18 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ui.menus">
+         point="org.eclipse.ui.menus">    
       <menuContribution
             allPopups="false"
-            locationURI="popup:blackduck?after=additions">
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+         <menu
+               id="blackduck-PackageExplorer"
+               label="Black Duck">
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:blackduck-PackageExplorer?after=additions">
          <command
          		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
          		label="Black Duck Authorization..."
@@ -63,12 +71,71 @@
          </command>
       </menuContribution>
       <menuContribution
-            allPopups="false"
-            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+      		allPopups="false"
+      		locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
          <menu
-               id="blackduck"
+               id="blackduck-ProjectExplorer"
                label="Black Duck">
          </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:blackduck-ProjectExplorer?after=additions">
+         <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
+         		label="Black Duck Authorization..."
+         		style="push">
+         </command>
+         <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
+         		label="Black Duck Proxy Settings..."
+         		style="push">
+         </command>
+         <command
+               commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
+               label="Open Warning View"
+               style="push">
+              <visibleWhen>
+         		<with
+         				variable="selection">
+         			<iterate
+         					ifEmpty="false">
+         				<adapt
+         						type="org.eclipse.core.resources.IProject">
+         					<test
+         							property="org.eclipse.core.resources.projectNature"
+         							value="org.eclipse.jdt.core.javanature">
+         					</test>
+         				</adapt>
+         			</iterate>
+         		</with>
+         	</visibleWhen>
+         </command>
+         <command
+               commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
+               label="Scanning Preferences..."
+               style="push">
+         </command>
+         <command
+         		commandId="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
+         		label="Project Preferences..."
+         		style="push">
+         	<visibleWhen>
+         		<with
+         				variable="selection">
+         			<iterate
+         					ifEmpty="false">
+         				<adapt
+         						type="org.eclipse.core.resources.IProject">
+         					<test
+         							property="org.eclipse.core.resources.projectNature"
+         							value="org.eclipse.jdt.core.javanature">
+         					</test>
+         				</adapt>
+         			</iterate>
+         		</with>
+         	</visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension

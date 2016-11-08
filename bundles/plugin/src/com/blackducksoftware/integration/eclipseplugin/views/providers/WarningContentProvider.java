@@ -1,6 +1,5 @@
 package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -37,7 +36,7 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 				final Gav[] gavs = information.getAllDependencyGavs((String) projectName);
 				final String[] messages = new String[gavs.length];
 				for (int i = 0; i < gavs.length; i++) {
-					messages[i] = getGavMessage(gavs[i]);
+					messages[i] = gavs[i].toString();
 				}
 				return messages;
 			} else {
@@ -47,12 +46,6 @@ public class WarningContentProvider extends ArrayContentProvider implements IStr
 		} else {
 			return ERR_UNKNOWN_INPUT;
 		}
-	}
-
-	public String getGavMessage(final Gav gav) {
-		final String[] elements = new String[] { "group: " + gav.getGroupId(), "artifact: " + gav.getArtifactId(),
-				"version: " + gav.getVersion() };
-		return StringUtils.join(elements, ", ");
 	}
 
 }

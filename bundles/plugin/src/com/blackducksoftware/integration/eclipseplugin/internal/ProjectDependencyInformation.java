@@ -1,23 +1,40 @@
 package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class ProjectDependencyInformation {
 
+	private final LoadingCache<Gav, Warning> componentCache;
 	private final HashMap<String, HashMap<Gav, Warning>> projectInfo;
 	private final ProjectInformationService projService;
 
 	private WarningView warningView;
 
-	public ProjectDependencyInformation(final ProjectInformationService projService) {
+	public ProjectDependencyInformation(final ProjectInformationService projService, final int cacheCapacity) {
 		projectInfo = new HashMap<String, HashMap<Gav, Warning>>();
 		this.projService = projService;
 		this.warningView = null;
+		componentCache = createCache(cacheCapacity);
+	}
+
+	public LoadingCache<Gav, Warning> createCache(final int cacheCapacity) {
+		return CacheBuilder.newBuilder().maximumSize(cacheCapacity).expireAfterWrite(1, TimeUnit.HOURS)
+				.build(new CacheLoader<Gav, Warning>() {
+					@Override
+					public Warning load(final Gav gav) throws Exception {
+						// API call to make warning
+						return new Warning("", 0, "", "", "", "", "");
+					}
+				});
 	}
 
 	public void setWarningView(final WarningView warningView) {
@@ -29,20 +46,28 @@ public class ProjectDependencyInformation {
 	}
 
 	public void addProject(final String projectName) {
-		final Gav[] gavs = projService.getMavenAndGradleDependencies(projectName);
-		final HashMap<Gav, Warning> deps = new HashMap<Gav, Warning>();
-		for (final Gav gav : gavs) {
-			// API call to make warning
-			deps.put(gav, new Warning("", 0, "", "", "", "", ""));
+		if (!projectInfo.containsKey(projectName)) {
+			final Gav[] gavs = projService.getMavenAndGradleDependencies(projectName);
+			final HashMap<Gav, Warning> deps = new HashMap<Gav, Warning>();
+			for (final Gav gav : gavs) {
+				try {
+					deps.put(gav, componentCache.get(gav));
+				} catch (final ExecutionException e) {
+
+				}
+			}
+			projectInfo.put(projectName, deps);
 		}
-		projectInfo.put(projectName, deps);
 	}
 
 	public void addWarningToProject(final String projectName, final Gav gav) {
 		final HashMap<Gav, Warning> deps = projectInfo.get(projectName);
 		if (deps != null) {
-			// API call to make warning
-			deps.put(gav, new Warning("", 0, "", "", "", "", ""));
+			try {
+				deps.put(gav, componentCache.get(gav));
+			} catch (final ExecutionException e) {
+
+			}
 			if (warningView != null) {
 				warningView.resetInput();
 			}
@@ -50,6 +75,7 @@ public class ProjectDependencyInformation {
 	}
 
 	public void removeProject(final String projectName) {
+		System.out.println("REMOVING PROJECT " + projectName);
 		projectInfo.remove(projectName);
 	}
 
@@ -73,23 +99,6 @@ public class ProjectDependencyInformation {
 			return dependencyInfo.keySet().toArray(new Gav[dependencyInfo.keySet().size()]);
 		} else {
 			return new Gav[0];
-		}
-	}
-
-	public void printAllInfo() {
-		final Iterator<String> nameIt = projectInfo.keySet().iterator();
-		System.out.println("WORKSPACE INFO:");
-		System.out.println("----------------");
-		while (nameIt.hasNext()) {
-			final String name = nameIt.next();
-			System.out.println("PROJECT: " + name);
-			final Iterator<Gav> gavIt = projectInfo.get(name).keySet().iterator();
-			System.out.println("DEPENDENCIES:");
-			while (gavIt.hasNext()) {
-				final Gav gav = gavIt.next();
-				System.out.println(gav.getGroupId() + ":" + gav.getArtifactId() + ":" + gav.getVersion());
-			}
-			System.out.println("----------------");
 		}
 	}
 

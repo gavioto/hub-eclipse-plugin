@@ -11,6 +11,7 @@ import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DefaultPreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.internal.listeners.JavaProjectDeletedListener;
 import com.blackducksoftware.integration.eclipseplugin.internal.listeners.NewJavaProjectListener;
 import com.blackducksoftware.integration.eclipseplugin.internal.listeners.ProjectDependenciesChangedListener;
@@ -19,6 +20,8 @@ import com.blackducksoftware.integration.eclipseplugin.preferences.listeners.Def
 public class Activator extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "com.blackduck.integration.eclipseplugin";
+
+	private final int COMPONENT_CACHE_CAPACITY = 10000;
 
 	private static Activator plugin;
 
@@ -35,21 +38,30 @@ public class Activator extends AbstractUIPlugin {
 		final FilePathGavExtractor extractor = new FilePathGavExtractor();
 		final DependencyInformationService depService = new DependencyInformationService();
 		final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
-		information = new ProjectDependencyInformation(projService);
+		final WorkspaceInformationService workspaceService = new WorkspaceInformationService(projService);
+		information = new ProjectDependencyInformation(projService, COMPONENT_CACHE_CAPACITY);
 		final DefaultPreferencesService defaultPrefService = new DefaultPreferencesService(
 				getDefault().getPreferenceStore());
-		final NewJavaProjectListener projectModificationListener = new NewJavaProjectListener(defaultPrefService,
+		final NewJavaProjectListener newJavaProjectListener = new NewJavaProjectListener(defaultPrefService,
 				information);
 		final DefaultPreferenceChangeListener defaultPrefChangeListener = new DefaultPreferenceChangeListener(
 				defaultPrefService);
 		final ProjectDependenciesChangedListener depsChangedListener = new ProjectDependenciesChangedListener(
 				information, extractor, depService);
 		final JavaProjectDeletedListener deletedListener = new JavaProjectDeletedListener(information);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectModificationListener);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(newJavaProjectListener);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(deletedListener, IResourceChangeEvent.PRE_DELETE);
 		getPreferenceStore().addPropertyChangeListener(defaultPrefChangeListener);
 		JavaCore.addElementChangedListener(depsChangedListener);
 		defaultPrefService.setDefaultConfig();
+		addAllProjects(workspaceService);
+	}
+
+	public void addAllProjects(final WorkspaceInformationService workspaceService) {
+		final String[] javaProjects = workspaceService.getJavaProjectNames();
+		for (final String project : javaProjects) {
+			information.addProject(project);
+		}
 	}
 
 	public ProjectDependencyInformation getProjectInformation() {
