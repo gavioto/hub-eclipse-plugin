@@ -1,5 +1,7 @@
 package com.blackducksoftware.integration.eclipseplugin.internal;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.JavaCore;
@@ -7,6 +9,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DefaultPreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
@@ -16,6 +19,9 @@ import com.blackducksoftware.integration.eclipseplugin.internal.listeners.JavaPr
 import com.blackducksoftware.integration.eclipseplugin.internal.listeners.NewJavaProjectListener;
 import com.blackducksoftware.integration.eclipseplugin.internal.listeners.ProjectDependenciesChangedListener;
 import com.blackducksoftware.integration.eclipseplugin.preferences.listeners.DefaultPreferenceChangeListener;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class Activator extends AbstractUIPlugin {
 
@@ -26,6 +32,8 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 
 	private ProjectDependencyInformation information;
+
+	private LoadingCache<Gav, Warning> componentCache;
 
 	public Activator() {
 	}
@@ -39,7 +47,8 @@ public class Activator extends AbstractUIPlugin {
 		final DependencyInformationService depService = new DependencyInformationService();
 		final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
 		final WorkspaceInformationService workspaceService = new WorkspaceInformationService(projService);
-		information = new ProjectDependencyInformation(projService, COMPONENT_CACHE_CAPACITY);
+		componentCache = createCache(COMPONENT_CACHE_CAPACITY);
+		information = new ProjectDependencyInformation(projService, componentCache);
 		final DefaultPreferencesService defaultPrefService = new DefaultPreferencesService(
 				getDefault().getPreferenceStore());
 		final NewJavaProjectListener newJavaProjectListener = new NewJavaProjectListener(defaultPrefService,
@@ -55,6 +64,17 @@ public class Activator extends AbstractUIPlugin {
 		JavaCore.addElementChangedListener(depsChangedListener);
 		defaultPrefService.setDefaultConfig();
 		addAllProjects(workspaceService);
+	}
+
+	public LoadingCache<Gav, Warning> createCache(final int cacheCapacity) {
+		return CacheBuilder.newBuilder().maximumSize(cacheCapacity).expireAfterWrite(1, TimeUnit.HOURS)
+				.build(new CacheLoader<Gav, Warning>() {
+					@Override
+					public Warning load(final Gav gav) throws Exception {
+						// API call to make warning
+						return new Warning("", 0, "", "", "", "", "");
+					}
+				});
 	}
 
 	public void addAllProjects(final WorkspaceInformationService workspaceService) {

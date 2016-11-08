@@ -2,13 +2,10 @@ package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 public class ProjectDependencyInformation {
@@ -19,22 +16,12 @@ public class ProjectDependencyInformation {
 
 	private WarningView warningView;
 
-	public ProjectDependencyInformation(final ProjectInformationService projService, final int cacheCapacity) {
+	public ProjectDependencyInformation(final ProjectInformationService projService,
+			final LoadingCache<Gav, Warning> componentCache) {
 		projectInfo = new HashMap<String, HashMap<Gav, Warning>>();
 		this.projService = projService;
 		this.warningView = null;
-		componentCache = createCache(cacheCapacity);
-	}
-
-	public LoadingCache<Gav, Warning> createCache(final int cacheCapacity) {
-		return CacheBuilder.newBuilder().maximumSize(cacheCapacity).expireAfterWrite(1, TimeUnit.HOURS)
-				.build(new CacheLoader<Gav, Warning>() {
-					@Override
-					public Warning load(final Gav gav) throws Exception {
-						// API call to make warning
-						return new Warning("", 0, "", "", "", "", "");
-					}
-				});
+		this.componentCache = componentCache;
 	}
 
 	public void setWarningView(final WarningView warningView) {

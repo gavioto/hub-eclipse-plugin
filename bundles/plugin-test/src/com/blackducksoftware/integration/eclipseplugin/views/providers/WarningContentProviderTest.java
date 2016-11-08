@@ -4,11 +4,14 @@ import static org.junit.Assert.assertArrayEquals;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.blackducksoftware.integration.eclipseplugin.common.services.PreferenceStoreMock;
 import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependencyInformation;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WarningContentProviderTest {
 
 	private final String PROJECT_NAME = "project name";
