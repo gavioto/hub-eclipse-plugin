@@ -36,6 +36,12 @@ public class SWTBotProjectUtils {
 			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
 			bot.button("Yes").click();
 		} catch (final TimeoutException e) {
+		} finally {
+			try {
+				bot.waitUntil(Conditions.shellCloses(bot.activeShell()));
+			} catch (final TimeoutException e) {
+
+			}
 		}
 	}
 
@@ -58,6 +64,12 @@ public class SWTBotProjectUtils {
 			bot.waitUntil(Conditions.shellIsActive("Open Associated Perspective?"));
 			bot.button("Yes").click();
 		} catch (final TimeoutException e) {
+		} finally {
+			try {
+				bot.waitUntil(Conditions.shellCloses(bot.activeShell()));
+			} catch (final TimeoutException e) {
+
+			}
 		}
 	}
 
