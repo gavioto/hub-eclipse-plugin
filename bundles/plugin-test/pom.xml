@@ -175,6 +175,17 @@
 
   <profiles>
     <profile>
+      <id>unix-jvm-flags</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <os-jvm-flags></os-jvm-flags>
+      </properties>
+    </profile>
+    <profile>
       <id>macosx-jvm-flags</id>
       <activation>
         <os>
@@ -197,17 +208,7 @@
       </properties>
     </profile>
     <!-->
-    <profile>
-      <id>unix-jvm-flags</id>
-      <activation>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <properties>
-        <os-jvm-flags></os-jvm-flags>
-      </properties>
-    </profile>
+    
     <!-->
     <profile>
       <id>dos-jvm-flags</id>
