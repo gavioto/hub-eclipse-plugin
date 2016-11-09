@@ -25,6 +25,7 @@ import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePre
 import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
 import com.blackducksoftware.integration.eclipseplugin.internal.AuthorizationValidator;
 import com.blackducksoftware.integration.eclipseplugin.preferences.listeners.TestHubCredentialsSelectionListener;
+import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 
 public class BlackDuckAuthorizationPreferences extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -102,9 +103,10 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
 				.setBackground(connectionMessageText.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		connectionMessageText.setText("\n");
 
-		testHubCredentials.addSelectionListener(new TestHubCredentialsSelectionListener(hubUsername, hubPassword,
-				hubURL, hubTimeout, proxyUsername, proxyPassword, proxyHost, proxyPort, ignoredProxyHosts,
-				connectionMessageText, new AuthorizationValidator(new HubRestConnectionService())));
+		testHubCredentials.addSelectionListener(
+				new TestHubCredentialsSelectionListener(hubUsername, hubPassword, hubURL, hubTimeout, proxyUsername,
+						proxyPassword, proxyHost, proxyPort, ignoredProxyHosts, connectionMessageText,
+						new AuthorizationValidator(new HubRestConnectionService(), new HubServerConfigBuilder())));
 
 		return authComposite;
 	}
