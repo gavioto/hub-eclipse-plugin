@@ -19,7 +19,7 @@ public class OpenPreferences extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
 		final String[] pageIds = new String[] { PreferencePageIds.BLACK_DUCK, PreferencePageIds.ACTIVE_JAVA_PROJECTS,
-				PreferencePageIds.DEFAULT_CONFIG };
+				PreferencePageIds.DEFAULT_CONFIG, PreferencePageIds.HUB_AUTHORIZATION };
 		final PreferenceDialog prefPage = PreferencesUtil.createPreferenceDialogOn(activeShell,
 				PreferencePageIds.BLACK_DUCK, pageIds, null);
 		prefPage.open();

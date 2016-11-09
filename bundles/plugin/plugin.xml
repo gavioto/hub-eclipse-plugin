@@ -15,16 +15,6 @@
             allPopups="false"
             locationURI="popup:blackduck-PackageExplorer?after=additions">
          <command
-         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
-         		label="Black Duck Authorization..."
-         		style="push">
-         </command>
-         <command
-         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
-         		label="Black Duck Proxy Settings..."
-         		style="push">
-         </command>
-         <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Warning View"
                style="push">
@@ -46,7 +36,7 @@
          </command>
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
-               label="Scanning Preferences..."
+               label="Black Duck Settings..."
                style="push">
          </command>
          <command
@@ -82,16 +72,6 @@
             allPopups="false"
             locationURI="popup:blackduck-ProjectExplorer?after=additions">
          <command
-         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
-         		label="Black Duck Authorization..."
-         		style="push">
-         </command>
-         <command
-         		commandId="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
-         		label="Black Duck Proxy Settings..."
-         		style="push">
-         </command>
-         <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Warning View"
                style="push">
@@ -113,7 +93,7 @@
          </command>
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
-               label="Scanning Preferences..."
+               label="Black Duck Settings..."
                style="push">
          </command>
          <command
@@ -141,11 +121,6 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenBlackDuckAuthorizationDialog"
-      		id="com.blackducksoftware.integration.popupmenu.OpenBlackDuckAuthorizationDialog"
-      		name="Open Black Duck Authorization Dialog">
-      </command>
-      <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenWarningView"
             id="com.blackducksoftware.integration.popupmenu.OpenWarningView"
             name="Open Warning View">
@@ -159,11 +134,6 @@
       		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenProjectPreferences"
       		id="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
       		name="Open Project Preferences">
-      </command>
-      <command
-      		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenBlackDuckProxyInfoDialog"
-      		id="com.blackducksoftware.integration.popupmenu.OpenBlackDuckProxyInfoDialog"
-      		name="Open Proxy Server Settings Dialog">
       </command>
    </extension>
    <extension
@@ -200,5 +170,12 @@
       		name="Black Duck Default Settings"
       		category="BlackDuck">
       </page>
+      <page
+      		class="com.blackducksoftware.integration.eclipseplugin.preferences.BlackDuckAuthorizationPreferences"
+      		id="HubAuthorization"
+      		name="Black Duck Authorization Settings"
+      		category="BlackDuck">
+      </page>
+      
    </extension>
 </plugin>

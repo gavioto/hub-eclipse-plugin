@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.dialogs;
+package com.blackducksoftware.integration.internal;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
+import com.blackducksoftware.integration.eclipseplugin.internal.AuthorizationValidator;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
 import com.blackducksoftware.integration.hub.rest.CredentialsRestConnection;
 

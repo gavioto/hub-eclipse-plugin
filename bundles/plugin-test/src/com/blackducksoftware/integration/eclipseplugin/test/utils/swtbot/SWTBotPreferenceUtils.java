@@ -14,6 +14,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import com.blackducksoftware.integration.eclipseplugin.common.constants.MenuLabels;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferencePageNames;
 import com.blackducksoftware.integration.eclipseplugin.preferences.PreferenceDefaults;
 
@@ -27,7 +28,7 @@ public class SWTBotPreferenceUtils {
 
 	public void openBlackDuckPreferencesFromContextMenu(final String projectName) {
 		final SWTBotTreeItem project = bot.viewByTitle("Package Explorer").bot().tree().getTreeItem(projectName);
-		project.contextMenu().menu("Black Duck").menu("Scanning Preferences...").click();
+		project.contextMenu().menu("Black Duck").menu(MenuLabels.BLACK_DUCK_SETTINGS).click();
 		bot.waitUntil(Conditions.shellIsActive("Preferences (Filtered)"));
 	}
 

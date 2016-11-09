@@ -62,7 +62,6 @@ public class ProjectDependencyInformation {
 	}
 
 	public void removeProject(final String projectName) {
-		System.out.println("REMOVING PROJECT " + projectName);
 		projectInfo.remove(projectName);
 	}
 

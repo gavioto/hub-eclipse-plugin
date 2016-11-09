@@ -41,10 +41,8 @@ public class PopupMenuTest {
 				.getTreeItem(TEST_JAVA_PROJECT_NAME);
 		node.setFocus();
 		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
-		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_AUTHORIZATION));
-		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_PROXY_SETTINGS));
 		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.PROJECT_PREFERENCES));
-		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.SCANNING_PREFERENCES));
+		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_SETTINGS));
 		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW));
 	}
 
@@ -54,9 +52,7 @@ public class PopupMenuTest {
 				.getTreeItem(TEST_NON_JAVA_PROJECT_NAME);
 		node.setFocus();
 		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
-		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_AUTHORIZATION));
-		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_PROXY_SETTINGS));
-		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.SCANNING_PREFERENCES));
+		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_SETTINGS));
 	}
 
 	@AfterClass

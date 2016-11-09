@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.dialogs;
+package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import java.net.URISyntaxException;
 
