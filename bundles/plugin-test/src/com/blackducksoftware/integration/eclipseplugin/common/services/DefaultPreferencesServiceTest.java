@@ -27,4 +27,14 @@ public class DefaultPreferencesServiceTest {
 		service.setAllProjectSpecificDefaults(testProject);
 		assertEquals(mockPrefStore.getBoolean(testProject), true);
 	}
+
+	@Test
+	public void testIndividualProjectDefaultSettingsWhenActivateByDefaultFalse() {
+		final IPreferenceStore mockPrefStore = new PreferenceStoreMock();
+		final DefaultPreferencesService service = new DefaultPreferencesService(mockPrefStore);
+		service.setDefaultConfig();
+		mockPrefStore.setValue(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT, "false");
+		service.setAllProjectSpecificDefaults(testProject);
+		assertEquals(mockPrefStore.getBoolean(testProject), false);
+	}
 }

@@ -55,6 +55,16 @@ public class DependencyInformationServiceTest {
 		}
 	}
 
+	@Test
+	public void testIsNotMavenDependency() {
+		PowerMockito.mockStatic(JavaCore.class);
+		Mockito.when(JavaCore.getClasspathVariable(ClasspathVariables.MAVEN)).thenReturn(mavenPath);
+		Mockito.when(mavenPath.toString()).thenReturn(getSystemSpecificFilepath(fakeMavenClasspathVariable, "/"));
+		for (final String dependency : MAVEN_DEPENDENCIES_TO_TEST) {
+			assertFalse(dependency + " is a maven dependency", service.isMavenDependency(dependency));
+		}
+	}
+
 	private String getSystemSpecificFilepath(final String path, final String separator) {
 		return path.replaceAll(separator, File.separator);
 	}
