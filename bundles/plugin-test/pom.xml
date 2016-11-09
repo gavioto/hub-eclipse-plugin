@@ -207,9 +207,6 @@
         <os-jvm-flags></os-jvm-flags>
       </properties>
     </profile>
-    <!-->
-    
-    <!-->
     <profile>
       <id>dos-jvm-flags</id>
       <activation>

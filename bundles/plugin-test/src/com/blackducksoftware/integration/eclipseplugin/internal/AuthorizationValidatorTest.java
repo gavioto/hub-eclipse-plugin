@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.internal;
+package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import static org.junit.Assert.assertEquals;
 
