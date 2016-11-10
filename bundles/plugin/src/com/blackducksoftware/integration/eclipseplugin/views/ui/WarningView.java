@@ -21,6 +21,7 @@ import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.PreferenceChangeDisplayUpdateListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDeletedListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectSelectionListener;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningColumnLabelProvider;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
 /*

@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.eclipseplugin.views.ui;
+package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
