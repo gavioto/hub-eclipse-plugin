@@ -13,9 +13,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewIds;
 
-/*
- * Class that opens the warning view
- */
 public class OpenWarningView extends AbstractHandler {
 
 	@Override
@@ -25,7 +22,6 @@ public class OpenWarningView extends AbstractHandler {
 			return null;
 		}
 
-		// open window in which warnings will be displayed
 		try {
 			final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 			if (window != null) {
@@ -41,9 +37,6 @@ public class OpenWarningView extends AbstractHandler {
 		return null;
 	}
 
-	/*
-	 * Show an error message if an exception is caught when opening warning view
-	 */
 	private void showErrorMessage(final ExecutionEvent event) {
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
 		final MessageBox errorMessageDialog = new MessageBox(activeShell, SWT.OK);

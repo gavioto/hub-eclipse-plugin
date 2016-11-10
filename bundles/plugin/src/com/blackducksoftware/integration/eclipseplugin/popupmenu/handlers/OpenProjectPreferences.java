@@ -15,9 +15,6 @@ import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectIn
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.preferences.IndividualProjectPreferences;
 
-/*
- * Class to create a window in which user can modify project-specific Black Duck preferences
- */
 public class OpenProjectPreferences extends AbstractHandler {
 
 	private final char preferencePathSeparatorCharacter = '.';

@@ -10,9 +10,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferencePageIds;
 
-/*
- * Class that opens the general Black Duck preferences menu in a window
- */
 public class OpenPreferences extends AbstractHandler {
 
 	@Override

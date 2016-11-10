@@ -54,7 +54,7 @@ public class Activator extends AbstractUIPlugin {
 		final NewJavaProjectListener newJavaProjectListener = new NewJavaProjectListener(defaultPrefService,
 				information);
 		final DefaultPreferenceChangeListener defaultPrefChangeListener = new DefaultPreferenceChangeListener(
-				defaultPrefService);
+				defaultPrefService, workspaceService);
 		final ProjectDependenciesChangedListener depsChangedListener = new ProjectDependenciesChangedListener(
 				information, extractor, depService);
 		final JavaProjectDeletedListener deletedListener = new JavaProjectDeletedListener(information);
