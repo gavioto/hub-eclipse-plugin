@@ -15,7 +15,6 @@ public class ProjectSelectionListener implements ISelectionListener {
 	private final WarningView warningView;
 
 	public ProjectSelectionListener(final WarningView warningView) {
-		super();
 		this.warningView = warningView;
 	}
 

@@ -43,7 +43,7 @@ public class WarningView extends ViewPart {
 
 		display = PlatformUI.getWorkbench().getDisplay();
 		preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this);
-		projectDeletedListener = new ProjectDeletedListener(this, display);
+		projectDeletedListener = new ProjectDeletedListener(this);
 		projectSelectionListener = new ProjectSelectionListener(this);
 		prefs = Activator.getDefault().getPreferenceStore();
 		workspaceInformationService = new WorkspaceInformationService(
