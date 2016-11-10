@@ -51,11 +51,15 @@ public class ProjectDependenciesChangedListener implements IElementChangedListen
 	public void removeDependency(final IJavaElement el) throws CoreException {
 		final String projName = getProjectNameFromElement(el);
 		if (projName != null) {
+			System.out.println(projName);
 			final String OSSpecificFilepath = el.getPath().toOSString();
+			System.out.println("FILEPATH: " + OSSpecificFilepath);
 			if (depService.isGradleDependency(OSSpecificFilepath)) {
+				System.out.println("GRADLE DEPENDENCY");
 				final Gav gav = extractor.getGradlePathGav(OSSpecificFilepath);
 				information.removeWarningFromProject(projName, gav);
 			} else if (depService.isMavenDependency(OSSpecificFilepath)) {
+				System.out.println("MAVEN DEPENDENCY");
 				final String mavenPath = JavaCore.getClasspathVariable(ClasspathVariables.MAVEN).toOSString();
 				final Gav gav = extractor.getMavenPathGav(OSSpecificFilepath, mavenPath);
 				information.removeWarningFromProject(projName, gav);
@@ -97,13 +101,11 @@ public class ProjectDependenciesChangedListener implements IElementChangedListen
 				try {
 					removeDependency(el);
 				} catch (final CoreException e) {
-
 				}
-			} else if (delta.getKind() == IJavaElementDelta.ADDED || delta.getKind() == IJavaElementDelta.CHANGED) {
+			} else if ((delta.getKind() & (IJavaElementDelta.ADDED | IJavaElementDelta.CHANGED)) != 0) {
 				try {
 					addDependency(el);
 				} catch (final CoreException e) {
-
 				}
 			}
 			break;
