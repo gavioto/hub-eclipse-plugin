@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.blackducksoftware.integration.build.Gav;
+import com.blackducksoftware.integration.build.GavWithType;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.google.common.cache.LoadingCache;
 
@@ -25,10 +26,13 @@ public class ProjectDependencyInformationTest {
     Gav gav1, gav2, gav3;
 
     @Mock
+    GavWithType gavWithType1, gavWithType2, gavWithType3;
+
+    @Mock
     List<Vulnerability> vulnerabilities1, vulnerabilities2, vulnerabilities3;
 
     @Mock
-    LoadingCache<Gav, List<Vulnerability>> cache;
+    LoadingCache<GavWithType, List<Vulnerability>> cache;
 
     @Mock
     ComponentCache componentCache;
@@ -38,9 +42,12 @@ public class ProjectDependencyInformationTest {
 
     private void prepareCache() throws ExecutionException {
         Mockito.when(componentCache.getCache()).thenReturn(cache);
-        Mockito.when(cache.get(gav1)).thenReturn(vulnerabilities1);
-        Mockito.when(cache.get(gav2)).thenReturn(vulnerabilities2);
-        Mockito.when(cache.get(gav3)).thenReturn(vulnerabilities3);
+        Mockito.when(gavWithType1.getGav()).thenReturn(gav1);
+        Mockito.when(gavWithType2.getGav()).thenReturn(gav2);
+        Mockito.when(gavWithType3.getGav()).thenReturn(gav3);
+        Mockito.when(cache.get(gavWithType1)).thenReturn(vulnerabilities1);
+        Mockito.when(cache.get(gavWithType2)).thenReturn(vulnerabilities2);
+        Mockito.when(cache.get(gavWithType3)).thenReturn(vulnerabilities3);
     }
 
     private boolean containsGav(final Gav[] gavs, final Gav gav) {
@@ -55,7 +62,7 @@ public class ProjectDependencyInformationTest {
     @Test
     public void testAddingProject() throws ExecutionException {
         prepareCache();
-        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new Gav[] { gav1, gav2, gav3 });
+        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new GavWithType[] { gavWithType1, gavWithType2, gavWithType3 });
         final ProjectDependencyInformation projInfo = new ProjectDependencyInformation(projService, componentCache);
         projInfo.addProject(proj);
         final Gav[] gavs = projInfo.getAllDependencyGavs(proj);
@@ -67,13 +74,13 @@ public class ProjectDependencyInformationTest {
     @Test
     public void testAddingDependency() throws ExecutionException {
         prepareCache();
-        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new Gav[] { gav1, gav2 });
+        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new GavWithType[] { gavWithType1, gavWithType2 });
         final ProjectDependencyInformation projInfo = new ProjectDependencyInformation(projService, componentCache);
         projInfo.addProject(proj);
         assertTrue(projInfo.containsProject(proj));
         final Gav[] gavsBefore = projInfo.getAllDependencyGavs(proj);
         assertFalse(containsGav(gavsBefore, gav3));
-        projInfo.addWarningToProject(proj, gav3);
+        projInfo.addWarningToProject(proj, gavWithType3);
         final Gav[] gavsAfter = projInfo.getAllDependencyGavs(proj);
         assertTrue(containsGav(gavsAfter, gav3));
     }
@@ -81,7 +88,7 @@ public class ProjectDependencyInformationTest {
     @Test
     public void testRemovingDependency() throws ExecutionException {
         prepareCache();
-        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new Gav[] { gav1, gav2, gav3 });
+        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new GavWithType[] { gavWithType1, gavWithType2, gavWithType3 });
         final ProjectDependencyInformation projInfo = new ProjectDependencyInformation(projService, componentCache);
         projInfo.addProject(proj);
         final Gav[] gavsBefore = projInfo.getAllDependencyGavs(proj);
@@ -94,7 +101,7 @@ public class ProjectDependencyInformationTest {
     @Test
     public void testRemovingProject() throws ExecutionException {
         prepareCache();
-        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new Gav[] { gav1, gav2 });
+        Mockito.when(projService.getMavenAndGradleDependencies(proj)).thenReturn(new GavWithType[] { gavWithType1, gavWithType2 });
         final ProjectDependencyInformation projInfo = new ProjectDependencyInformation(projService, componentCache);
         projInfo.addProject(proj);
         assertTrue(projInfo.containsProject(proj));

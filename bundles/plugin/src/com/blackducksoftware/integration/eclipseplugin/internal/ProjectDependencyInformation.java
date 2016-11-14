@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import com.blackducksoftware.integration.build.Gav;
+import com.blackducksoftware.integration.build.GavWithType;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
 
@@ -42,11 +43,11 @@ public class ProjectDependencyInformation {
     }
 
     public void reloadProject(String projectName) {
-        final Gav[] gavs = projService.getMavenAndGradleDependencies(projectName);
+        final GavWithType[] gavs = projService.getMavenAndGradleDependencies(projectName);
         final ConcurrentHashMap<Gav, List<Vulnerability>> deps = new ConcurrentHashMap<>();
-        for (final Gav gav : gavs) {
+        for (final GavWithType gav : gavs) {
             try {
-                deps.put(gav, componentCache.getCache().get(gav));
+                deps.put(gav.getGav(), componentCache.getCache().get(gav));
             } catch (final ExecutionException e) {
 
             }
@@ -54,11 +55,11 @@ public class ProjectDependencyInformation {
         projectInfo.put(projectName, deps);
     }
 
-    public void addWarningToProject(final String projectName, final Gav gav) {
+    public void addWarningToProject(final String projectName, final GavWithType gav) {
         final ConcurrentHashMap<Gav, List<Vulnerability>> deps = projectInfo.get(projectName);
         if (deps != null) {
             try {
-                deps.put(gav, componentCache.getCache().get(gav));
+                deps.put(gav.getGav(), componentCache.getCache().get(gav));
                 System.out.println("INSERTING COMPONENT " + gav + " INTO PROJECT " + projectName);
             } catch (ExecutionException e) {
 

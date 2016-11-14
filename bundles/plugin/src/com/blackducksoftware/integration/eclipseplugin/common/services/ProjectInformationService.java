@@ -10,114 +10,117 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 import com.blackducksoftware.integration.build.Gav;
+import com.blackducksoftware.integration.build.GavTypeEnum;
+import com.blackducksoftware.integration.build.GavWithType;
 import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.ClasspathVariables;
 
 public class ProjectInformationService {
 
-	private final DependencyInformationService dependencyInformationService;
-	private final FilePathGavExtractor extractor;
+    private final DependencyInformationService dependencyInformationService;
 
-	public ProjectInformationService(final DependencyInformationService dependencyInformationService,
-			final FilePathGavExtractor extractor) {
-		this.dependencyInformationService = dependencyInformationService;
-		this.extractor = extractor;
-	}
+    private final FilePathGavExtractor extractor;
 
-	public boolean isJavaProject(final IProject project) {
-		try {
-			return project.hasNature(JavaCore.NATURE_ID);
-		} catch (final CoreException e) {
-			return false;
-		}
-	}
+    public ProjectInformationService(final DependencyInformationService dependencyInformationService,
+            final FilePathGavExtractor extractor) {
+        this.dependencyInformationService = dependencyInformationService;
+        this.extractor = extractor;
+    }
 
-	public int getNumBinaryDependencies(final IPackageFragmentRoot[] packageFragmentRoots) {
-		int numBinary = 0;
-		for (final IPackageFragmentRoot root : packageFragmentRoots) {
-			try {
-				if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
-					numBinary++;
-				}
-			} catch (final JavaModelException e) {
-			}
-		}
-		return numBinary;
-	}
+    public boolean isJavaProject(final IProject project) {
+        try {
+            return project.hasNature(JavaCore.NATURE_ID);
+        } catch (final CoreException e) {
+            return false;
+        }
+    }
 
-	public String[] getBinaryDependencyFilepaths(final IPackageFragmentRoot[] packageFragmentRoots) {
-		final int numBinary = getNumBinaryDependencies(packageFragmentRoots);
-		final String[] dependencyFilepaths = new String[numBinary];
-		int i = 0;
-		for (final IPackageFragmentRoot root : packageFragmentRoots) {
-			try {
-				if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
-					final IPath path = root.getPath();
-					final String device = path.getDevice();
-					String osString = path.toOSString();
-					if (device != null) {
-						osString = osString.replaceFirst(device, "");
-					}
-					dependencyFilepaths[i] = osString;
-					i++;
-				}
-			} catch (final JavaModelException e) {
-			}
-		}
-		return dependencyFilepaths;
-	}
+    public int getNumBinaryDependencies(final IPackageFragmentRoot[] packageFragmentRoots) {
+        int numBinary = 0;
+        for (final IPackageFragmentRoot root : packageFragmentRoots) {
+            try {
+                if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
+                    numBinary++;
+                }
+            } catch (final JavaModelException e) {
+            }
+        }
+        return numBinary;
+    }
 
-	public Gav[] getMavenAndGradleDependencies(final String projectName) {
-		if (projectName.equals("")) {
-			return new Gav[0];
-		}
-		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (project == null) {
-			return new Gav[0];
-		}
-		if (isJavaProject(project)) {
-			final IJavaProject javaProject = JavaCore.create(project);
-			IPackageFragmentRoot[] packageFragmentRoots;
-			try {
-				packageFragmentRoots = javaProject.getPackageFragmentRoots();
-				final String[] dependencyFilepaths = getBinaryDependencyFilepaths(packageFragmentRoots);
-				return getGavsFromFilepaths(dependencyFilepaths);
-			} catch (final JavaModelException e) {
-				return new Gav[0];
-			}
-		} else {
-			return new Gav[0];
-		}
-	}
+    public String[] getBinaryDependencyFilepaths(final IPackageFragmentRoot[] packageFragmentRoots) {
+        final int numBinary = getNumBinaryDependencies(packageFragmentRoots);
+        final String[] dependencyFilepaths = new String[numBinary];
+        int i = 0;
+        for (final IPackageFragmentRoot root : packageFragmentRoots) {
+            try {
+                if (root.getKind() == IPackageFragmentRoot.K_BINARY) {
+                    final IPath path = root.getPath();
+                    final String device = path.getDevice();
+                    String osString = path.toOSString();
+                    if (device != null) {
+                        osString = osString.replaceFirst(device, "");
+                    }
+                    dependencyFilepaths[i] = osString;
+                    i++;
+                }
+            } catch (final JavaModelException e) {
+            }
+        }
+        return dependencyFilepaths;
+    }
 
-	public int getNumMavenAndGradleDependencies(final String[] dependencyFilepaths) {
-		int numDeps = 0;
-		for (final String filepath : dependencyFilepaths) {
-			if (dependencyInformationService.isMavenDependency(filepath)
-					|| dependencyInformationService.isGradleDependency(filepath)) {
-				numDeps++;
-			}
-		}
-		return numDeps;
-	}
+    public GavWithType[] getMavenAndGradleDependencies(final String projectName) {
+        if (projectName.equals("")) {
+            return new GavWithType[0];
+        }
+        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        if (project == null) {
+            return new GavWithType[0];
+        }
+        if (isJavaProject(project)) {
+            final IJavaProject javaProject = JavaCore.create(project);
+            IPackageFragmentRoot[] packageFragmentRoots;
+            try {
+                packageFragmentRoots = javaProject.getPackageFragmentRoots();
+                final String[] dependencyFilepaths = getBinaryDependencyFilepaths(packageFragmentRoots);
+                return getGavsFromFilepaths(dependencyFilepaths);
+            } catch (final JavaModelException e) {
+                return new GavWithType[0];
+            }
+        } else {
+            return new GavWithType[0];
+        }
+    }
 
-	public Gav[] getGavsFromFilepaths(final String[] dependencyFilepaths) {
-		final int numDeps = getNumMavenAndGradleDependencies(dependencyFilepaths);
-		final Gav[] gavs = new Gav[numDeps];
-		int gavsIndex = 0;
-		for (int j = 0; j < dependencyFilepaths.length; j++) {
-			if (dependencyInformationService.isMavenDependency(dependencyFilepaths[j])) {
-				final Gav gav = extractor.getMavenPathGav(dependencyFilepaths[j],
-						JavaCore.getClasspathVariable(ClasspathVariables.MAVEN).toString());
+    public int getNumMavenAndGradleDependencies(final String[] dependencyFilepaths) {
+        int numDeps = 0;
+        for (final String filepath : dependencyFilepaths) {
+            if (dependencyInformationService.isMavenDependency(filepath)
+                    || dependencyInformationService.isGradleDependency(filepath)) {
+                numDeps++;
+            }
+        }
+        return numDeps;
+    }
 
-				gavs[gavsIndex] = gav;
-				gavsIndex++;
-			} else if (dependencyInformationService.isGradleDependency(dependencyFilepaths[j])) {
-				final Gav gav = extractor.getGradlePathGav(dependencyFilepaths[j]);
-				gavs[gavsIndex] = gav;
-				gavsIndex++;
-			}
-		}
-		return gavs;
-	}
+    public GavWithType[] getGavsFromFilepaths(final String[] dependencyFilepaths) {
+        final int numDeps = getNumMavenAndGradleDependencies(dependencyFilepaths);
+        final GavWithType[] gavsWithType = new GavWithType[numDeps];
+        int gavsIndex = 0;
+        for (String dependencyFilepath : dependencyFilepaths) {
+            if (dependencyInformationService.isMavenDependency(dependencyFilepath)) {
+                final Gav gav = extractor.getMavenPathGav(dependencyFilepath,
+                        JavaCore.getClasspathVariable(ClasspathVariables.MAVEN).toString());
+
+                gavsWithType[gavsIndex] = new GavWithType(gav, GavTypeEnum.MAVEN);
+                gavsIndex++;
+            } else if (dependencyInformationService.isGradleDependency(dependencyFilepath)) {
+                final Gav gav = extractor.getGradlePathGav(dependencyFilepath);
+                gavsWithType[gavsIndex] = new GavWithType(gav, GavTypeEnum.MAVEN);
+                gavsIndex++;
+            }
+        }
+        return gavsWithType;
+    }
 }
