@@ -17,114 +17,126 @@ import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
-import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
+import com.blackducksoftware.integration.eclipseplugin.startup.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.PreferenceChangeDisplayUpdateListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectDeletedListener;
 import com.blackducksoftware.integration.eclipseplugin.views.listeners.ProjectSelectionListener;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningColumnLabelProvider;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.WarningContentProvider;
 
-/*
- * Class that implements the warning view UI
- */
 public class WarningView extends ViewPart {
 
-	private final int MAX_COLUMN_SIZE = 100;
-	private TableViewer tableOfWarnings;
-	private String lastSelectedProjectName = "";
-	private PreferenceChangeDisplayUpdateListener preferenceChangeDisplayUpdateListener;
-	private ProjectDeletedListener projectDeletedListener;
-	private ProjectSelectionListener projectSelectionListener;
-	private Display display;
-	private IPreferenceStore prefs;
-	private WorkspaceInformationService workspaceInformationService;
+    private final int MAX_COLUMN_SIZE = 100;
 
-	@Override
-	public void createPartControl(final Composite parent) {
+    private TableViewer tableOfWarnings;
 
-		display = PlatformUI.getWorkbench().getDisplay();
-		preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this);
-		projectDeletedListener = new ProjectDeletedListener(this);
-		projectSelectionListener = new ProjectSelectionListener(this);
-		prefs = Activator.getDefault().getPreferenceStore();
-		workspaceInformationService = new WorkspaceInformationService(
-				new ProjectInformationService(new DependencyInformationService(), new FilePathGavExtractor()));
+    private String lastSelectedProjectName = "";
 
-		getSite().getPage().addSelectionListener(projectSelectionListener);
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeDisplayUpdateListener);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeletedListener,
-				IResourceChangeEvent.PRE_DELETE);
-		Activator.getDefault().getProjectInformation().setWarningView(this);
+    private PreferenceChangeDisplayUpdateListener preferenceChangeDisplayUpdateListener;
 
-		tableOfWarnings = new TableViewer(parent,
-				SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		tableOfWarnings
-				.setContentProvider(new WarningContentProvider(prefs, Activator.getDefault().getProjectInformation()));
-		createColumns(parent, tableOfWarnings);
-		lastSelectedProjectName = workspaceInformationService.getSelectedProject();
-		tableOfWarnings.setInput(lastSelectedProjectName);
+    private ProjectDeletedListener projectDeletedListener;
 
-		final Table table = tableOfWarnings.getTable();
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-	}
+    private ProjectSelectionListener projectSelectionListener;
 
-	public void resetInput() {
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				tableOfWarnings.setInput(lastSelectedProjectName);
-			}
-		});
-	}
+    private Display display;
 
-	public void setLastSelectedProjectName(final String name) {
-		this.lastSelectedProjectName = name;
-	}
+    private IPreferenceStore prefs;
 
-	public void setTableInput(final String input) {
-		tableOfWarnings.setInput(input);
-	}
+    private WorkspaceInformationService workspaceInformationService;
 
-	public String getLastSelectedProjectName() {
-		return this.lastSelectedProjectName;
-	}
+    public static final String VULNERABILITY_NAME_LABEL = "Vulnerability Name";
 
-	public TableViewer getTable() {
-		return tableOfWarnings;
-	}
+    public static final String VULNERABILITY_DESCRIPTION_LABEL = "Vulnerability Description";
 
-	private void createColumns(final Composite parent, final TableViewer warningTable) {
-		final String[] labels = { "Component", "Match Count", "Match Type", "Usage", "License", "Security Risk",
-				"Operational Risk", };
-		final int[] columnBounds = new int[labels.length];
-		for (int i = 0; i < columnBounds.length; i++) {
-			columnBounds[i] = MAX_COLUMN_SIZE;
-		}
-		for (int i = 0; i < labels.length; i++) {
-			final TableViewerColumn viewCol = new TableViewerColumn(warningTable, SWT.NONE);
-			final TableColumn col = viewCol.getColumn();
-			col.setText(labels[i]);
-			col.setWidth(columnBounds[i]);
-			col.setResizable(true);
-			col.setMoveable(true);
-			viewCol.setLabelProvider(new WarningColumnLabelProvider(i));
-		}
-	}
+    public static final String VULNERABILITY_BASE_SCORE_LABEL = "Vulnerability Base Score";
 
-	@Override
-	public void setFocus() {
-		tableOfWarnings.getControl().setFocus();
-	}
+    public static final String VULNERABILITY_SEVERITY_LABEL = "Vulnerability Severity";
 
-	@Override
-	public void dispose() {
-		super.dispose();
+    @Override
+    public void createPartControl(final Composite parent) {
 
-		// remove all listeners when view is closed
-		getSite().getPage().removeSelectionListener(projectSelectionListener);
-		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeDisplayUpdateListener);
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectDeletedListener);
-		Activator.getDefault().getProjectInformation().removeWarningView();
-	}
+        display = PlatformUI.getWorkbench().getDisplay();
+        preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this);
+        projectDeletedListener = new ProjectDeletedListener(this);
+        projectSelectionListener = new ProjectSelectionListener(this);
+        prefs = Activator.getDefault().getPreferenceStore();
+        workspaceInformationService = new WorkspaceInformationService(
+                new ProjectInformationService(new DependencyInformationService(), new FilePathGavExtractor()));
+
+        getSite().getPage().addSelectionListener(projectSelectionListener);
+        Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeDisplayUpdateListener);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeletedListener,
+                IResourceChangeEvent.PRE_DELETE);
+        Activator.getDefault().getProjectInformation().setWarningView(this);
+
+        tableOfWarnings = new TableViewer(parent,
+                SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+        tableOfWarnings
+                .setContentProvider(new WarningContentProvider(prefs, Activator.getDefault().getProjectInformation()));
+        createColumns(parent, tableOfWarnings);
+        lastSelectedProjectName = workspaceInformationService.getSelectedProject();
+        tableOfWarnings.setInput(lastSelectedProjectName);
+
+        final Table table = tableOfWarnings.getTable();
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+    }
+
+    public void resetInput() {
+        display.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                tableOfWarnings.setInput(lastSelectedProjectName);
+            }
+        });
+    }
+
+    public void setLastSelectedProjectName(final String name) {
+        this.lastSelectedProjectName = name;
+    }
+
+    public void setTableInput(final String input) {
+        tableOfWarnings.setInput(input);
+    }
+
+    public String getLastSelectedProjectName() {
+        return this.lastSelectedProjectName;
+    }
+
+    public TableViewer getTable() {
+        return tableOfWarnings;
+    }
+
+    private void createColumns(final Composite parent, final TableViewer warningTable) {
+        final String[] labels = { VULNERABILITY_NAME_LABEL, VULNERABILITY_DESCRIPTION_LABEL, VULNERABILITY_BASE_SCORE_LABEL, VULNERABILITY_SEVERITY_LABEL };
+        final int[] columnBounds = new int[labels.length];
+        for (int i = 0; i < columnBounds.length; i++) {
+            columnBounds[i] = MAX_COLUMN_SIZE;
+        }
+        for (int i = 0; i < labels.length; i++) {
+            final TableViewerColumn viewCol = new TableViewerColumn(warningTable, SWT.NONE);
+            final TableColumn col = viewCol.getColumn();
+            col.setText(labels[i]);
+            col.setWidth(columnBounds[i]);
+            col.setResizable(true);
+            col.setMoveable(true);
+            viewCol.setLabelProvider(new WarningColumnLabelProvider(i));
+        }
+    }
+
+    @Override
+    public void setFocus() {
+        tableOfWarnings.getControl().setFocus();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        // remove all listeners when view is closed
+        getSite().getPage().removeSelectionListener(projectSelectionListener);
+        Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeDisplayUpdateListener);
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectDeletedListener);
+        Activator.getDefault().getProjectInformation().removeWarningView();
+    }
 }

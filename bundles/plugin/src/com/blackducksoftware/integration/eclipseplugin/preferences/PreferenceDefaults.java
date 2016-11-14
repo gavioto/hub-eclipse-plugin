@@ -11,7 +11,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
-import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
+import com.blackducksoftware.integration.eclipseplugin.startup.Activator;
 
 public class PreferenceDefaults extends PreferencePage implements IWorkbenchPreferencePage {
 

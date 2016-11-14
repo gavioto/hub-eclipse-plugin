@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
+import com.blackducksoftware.integration.eclipseplugin.startup.Activator;
 
 /*
  * Class that implements the individual project preferences page

@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.blackducksoftware.integration.eclipseplugin.internal.Activator;
+import com.blackducksoftware.integration.eclipseplugin.startup.Activator;
 
 public class ProjectSpecificPreferenceDefaults extends PreferencePage implements IWorkbenchPreferencePage {
 

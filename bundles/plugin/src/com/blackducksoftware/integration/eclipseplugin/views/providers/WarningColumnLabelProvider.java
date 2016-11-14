@@ -2,41 +2,43 @@ package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
-import com.blackducksoftware.integration.eclipseplugin.internal.Warning;
+import com.blackducksoftware.integration.eclipseplugin.internal.Vulnerability;
 
 public class WarningColumnLabelProvider extends ColumnLabelProvider {
 
-	private final int columnIndex;
+    private final int columnIndex;
 
-	public WarningColumnLabelProvider(final int columnIndex) {
-		super();
-		this.columnIndex = columnIndex;
-	}
+    public static final int VULNERABILITY_NAME_COLUMN_INDEX = 0;
 
-	@Override
-	public String getText(final Object warning) {
-		if (warning instanceof Warning) {
-			if (columnIndex == Warning.COMPONENT_COLUMN_INDEX) {
-				return ((Warning) warning).getComponent();
-			} else if (columnIndex == Warning.LICENSE_COLUMN_INDEX) {
-				return ((Warning) warning).getLicense();
-			} else if (columnIndex == Warning.MATCH_COUNT_COLUMN_INDEX) {
-				return ((Warning) warning).getMatchCount();
-			} else if (columnIndex == Warning.MATCH_TYPE_COLUMN_INDEX) {
-				return ((Warning) warning).getMatchType();
-			} else if (columnIndex == Warning.OPERATIONAL_RISK_COLUMN_INDEX) {
-				return ((Warning) warning).getOperationalRisk();
-			} else if (columnIndex == Warning.SECURITY_RISK_COLUMN_INDEX) {
-				return ((Warning) warning).getSecurityRisk();
-			} else if (columnIndex == Warning.USAGE_COLUMN_INDEX) {
-				return ((Warning) warning).getUsage();
-			} else {
-				return "";
-			}
-		} else if (warning instanceof String && columnIndex == 0) {
-			return (String) warning;
-		} else {
-			return "";
-		}
-	}
+    public static final int VULNERABILITY_DESCRIPTION_COLUMN_INDEX = 1;
+
+    public static final int VULNERABILITY_BASE_SCORE_COLUMN_INDEX = 2;
+
+    public static final int VULNERABILITY_SEVERITY_COLUMN_INDEX = 3;
+
+    public WarningColumnLabelProvider(final int columnIndex) {
+        super();
+        this.columnIndex = columnIndex;
+    }
+
+    @Override
+    public String getText(final Object input) {
+        if (input instanceof Vulnerability) {
+            if (columnIndex == VULNERABILITY_NAME_COLUMN_INDEX) {
+                return ((Vulnerability) input).getVulnerabilityName();
+            } else if (columnIndex == VULNERABILITY_DESCRIPTION_COLUMN_INDEX) {
+                return ((Vulnerability) input).getDescription();
+            } else if (columnIndex == VULNERABILITY_BASE_SCORE_COLUMN_INDEX) {
+                return Double.toString(((Vulnerability) input).getBaseScore());
+            } else if (columnIndex == VULNERABILITY_SEVERITY_COLUMN_INDEX) {
+                return ((Vulnerability) input).getSeverity();
+            } else {
+                return "";
+            }
+        } else if (input instanceof String && columnIndex == 0) {
+            return (String) input;
+        } else {
+            return "";
+        }
+    }
 }
