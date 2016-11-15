@@ -15,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.build.GavWithType;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
+import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
 import com.google.common.cache.LoadingCache;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -29,10 +30,10 @@ public class ProjectDependencyInformationTest {
     GavWithType gavWithType1, gavWithType2, gavWithType3;
 
     @Mock
-    List<Vulnerability> vulnerabilities1, vulnerabilities2, vulnerabilities3;
+    List<VulnerabilityItem> vulnerabilities1, vulnerabilities2, vulnerabilities3;
 
     @Mock
-    LoadingCache<GavWithType, List<Vulnerability>> cache;
+    LoadingCache<GavWithType, List<VulnerabilityItem>> cache;
 
     @Mock
     ComponentCache componentCache;

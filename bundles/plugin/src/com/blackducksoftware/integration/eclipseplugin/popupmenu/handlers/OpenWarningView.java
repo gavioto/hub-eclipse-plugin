@@ -15,34 +15,33 @@ import com.blackducksoftware.integration.eclipseplugin.common.constants.ViewIds;
 
 public class OpenWarningView extends AbstractHandler {
 
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		if (event == null) {
-			System.err.println("null ExecutionEvent");
-			return null;
-		}
+    @Override
+    public Object execute(final ExecutionEvent event) throws ExecutionException {
+        if (event == null) {
+            return null;
+        }
 
-		try {
-			final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
-			if (window != null) {
-				final IWorkbenchPage page = window.getActivePage();
-				if (page != null) {
-					page.showView(ViewIds.WARNING);
-				}
-			}
-		} catch (final PartInitException e) {
-			showErrorMessage(event);
-			e.printStackTrace();
-		}
-		return null;
-	}
+        try {
+            final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+            if (window != null) {
+                final IWorkbenchPage page = window.getActivePage();
+                if (page != null) {
+                    page.showView(ViewIds.WARNING);
+                }
+            }
+        } catch (final PartInitException e) {
+            showErrorMessage(event);
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	private void showErrorMessage(final ExecutionEvent event) {
-		final Shell activeShell = HandlerUtil.getActiveShell(event);
-		final MessageBox errorMessageDialog = new MessageBox(activeShell, SWT.OK);
-		errorMessageDialog.setText("Warning View Error");
-		errorMessageDialog.setMessage("There was an error opening the warning view");
-		errorMessageDialog.open();
-	}
+    private void showErrorMessage(final ExecutionEvent event) {
+        final Shell activeShell = HandlerUtil.getActiveShell(event);
+        final MessageBox errorMessageDialog = new MessageBox(activeShell, SWT.OK);
+        errorMessageDialog.setText("Warning View Error");
+        errorMessageDialog.setMessage("There was an error opening the warning view");
+        errorMessageDialog.open();
+    }
 
 }

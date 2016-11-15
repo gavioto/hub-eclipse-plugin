@@ -25,7 +25,6 @@ import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestCo
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.SecurePreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
-import com.blackducksoftware.integration.eclipseplugin.hub.ComponentVulnerabilityLookup;
 import com.blackducksoftware.integration.eclipseplugin.internal.AuthorizationResponse;
 import com.blackducksoftware.integration.eclipseplugin.internal.AuthorizationValidator;
 import com.blackducksoftware.integration.eclipseplugin.internal.ComponentCache;
@@ -34,14 +33,10 @@ import com.blackducksoftware.integration.eclipseplugin.internal.listeners.JavaPr
 import com.blackducksoftware.integration.eclipseplugin.internal.listeners.NewJavaProjectListener;
 import com.blackducksoftware.integration.eclipseplugin.internal.listeners.ProjectDependenciesChangedListener;
 import com.blackducksoftware.integration.eclipseplugin.preferences.listeners.DefaultPreferenceChangeListener;
-import com.blackducksoftware.integration.hub.api.component.ComponentRestService;
-import com.blackducksoftware.integration.hub.api.component.id.ComponentIdRestService;
-import com.blackducksoftware.integration.hub.api.component.version.ComponentVersionRestService;
-import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityRestService;
 import com.blackducksoftware.integration.hub.builder.HubServerConfigBuilder;
+import com.blackducksoftware.integration.hub.dataservices.DataServicesFactory;
+import com.blackducksoftware.integration.hub.dataservices.vulnerability.VulnerabilityDataService;
 import com.blackducksoftware.integration.hub.rest.RestConnection;
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 
 public class Activator extends AbstractUIPlugin {
 
@@ -82,15 +77,9 @@ public class Activator extends AbstractUIPlugin {
         securePrefService = new SecurePreferencesService(SecurePreferenceNodes.BLACK_DUCK, SecurePreferencesFactory.getDefault());
         getInitialHubConnection();
         if (hubConnection != null) {
-            Gson gson = new Gson();
-            JsonParser parser = new JsonParser();
-            ComponentRestService componentRestService = new ComponentRestService(hubConnection, gson, parser);
-            ComponentVersionRestService versionRestService = new ComponentVersionRestService(hubConnection, gson, parser);
-            ComponentIdRestService idRestService = new ComponentIdRestService(hubConnection, gson, parser);
-            VulnerabilityRestService vulnerabilityRestService = new VulnerabilityRestService(hubConnection, gson, parser);
-            ComponentVulnerabilityLookup lookup = new ComponentVulnerabilityLookup(componentRestService, versionRestService, idRestService,
-                    vulnerabilityRestService);
-            componentCache = new ComponentCache(lookup, COMPONENT_CACHE_CAPACITY);
+            DataServicesFactory servicesFactory = new DataServicesFactory(hubConnection);
+            VulnerabilityDataService vulnService = servicesFactory.createVulnerabilityDataService();
+            componentCache = new ComponentCache(vulnService, COMPONENT_CACHE_CAPACITY);
         } else {
             componentCache = new ComponentCache(null, COMPONENT_CACHE_CAPACITY);
         }
@@ -163,22 +152,16 @@ public class Activator extends AbstractUIPlugin {
     public void updateHubConnection(RestConnection connection) {
         hubConnection = connection;
         if (connection != null) {
-            Gson gson = new Gson();
-            JsonParser parser = new JsonParser();
-            ComponentRestService componentRestService = new ComponentRestService(hubConnection, gson, parser);
-            ComponentVersionRestService versionRestService = new ComponentVersionRestService(hubConnection, gson, parser);
-            ComponentIdRestService idRestService = new ComponentIdRestService(hubConnection, gson, parser);
-            VulnerabilityRestService vulnerabilityRestService = new VulnerabilityRestService(hubConnection, gson, parser);
-            ComponentVulnerabilityLookup lookup = new ComponentVulnerabilityLookup(componentRestService, versionRestService, idRestService,
-                    vulnerabilityRestService);
-            componentCache.setVulnLookup(lookup);
+            DataServicesFactory servicesFactory = new DataServicesFactory(connection);
+            VulnerabilityDataService vulnService = servicesFactory.createVulnerabilityDataService();
+            componentCache.setVulnService(vulnService);
             final FilePathGavExtractor extractor = new FilePathGavExtractor();
             final DependencyInformationService depService = new DependencyInformationService();
             final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
             final WorkspaceInformationService workspaceService = new WorkspaceInformationService(projService);
             reloadAllProjects(workspaceService);
         } else {
-            componentCache.setVulnLookup(null);
+            componentCache.setVulnService(null);
         }
     }
 

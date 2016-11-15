@@ -1,7 +1,9 @@
 package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -9,12 +11,13 @@ import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.build.GavWithType;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
 import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
+import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
 
 public class ProjectDependencyInformation {
 
     private final ComponentCache componentCache;
 
-    private final HashMap<String, ConcurrentHashMap<Gav, List<Vulnerability>>> projectInfo;
+    private final HashMap<String, ConcurrentHashMap<Gav, List<VulnerabilityItem>>> projectInfo;
 
     private final ProjectInformationService projService;
 
@@ -44,7 +47,7 @@ public class ProjectDependencyInformation {
 
     public void reloadProject(String projectName) {
         final GavWithType[] gavs = projService.getMavenAndGradleDependencies(projectName);
-        final ConcurrentHashMap<Gav, List<Vulnerability>> deps = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> deps = new ConcurrentHashMap<>();
         for (final GavWithType gav : gavs) {
             try {
                 deps.put(gav.getGav(), componentCache.getCache().get(gav));
@@ -56,11 +59,10 @@ public class ProjectDependencyInformation {
     }
 
     public void addWarningToProject(final String projectName, final GavWithType gav) {
-        final ConcurrentHashMap<Gav, List<Vulnerability>> deps = projectInfo.get(projectName);
+        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> deps = projectInfo.get(projectName);
         if (deps != null) {
             try {
                 deps.put(gav.getGav(), componentCache.getCache().get(gav));
-                System.out.println("INSERTING COMPONENT " + gav + " INTO PROJECT " + projectName);
             } catch (ExecutionException e) {
 
             }
@@ -72,7 +74,7 @@ public class ProjectDependencyInformation {
     }
 
     public void removeWarningFromProject(final String projectName, final Gav gav) {
-        final ConcurrentHashMap<Gav, List<Vulnerability>> dependencies = projectInfo.get(projectName);
+        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> dependencies = projectInfo.get(projectName);
         if (dependencies != null) {
             dependencies.remove(gav);
             if (warningView != null) {
@@ -86,12 +88,30 @@ public class ProjectDependencyInformation {
     }
 
     public Gav[] getAllDependencyGavs(final String projectName) {
-        final ConcurrentHashMap<Gav, List<Vulnerability>> dependencyInfo = projectInfo.get(projectName);
+        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> dependencyInfo = projectInfo.get(projectName);
         if (dependencyInfo != null) {
             return dependencyInfo.keySet().toArray(new Gav[dependencyInfo.keySet().size()]);
         } else {
             return new Gav[0];
         }
+    }
+
+    public GavWithVulnerabilities[] getVulns(String projectName) {
+        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> dependencyInfo = projectInfo.get(projectName);
+        if (dependencyInfo != null) {
+            Set<Gav> gavSet = dependencyInfo.keySet();
+            Iterator<Gav> gavIt = gavSet.iterator();
+            GavWithVulnerabilities[] allVulns = new GavWithVulnerabilities[gavSet.size()];
+            int i = 0;
+            while (gavIt.hasNext()) {
+                Gav gav = gavIt.next();
+                GavWithVulnerabilities gavWithVulns = new GavWithVulnerabilities(gav, dependencyInfo.get(gav));
+                allVulns[i] = gavWithVulns;
+                i++;
+            }
+            return allVulns;
+        }
+        return new GavWithVulnerabilities[0];
     }
 
 }
