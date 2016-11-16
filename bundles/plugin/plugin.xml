@@ -121,7 +121,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenWarningView"
+            defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenVulnerabilityView"
             id="com.blackducksoftware.integration.popupmenu.OpenWarningView"
             name="Open Black Duck Vulnerability View">
       </command>

@@ -11,25 +11,36 @@
  */
 package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
-import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
-public class InformationItemWithParentVulnerability {
+@RunWith(MockitoJUnitRunner.class)
+public class ComponentTreeViewLabelProviderTest {
 
-    private String informationItem;
+    @Test
+    public void testGetTextForGav() {
 
-    private VulnerabilityItem vuln;
-
-    public InformationItemWithParentVulnerability(String informationItem, VulnerabilityItem vuln) {
-        this.informationItem = informationItem;
-        this.vuln = vuln;
     }
 
-    public String getInformationItem() {
-        return informationItem;
+    @Test
+    public void testGetTextForVulnerabilityWithParentGav() {
+
     }
 
-    public VulnerabilityItem getVuln() {
-        return vuln;
+    @Test
+    public void testGetTextForInformationItemWithParentVulnerability() {
+
+    }
+
+    @Test
+    public void testGetTextForString() {
+
+    }
+
+    @Test
+    public void testGetTextForOtherObjectType() {
+
     }
 
 }

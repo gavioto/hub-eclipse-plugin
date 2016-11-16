@@ -14,6 +14,8 @@ package com.blackducksoftware.integration.eclipseplugin.views.providers;
 import org.eclipse.jface.viewers.LabelProvider;
 
 import com.blackducksoftware.integration.build.Gav;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.InformationItemWithParentVulnerability;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.VulnerabilityWithParentGav;
 
 public class ComponentTreeViewLabelProvider extends LabelProvider {
 

@@ -20,6 +20,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependencyInformation;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.InformationItemWithParentVulnerability;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.VulnerabilityWithParentGav;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
 
 public class ComponentTreeViewContentProvider implements ITreeContentProvider {
@@ -96,9 +98,6 @@ public class ComponentTreeViewContentProvider implements ITreeContentProvider {
 
     @Override
     public Object getParent(Object element) {
-        if (element instanceof Gav) {
-            return null;
-        }
         if (element instanceof VulnerabilityWithParentGav) {
             return ((VulnerabilityWithParentGav) element).getGav();
         }
