@@ -64,6 +64,9 @@ public class ProjectDependencyInformation {
         if (deps != null) {
             try {
                 deps.put(gav.getGav(), componentCache.getCache().get(gav));
+                if (componentView != null) {
+                    componentView.resetInput();
+                }
             } catch (ExecutionException e) {
 
             }

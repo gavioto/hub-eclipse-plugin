@@ -1,7 +1,7 @@
 package com.blackducksoftware.integration.eclipseplugin.preferences;
 
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -34,7 +34,7 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
 
     private StringFieldEditor hubUsername;
 
-    private Text hubPassword; // Encrypt!
+    private Text hubPassword;
 
     private StringFieldEditor hubURL;
 
@@ -42,7 +42,7 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
 
     private StringFieldEditor proxyUsername;
 
-    private Text proxyPassword; // Encrypt!
+    private Text proxyPassword;
 
     private StringFieldEditor proxyHost;
 
@@ -76,6 +76,12 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
 
     private final String TEST_HUB_CREDENTIALS_TEXT = "Test Hub Credentials";
 
+    private final int NUM_COLUMNS = 2;
+
+    private final int DEFAULT_TEXT_WIDTH = 300;
+
+    private final int DEFAULT_TEXT_HEIGHT = 60;
+
     @Override
     public void init(final IWorkbench workbench) {
         securePrefService = new SecurePreferencesService(SecurePreferenceNodes.BLACK_DUCK,
@@ -88,51 +94,60 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
     protected Control createContents(final Composite parent) {
 
         final Composite authComposite = new Composite(parent, SWT.LEFT);
-        authComposite.setLayout(new GridLayout());
+        GridLayout authCompositeLayout = new GridLayout();
+        authCompositeLayout.numColumns = NUM_COLUMNS;
+        authComposite.setLayout(authCompositeLayout);
         authComposite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_BEGINNING));
-        final GridData labelData = new GridData(GridData.GRAB_VERTICAL | GridData.VERTICAL_ALIGN_CENTER);
-        labelData.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
-        final GridData textData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
 
         hubUsername = new StringFieldEditor(PreferenceNames.HUB_USERNAME, HUB_USERNAME_LABEL, authComposite);
-        performStringFieldEditorSetup(hubUsername);
-        createLabel(parent, authComposite, labelData, HUB_PASSWORD_LABEL);
+        performFieldEditorSetup(authComposite, hubUsername);
+
+        createLabel(parent, authComposite, HUB_PASSWORD_LABEL);
         hubPassword = new Text(authComposite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
-        hubPassword.setLayoutData(textData);
         hubPassword.setText(securePrefService.getSecurePreference(SecurePreferenceNames.HUB_PASSWORD));
         hubURL = new StringFieldEditor(PreferenceNames.HUB_URL, HUB_URL_LABEL, authComposite);
-        performStringFieldEditorSetup(hubURL);
+        performFieldEditorSetup(authComposite, hubURL);
         hubTimeout = new IntegerFieldEditor(PreferenceNames.HUB_TIMEOUT, HUB_TIMEOUT_LABEL, authComposite);
-        performStringFieldEditorSetup(hubTimeout);
+        performFieldEditorSetup(authComposite, hubTimeout);
         proxyUsername = new StringFieldEditor(PreferenceNames.PROXY_USERNAME, PROXY_USERNAME_LABEL, authComposite);
-        performStringFieldEditorSetup(proxyUsername);
-        createLabel(parent, authComposite, labelData, PROXY_PASSWORD_LABEL);
+        performFieldEditorSetup(authComposite, proxyUsername);
+
+        createLabel(parent, authComposite, PROXY_PASSWORD_LABEL);
         proxyPassword = new Text(authComposite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
-        proxyPassword.setLayoutData(textData);
         proxyPassword.setText(securePrefService.getSecurePreference(SecurePreferenceNames.PROXY_PASSWORD));
+
         proxyHost = new StringFieldEditor(PreferenceNames.PROXY_HOST, PROXY_HOST_LABEL, authComposite);
-        performStringFieldEditorSetup(proxyHost);
+        performFieldEditorSetup(authComposite, proxyHost);
         proxyPort = new IntegerFieldEditor(PreferenceNames.PROXY_PORT, PROXY_PORT_LABEL, authComposite);
-        performStringFieldEditorSetup(proxyPort);
+        performFieldEditorSetup(authComposite, proxyPort);
         ignoredProxyHosts = new StringFieldEditor(PreferenceNames.IGNORED_PROXY_HOSTS, IGNORED_PROXY_HOSTS_LABEL,
                 authComposite);
-        performStringFieldEditorSetup(ignoredProxyHosts);
+        performFieldEditorSetup(authComposite, ignoredProxyHosts);
 
-        testHubCredentials = new Button(authComposite, SWT.PUSH);
-        testHubCredentials.setText(TEST_HUB_CREDENTIALS_TEXT);
-
-        connectionMessageText = new Text(authComposite, SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
-        connectionMessageText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
+        Composite connectionMessageComposite = new Composite(parent, SWT.LEFT);
+        GridLayout connectionMessageCompositeLayout = new GridLayout();
+        connectionMessageCompositeLayout.numColumns = 1;
+        connectionMessageComposite.setLayout(connectionMessageCompositeLayout);
+        connectionMessageComposite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_BEGINNING));
+        GridData textData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+        connectionMessageText = new Text(connectionMessageComposite, SWT.READ_ONLY | SWT.MULTI | SWT.WRAP);
         connectionMessageText
                 .setBackground(connectionMessageText.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+        connectionMessageText.setLayoutData(textData);
         connectionMessageText.setText("\n");
 
+        return parent;
+    }
+
+    @Override
+    protected void contributeButtons(Composite parent) {
+        ((GridLayout) parent.getLayout()).numColumns++;
+        testHubCredentials = new Button(parent, SWT.PUSH);
+        testHubCredentials.setText(TEST_HUB_CREDENTIALS_TEXT);
         testHubCredentials.addSelectionListener(
                 new TestHubCredentialsSelectionListener(hubUsername, hubPassword, hubURL, hubTimeout, proxyUsername,
                         proxyPassword, proxyHost, proxyPort, ignoredProxyHosts, connectionMessageText,
                         validator));
-
-        return authComposite;
     }
 
     private void storeValues() {
@@ -150,17 +165,17 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
         Activator.getDefault().updateHubConnection(authResponse.getConnection());
     }
 
-    private void createLabel(final Composite parent, final Composite composite, final GridData data,
+    private void createLabel(final Composite parent, final Composite composite,
             final String labelText) {
         final Label label = new Label(composite, SWT.WRAP);
         label.setText(labelText);
-        label.setLayoutData(data);
         label.setFont(parent.getFont());
     }
 
-    private void performStringFieldEditorSetup(final StringFieldEditor editor) {
+    private void performFieldEditorSetup(Composite parent, final FieldEditor editor) {
         editor.setPage(this);
         editor.setPreferenceStore(getPreferenceStore());
+        editor.fillIntoGrid(parent, NUM_COLUMNS);
         editor.load();
     }
 

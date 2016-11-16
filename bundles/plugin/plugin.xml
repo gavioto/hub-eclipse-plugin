@@ -17,7 +17,8 @@
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Black Duck Vulnerability View"
-               style="push">
+               style="push"
+      		   icon="icons/ducky.png">
               <visibleWhen>
          		<with
          				variable="selection">
@@ -37,12 +38,14 @@
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
                label="Black Duck Settings..."
-               style="push">
+               style="push"
+      		   icon="icons/ducky.png">
          </command>
          <command
          		commandId="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
          		label="Project Preferences..."
-         		style="push">
+         		style="push"
+      		   icon="icons/ducky.png">
          	<visibleWhen>
          		<with
          				variable="selection">
@@ -74,7 +77,8 @@
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Black Duck Vulnerability View"
-               style="push">
+               style="push"
+      		   icon="icons/ducky.png">
               <visibleWhen>
          		<with
          				variable="selection">
@@ -94,12 +98,14 @@
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
                label="Black Duck Settings..."
-               style="push">
+               style="push"
+      		   icon="icons/ducky.png">
          </command>
          <command
          		commandId="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
          		label="Project Preferences..."
-         		style="push">
+         		style="push"
+      		   icon="icons/ducky.png">
          	<visibleWhen>
          		<with
          				variable="selection">
@@ -147,6 +153,7 @@
             class="com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView"
             id="com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView"
             name="Black Duck Vulnerabilities"
+            icon="icons/ducky.png"
             category="com.blackducksoftware.integration.eclipseplugin.views"
             restorable="true">
       </view>
