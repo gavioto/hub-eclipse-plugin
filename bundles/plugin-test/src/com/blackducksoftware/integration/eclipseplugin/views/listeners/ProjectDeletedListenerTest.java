@@ -8,25 +8,27 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
+import com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectDeletedListenerTest {
 
-	@Mock
-	IResourceChangeEvent e;
-	@Mock
-	WarningView view;
-	@Mock
-	IResource resource;
+    @Mock
+    IResourceChangeEvent e;
 
-	@Test
-	public void testWhenProjectDeleted() {
-		Mockito.when(e.getResource()).thenReturn(resource);
-		final ProjectDeletedListener listener = new ProjectDeletedListener(view);
-		listener.resourceChanged(e);
-		Mockito.verify(view, Mockito.times(1)).setLastSelectedProjectName("");
-		Mockito.verify(view, Mockito.times(1)).resetInput();
-	}
+    @Mock
+    VulnerabilityView view;
+
+    @Mock
+    IResource resource;
+
+    @Test
+    public void testWhenProjectDeleted() {
+        Mockito.when(e.getResource()).thenReturn(resource);
+        final ProjectDeletedListener listener = new ProjectDeletedListener(view);
+        listener.resourceChanged(e);
+        Mockito.verify(view, Mockito.times(1)).setLastSelectedProjectName("");
+        Mockito.verify(view, Mockito.times(1)).resetInput();
+    }
 
 }

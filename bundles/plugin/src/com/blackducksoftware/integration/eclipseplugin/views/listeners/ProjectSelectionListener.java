@@ -8,37 +8,37 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
+import com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView;
 
 public class ProjectSelectionListener implements ISelectionListener {
 
-	private final WarningView warningView;
+    private final VulnerabilityView componentView;
 
-	public ProjectSelectionListener(final WarningView warningView) {
-		this.warningView = warningView;
-	}
+    public ProjectSelectionListener(final VulnerabilityView componentView) {
+        this.componentView = componentView;
+    }
 
-	@Override
-	public void selectionChanged(final IWorkbenchPart part, final ISelection sel) {
-		if (!(sel instanceof IStructuredSelection)) {
-			return;
-		}
-		final IStructuredSelection ss = (IStructuredSelection) sel;
-		final Object selectedProject = ss.getFirstElement();
-		if (selectedProject instanceof IAdaptable) {
-			final IProject project = ((IAdaptable) selectedProject).getAdapter(IProject.class);
-			String projectName;
-			try {
-				if (project != null && project.getDescription() != null && warningView.getTable() != null) {
-					projectName = project.getDescription().getName();
-					warningView.setLastSelectedProjectName(projectName);
-					warningView.setTableInput(projectName);
-				}
-			} catch (final CoreException e) {
-				projectName = "";
-				warningView.setLastSelectedProjectName(projectName);
-				warningView.setTableInput(projectName);
-			}
-		}
-	}
+    @Override
+    public void selectionChanged(final IWorkbenchPart part, final ISelection sel) {
+        if (!(sel instanceof IStructuredSelection)) {
+            return;
+        }
+        final IStructuredSelection ss = (IStructuredSelection) sel;
+        final Object selectedProject = ss.getFirstElement();
+        if (selectedProject instanceof IAdaptable) {
+            final IProject project = ((IAdaptable) selectedProject).getAdapter(IProject.class);
+            String projectName;
+            try {
+                if (project != null && project.getDescription() != null && componentView.getComponentViewer() != null) {
+                    projectName = project.getDescription().getName();
+                    componentView.setLastSelectedProjectName(projectName);
+                    componentView.setTableInput(projectName);
+                }
+            } catch (final CoreException e) {
+                projectName = "";
+                componentView.setLastSelectedProjectName(projectName);
+                componentView.setTableInput(projectName);
+            }
+        }
+    }
 }

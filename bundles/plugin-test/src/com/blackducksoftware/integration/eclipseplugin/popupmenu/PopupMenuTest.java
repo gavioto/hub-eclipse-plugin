@@ -43,7 +43,7 @@ public class PopupMenuTest {
 		final SWTBotMenu blackDuckMenu = node.select().contextMenu(MenuLabels.BLACK_DUCK);
 		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.PROJECT_PREFERENCES));
 		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.BLACK_DUCK_SETTINGS));
-		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.WARNING_VIEW));
+		assertNotNull(blackDuckMenu.contextMenu(MenuLabels.VULNERABILITY_VIEW));
 	}
 
 	@Test

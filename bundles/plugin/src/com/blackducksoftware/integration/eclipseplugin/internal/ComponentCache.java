@@ -34,7 +34,8 @@ public class ComponentCache {
                             if (vulns != null) {
                                 return vulns;
                             }
-                            throw new ComponentLookupNotFoundException("Hub could not find component " + gav.getGav() + " with type " + gav.getType());
+                            throw new ComponentLookupNotFoundException(
+                                    "Hub could not find vulnerabilities for component " + gav.getGav() + " with type " + gav.getType());
                         } else {
                             throw new ComponentLookupNotFoundException("Unable to look up component in Hub");
                         }

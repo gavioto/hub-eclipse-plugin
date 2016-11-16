@@ -3,6 +3,7 @@ package com.blackducksoftware.integration.eclipseplugin.internal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -10,7 +11,7 @@ import java.util.concurrent.ExecutionException;
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.build.GavWithType;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
-import com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView;
+import com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
 
 public class ProjectDependencyInformation {
@@ -21,22 +22,22 @@ public class ProjectDependencyInformation {
 
     private final ProjectInformationService projService;
 
-    private WarningView warningView;
+    private VulnerabilityView componentView;
 
     public ProjectDependencyInformation(final ProjectInformationService projService,
             ComponentCache componentCache) {
         projectInfo = new HashMap<>();
         this.projService = projService;
-        this.warningView = null;
+        this.componentView = null;
         this.componentCache = componentCache;
     }
 
-    public void setWarningView(final WarningView warningView) {
-        this.warningView = warningView;
+    public void setComponentView(final VulnerabilityView componentView) {
+        this.componentView = componentView;
     }
 
-    public void removeWarningView() {
-        warningView = null;
+    public void removeComponentView() {
+        componentView = null;
     }
 
     public void addProject(final String projectName) {
@@ -77,8 +78,8 @@ public class ProjectDependencyInformation {
         final ConcurrentHashMap<Gav, List<VulnerabilityItem>> dependencies = projectInfo.get(projectName);
         if (dependencies != null) {
             dependencies.remove(gav);
-            if (warningView != null) {
-                warningView.resetInput();
+            if (componentView != null) {
+                componentView.resetInput();
             }
         }
     }
@@ -112,6 +113,10 @@ public class ProjectDependencyInformation {
             return allVulns;
         }
         return new GavWithVulnerabilities[0];
+    }
+
+    public Map<Gav, List<VulnerabilityItem>> getVulnMap(String projectName) {
+        return projectInfo.get(projectName);
     }
 
 }

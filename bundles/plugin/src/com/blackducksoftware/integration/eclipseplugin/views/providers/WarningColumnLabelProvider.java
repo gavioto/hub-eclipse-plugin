@@ -23,6 +23,7 @@ public class WarningColumnLabelProvider extends ColumnLabelProvider {
 
     @Override
     public String getText(final Object input) {
+        System.out.println("GETTING TEXT");
         if (input instanceof Vulnerability) {
             if (columnIndex == VULNERABILITY_NAME_COLUMN_INDEX) {
                 return ((Vulnerability) input).getVulnerabilityName();

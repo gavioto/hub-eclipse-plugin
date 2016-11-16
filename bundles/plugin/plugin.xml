@@ -16,7 +16,7 @@
             locationURI="popup:blackduck-PackageExplorer?after=additions">
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
-               label="Open Warning View"
+               label="Open Black Duck Vulnerability View"
                style="push">
               <visibleWhen>
          		<with
@@ -73,7 +73,7 @@
             locationURI="popup:blackduck-ProjectExplorer?after=additions">
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
-               label="Open Warning View"
+               label="Open Black Duck Vulnerability View"
                style="push">
               <visibleWhen>
          		<with
@@ -123,7 +123,7 @@
       <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenWarningView"
             id="com.blackducksoftware.integration.popupmenu.OpenWarningView"
-            name="Open Warning View">
+            name="Open Black Duck Vulnerability View">
       </command>
       <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenPreferences"
@@ -144,9 +144,9 @@
       >
       </category>
       <view
-            class="com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView"
-            id="com.blackducksoftware.integration.eclipseplugin.views.ui.WarningView"
-            name="Warning View"
+            class="com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView"
+            id="com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView"
+            name="Black Duck Vulnerabilities"
             category="com.blackducksoftware.integration.eclipseplugin.views"
             restorable="true">
       </view>

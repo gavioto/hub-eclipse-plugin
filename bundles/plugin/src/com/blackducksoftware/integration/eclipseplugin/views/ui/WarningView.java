@@ -56,9 +56,9 @@ public class WarningView extends ViewPart {
     public void createPartControl(final Composite parent) {
 
         display = PlatformUI.getWorkbench().getDisplay();
-        preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this);
-        projectDeletedListener = new ProjectDeletedListener(this);
-        projectSelectionListener = new ProjectSelectionListener(this);
+        // preferenceChangeDisplayUpdateListener = new PreferenceChangeDisplayUpdateListener(this);
+        // projectDeletedListener = new ProjectDeletedListener(this);
+        // projectSelectionListener = new ProjectSelectionListener(this);
         prefs = Activator.getDefault().getPreferenceStore();
         workspaceInformationService = new WorkspaceInformationService(
                 new ProjectInformationService(new DependencyInformationService(), new FilePathGavExtractor()));
@@ -67,7 +67,7 @@ public class WarningView extends ViewPart {
         Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeDisplayUpdateListener);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(projectDeletedListener,
                 IResourceChangeEvent.PRE_DELETE);
-        Activator.getDefault().getProjectInformation().setWarningView(this);
+        // Activator.getDefault().getProjectInformation().setComponentView(this);
 
         tableOfWarnings = new TableViewer(parent,
                 SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
@@ -134,9 +134,9 @@ public class WarningView extends ViewPart {
         super.dispose();
 
         // remove all listeners when view is closed
-        getSite().getPage().removeSelectionListener(projectSelectionListener);
-        Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeDisplayUpdateListener);
-        ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectDeletedListener);
-        Activator.getDefault().getProjectInformation().removeWarningView();
+        // getSite().getPage().removeSelectionListener(projectSelectionListener);
+        // Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeDisplayUpdateListener);
+        // ResourcesPlugin.getWorkspace().removeResourceChangeListener(projectDeletedListener);
+        // Activator.getDefault().getProjectInformation().removeComponentView();
     }
 }
