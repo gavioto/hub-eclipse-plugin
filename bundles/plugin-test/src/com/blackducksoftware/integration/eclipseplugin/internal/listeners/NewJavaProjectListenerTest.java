@@ -113,7 +113,7 @@ public class NewJavaProjectListenerTest {
 		final NewJavaProjectListener listener = new NewJavaProjectListener(prefService, information);
 		listener.resourceChanged(event);
 		Mockito.verify(prefService, Mockito.times(1)).setAllProjectSpecificDefaults(PROJECT_NAME);
-		Mockito.verify(information, Mockito.times(1)).addProject(PROJECT_NAME);
+		Mockito.verify(information, Mockito.times(1)).addNewProject(PROJECT_NAME);
 	}
 
 	@Test
@@ -124,7 +124,7 @@ public class NewJavaProjectListenerTest {
 		final NewJavaProjectListener listener = new NewJavaProjectListener(prefService, information);
 		listener.resourceChanged(event);
 		Mockito.verify(prefService, Mockito.times(1)).setAllProjectSpecificDefaults(PROJECT_NAME);
-		Mockito.verify(information, Mockito.times(0)).addProject(PROJECT_NAME);
+		Mockito.verify(information, Mockito.times(0)).addNewProject(PROJECT_NAME);
 	}
 
 	@Test
@@ -135,7 +135,7 @@ public class NewJavaProjectListenerTest {
 		final NewJavaProjectListener listener = new NewJavaProjectListener(prefService, information);
 		listener.resourceChanged(event);
 		Mockito.verify(prefService, Mockito.times(0)).setAllProjectSpecificDefaults(PROJECT_NAME);
-		Mockito.verify(information, Mockito.times(0)).addProject(PROJECT_NAME);
+		Mockito.verify(information, Mockito.times(0)).addNewProject(PROJECT_NAME);
 	}
 
 	@Test
@@ -146,7 +146,7 @@ public class NewJavaProjectListenerTest {
 		final NewJavaProjectListener listener = new NewJavaProjectListener(prefService, information);
 		listener.resourceChanged(event);
 		Mockito.verify(prefService, Mockito.times(0)).setAllProjectSpecificDefaults(PROJECT_NAME);
-		Mockito.verify(information, Mockito.times(0)).addProject(PROJECT_NAME);
+		Mockito.verify(information, Mockito.times(0)).addNewProject(PROJECT_NAME);
 	}
 
 	@Test
@@ -157,7 +157,7 @@ public class NewJavaProjectListenerTest {
 		final NewJavaProjectListener listener = new NewJavaProjectListener(prefService, information);
 		listener.resourceChanged(event);
 		Mockito.verify(prefService, Mockito.times(0)).setAllProjectSpecificDefaults(PROJECT_NAME);
-		Mockito.verify(information, Mockito.times(0)).addProject(PROJECT_NAME);
+		Mockito.verify(information, Mockito.times(0)).addNewProject(PROJECT_NAME);
 	}
 
 	@Test
@@ -168,6 +168,6 @@ public class NewJavaProjectListenerTest {
 		final NewJavaProjectListener listener = new NewJavaProjectListener(prefService, information);
 		listener.resourceChanged(event);
 		Mockito.verify(prefService, Mockito.times(0)).setAllProjectSpecificDefaults(PROJECT_NAME);
-		Mockito.verify(information, Mockito.times(0)).addProject(PROJECT_NAME);
+		Mockito.verify(information, Mockito.times(0)).addNewProject(PROJECT_NAME);
 	}
 }

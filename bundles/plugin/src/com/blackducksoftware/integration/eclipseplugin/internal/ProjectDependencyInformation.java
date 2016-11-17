@@ -1,18 +1,20 @@
 package com.blackducksoftware.integration.eclipseplugin.internal;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.build.GavWithType;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 import com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
+import com.blackducksoftware.integration.hub.dataservices.DataServicesFactory;
+import com.blackducksoftware.integration.hub.dataservices.vulnerability.VulnerabilityDataService;
+import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class ProjectDependencyInformation {
 
@@ -22,12 +24,15 @@ public class ProjectDependencyInformation {
 
     private final ProjectInformationService projService;
 
+    private final WorkspaceInformationService workspaceService;
+
     private VulnerabilityView componentView;
 
-    public ProjectDependencyInformation(final ProjectInformationService projService,
+    public ProjectDependencyInformation(final ProjectInformationService projService, WorkspaceInformationService workspaceService,
             ComponentCache componentCache) {
         projectInfo = new HashMap<>();
         this.projService = projService;
+        this.workspaceService = workspaceService;
         this.componentView = null;
         this.componentCache = componentCache;
     }
@@ -40,13 +45,20 @@ public class ProjectDependencyInformation {
         componentView = null;
     }
 
-    public void addProject(final String projectName) {
+    public void addNewProject(final String projectName) {
         if (!projectInfo.containsKey(projectName)) {
-            reloadProject(projectName);
+            addProject(projectName);
         }
     }
 
-    public void reloadProject(String projectName) {
+    public void addAllProjects() {
+        String[] projects = workspaceService.getJavaProjectNames();
+        for (String project : projects) {
+            addProject(project);
+        }
+    }
+
+    public void addProject(String projectName) {
         final GavWithType[] gavs = projService.getMavenAndGradleDependencies(projectName);
         final ConcurrentHashMap<Gav, List<VulnerabilityItem>> deps = new ConcurrentHashMap<>();
         for (final GavWithType gav : gavs) {
@@ -100,26 +112,21 @@ public class ProjectDependencyInformation {
         }
     }
 
-    public GavWithVulnerabilities[] getVulns(String projectName) {
-        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> dependencyInfo = projectInfo.get(projectName);
-        if (dependencyInfo != null) {
-            Set<Gav> gavSet = dependencyInfo.keySet();
-            Iterator<Gav> gavIt = gavSet.iterator();
-            GavWithVulnerabilities[] allVulns = new GavWithVulnerabilities[gavSet.size()];
-            int i = 0;
-            while (gavIt.hasNext()) {
-                Gav gav = gavIt.next();
-                GavWithVulnerabilities gavWithVulns = new GavWithVulnerabilities(gav, dependencyInfo.get(gav));
-                allVulns[i] = gavWithVulns;
-                i++;
-            }
-            return allVulns;
-        }
-        return new GavWithVulnerabilities[0];
-    }
-
     public Map<Gav, List<VulnerabilityItem>> getVulnMap(String projectName) {
         return projectInfo.get(projectName);
+    }
+
+    public void updateCache(RestConnection connection) {
+        if (connection != null) {
+            System.out.println("NEW HUB CONNECTION WAS NOT NULL");
+            DataServicesFactory servicesFactory = new DataServicesFactory(connection);
+            VulnerabilityDataService vulnService = servicesFactory.createVulnerabilityDataService();
+            componentCache.setVulnService(vulnService);
+            addAllProjects();
+        } else {
+            System.out.println("NEW HUB CONNECTION WAS NULL");
+            componentCache.setVulnService(null);
+        }
     }
 
 }

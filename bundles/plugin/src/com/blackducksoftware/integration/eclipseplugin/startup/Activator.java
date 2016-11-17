@@ -9,9 +9,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -83,7 +80,7 @@ public class Activator extends AbstractUIPlugin {
         } else {
             componentCache = new ComponentCache(null, COMPONENT_CACHE_CAPACITY);
         }
-        information = new ProjectDependencyInformation(projService, componentCache);
+        information = new ProjectDependencyInformation(projService, workspaceService, componentCache);
         final DefaultPreferencesService defaultPrefService = new DefaultPreferencesService(
                 getDefault().getPreferenceStore());
         newJavaProjectListener = new NewJavaProjectListener(defaultPrefService, information);
@@ -96,21 +93,7 @@ public class Activator extends AbstractUIPlugin {
         getPreferenceStore().addPropertyChangeListener(defaultPrefChangeListener);
         JavaCore.addElementChangedListener(depsChangedListener);
         defaultPrefService.setDefaultConfig();
-        addAllProjects(workspaceService);
-    }
-
-    public void addAllProjects(final WorkspaceInformationService workspaceService) {
-        final String[] javaProjects = workspaceService.getJavaProjectNames();
-        for (final String project : javaProjects) {
-            information.addProject(project);
-        }
-    }
-
-    public void reloadAllProjects(WorkspaceInformationService workspaceService) {
-        final String[] javaProjects = workspaceService.getJavaProjectNames();
-        for (final String project : javaProjects) {
-            information.reloadProject(project);
-        }
+        information.addAllProjects();
     }
 
     public ProjectDependencyInformation getProjectInformation() {
@@ -136,33 +119,13 @@ public class Activator extends AbstractUIPlugin {
         if (response.getConnection() != null) {
             hubConnection = response.getConnection();
         } else {
-            // showAuthorizationErrorMessageBox(response.getResponseMessage());
             hubConnection = null;
         }
     }
 
-    public void showAuthorizationErrorMessageBox(String message) {
-        Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        MessageBox messageBox = new MessageBox(activeShell);
-        messageBox.setMessage("When attempting to connect to Black Duck's Hub, the following error was detected. Check your authorization settings.\n"
-                + message);
-        messageBox.open();
-    }
-
     public void updateHubConnection(RestConnection connection) {
         hubConnection = connection;
-        if (connection != null) {
-            DataServicesFactory servicesFactory = new DataServicesFactory(connection);
-            VulnerabilityDataService vulnService = servicesFactory.createVulnerabilityDataService();
-            componentCache.setVulnService(vulnService);
-            final FilePathGavExtractor extractor = new FilePathGavExtractor();
-            final DependencyInformationService depService = new DependencyInformationService();
-            final ProjectInformationService projService = new ProjectInformationService(depService, extractor);
-            final WorkspaceInformationService workspaceService = new WorkspaceInformationService(projService);
-            reloadAllProjects(workspaceService);
-        } else {
-            componentCache.setVulnService(null);
-        }
+        information.updateCache(connection);
     }
 
     @Override
