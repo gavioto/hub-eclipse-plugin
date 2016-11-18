@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependencyInformation;
+import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.GavWithParentProject;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.InformationItemWithParentVulnerability;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.VulnerabilityWithParentGav;
 import com.blackducksoftware.integration.hub.api.vulnerabilities.VulnerabilityItem;
@@ -48,32 +49,33 @@ public class ComponentTreeViewContentProvider implements ITreeContentProvider {
 
     @Override
     public Object[] getChildren(Object parentElement) {
-        if (parentElement instanceof Gav) {
-            Gav gav = (Gav) parentElement;
+        if (parentElement instanceof GavWithParentProject) {
+            Gav gav = ((GavWithParentProject) parentElement).getGav();
             Map<Gav, List<VulnerabilityItem>> vulnMap = projectInformation.getVulnMap(inputProject);
             if (vulnMap != null) {
-                List<VulnerabilityItem> vulnList = vulnMap.get(gav);
-                if (vulnList.size() == 0) {
-                    return NO_VULNERABILITIES_TO_SHOW;
+                if (((GavWithParentProject) parentElement).hasVulns()) {
+                    List<VulnerabilityItem> vulnList = vulnMap.get(gav);
+                    Iterator<VulnerabilityItem> vulnIt = vulnList.iterator();
+                    VulnerabilityWithParentGav[] vulnsWithGavs = new VulnerabilityWithParentGav[vulnList.size()];
+                    int i = 0;
+                    while (vulnIt.hasNext()) {
+                        VulnerabilityWithParentGav vulnWithGav = new VulnerabilityWithParentGav(gav, vulnIt.next());
+                        vulnsWithGavs[i] = vulnWithGav;
+                        i++;
+                    }
+                    return vulnsWithGavs;
                 }
-                Iterator<VulnerabilityItem> vulnIt = vulnList.iterator();
-                VulnerabilityWithParentGav[] vulnsWithGavs = new VulnerabilityWithParentGav[vulnList.size()];
-                int i = 0;
-                while (vulnIt.hasNext()) {
-                    VulnerabilityWithParentGav vulnWithGav = new VulnerabilityWithParentGav(gav, vulnIt.next());
-                    vulnsWithGavs[i] = vulnWithGav;
-                    i++;
-                }
-                return vulnsWithGavs;
+                return NO_VULNERABILITIES_TO_SHOW;
             }
         }
         if (parentElement instanceof VulnerabilityWithParentGav) {
             VulnerabilityItem vulnItem = ((VulnerabilityWithParentGav) parentElement).getVuln();
-            InformationItemWithParentVulnerability baseScore = new InformationItemWithParentVulnerability(Double.toString(vulnItem.getBaseScore()), vulnItem);
-            InformationItemWithParentVulnerability description = new InformationItemWithParentVulnerability(vulnItem.getDescription(), vulnItem);
-            InformationItemWithParentVulnerability name = new InformationItemWithParentVulnerability(vulnItem.getVulnerabilityName(), vulnItem);
-            InformationItemWithParentVulnerability severity = new InformationItemWithParentVulnerability(vulnItem.getSeverity(), vulnItem);
-            return new InformationItemWithParentVulnerability[] { name, description, severity, baseScore };
+            InformationItemWithParentVulnerability baseScore = new InformationItemWithParentVulnerability(
+                    "Base Score: " + Double.toString(vulnItem.getBaseScore()), vulnItem);
+            InformationItemWithParentVulnerability description = new InformationItemWithParentVulnerability("Description: " + vulnItem.getDescription(),
+                    vulnItem);
+            InformationItemWithParentVulnerability severity = new InformationItemWithParentVulnerability("Severity: " + vulnItem.getSeverity(), vulnItem);
+            return new InformationItemWithParentVulnerability[] { description, severity, baseScore };
         }
         return null;
     }
@@ -89,7 +91,14 @@ public class ComponentTreeViewContentProvider implements ITreeContentProvider {
             boolean isActivated = preferenceStore.getBoolean(projectName);
             if (isActivated) {
                 final Gav[] gavs = projectInformation.getAllDependencyGavs(projectName);
-                return gavs;
+                GavWithParentProject[] gavsWithParents = new GavWithParentProject[gavs.length];
+                for (int i = 0; i < gavs.length; i++) {
+                    Gav gav = gavs[i];
+                    Map<Gav, List<VulnerabilityItem>> vulnMap = projectInformation.getVulnMap(projectName);
+                    boolean hasVulns = vulnMap.get(gav) != null && vulnMap.get(gav).size() > 0;
+                    gavsWithParents[i] = new GavWithParentProject(gav, projectName, hasVulns);
+                }
+                return gavsWithParents;
             }
             return PROJECT_NOT_ACTIVATED;
         }
@@ -98,6 +107,9 @@ public class ComponentTreeViewContentProvider implements ITreeContentProvider {
 
     @Override
     public Object getParent(Object element) {
+        if (element instanceof GavWithParentProject) {
+            return ((GavWithParentProject) element).getParentProject();
+        }
         if (element instanceof VulnerabilityWithParentGav) {
             return ((VulnerabilityWithParentGav) element).getGav();
         }
@@ -109,7 +121,7 @@ public class ComponentTreeViewContentProvider implements ITreeContentProvider {
 
     @Override
     public boolean hasChildren(Object element) {
-        if (element instanceof Gav) {
+        if (element instanceof GavWithParentProject) {
             return true;
         }
         if (element instanceof VulnerabilityWithParentGav) {
