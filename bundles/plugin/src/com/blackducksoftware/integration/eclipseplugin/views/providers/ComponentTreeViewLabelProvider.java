@@ -13,12 +13,15 @@ package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.osgi.framework.Bundle;
 
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.GavWithParentProject;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.InformationItemWithParentVulnerability;
@@ -54,17 +57,17 @@ public class ComponentTreeViewLabelProvider extends LabelProvider implements ISt
     @Override
     public Image getImage(Object input) {
         if (input instanceof GavWithParentProject) {
+            Bundle bundle = Platform.getBundle("hub-eclipse-plugin");
+            URL imageURL;
             if (((GavWithParentProject) input).hasVulns()) {
-                try (InputStream image = getClass().getClassLoader().getResourceAsStream("resources/icons/rejected.gif")) {
-                    return new Image(display, image);
-                } catch (IOException e) {
-                    return null; // don't show image
-                }
+                imageURL = bundle.getEntry("resources/icons/rejected.gif");
+            } else {
+                imageURL = bundle.getEntry("resources/icons/approved.gif");
             }
-            try (InputStream image = getClass().getClassLoader().getResourceAsStream("resources/icons/approved.gif")) {
+            try (InputStream image = imageURL.openStream()) {
                 return new Image(display, image);
             } catch (IOException e) {
-                return null; // don't show image
+                return null; // don't display image
             }
         }
         return null;
