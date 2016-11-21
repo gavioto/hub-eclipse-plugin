@@ -37,7 +37,7 @@ import com.blackducksoftware.integration.hub.rest.RestConnection;
 
 public class Activator extends AbstractUIPlugin {
 
-    public static final String PLUGIN_ID = "com.blackduck.integration.eclipseplugin";
+    public static final String PLUGIN_ID = "hub-eclipse-plugin";
 
     private final int COMPONENT_CACHE_CAPACITY = 10000;
 
@@ -126,6 +126,10 @@ public class Activator extends AbstractUIPlugin {
     public void updateHubConnection(RestConnection connection) {
         hubConnection = connection;
         information.updateCache(connection);
+    }
+
+    public boolean hasActiveHubConnection() {
+        return hubConnection != null;
     }
 
     @Override

@@ -11,19 +11,15 @@
  */
 package com.blackducksoftware.integration.eclipseplugin.views.providers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.osgi.framework.Bundle;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PathsToIconFiles;
+import com.blackducksoftware.integration.eclipseplugin.startup.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.GavWithParentProject;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.InformationItemWithParentVulnerability;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.VulnerabilityWithParentGav;
@@ -58,18 +54,13 @@ public class ComponentTreeViewLabelProvider extends LabelProvider implements ISt
     @Override
     public Image getImage(Object input) {
         if (input instanceof GavWithParentProject) {
-            Bundle bundle = Platform.getBundle("hub-eclipse-plugin");
-            URL imageURL;
-            if (((GavWithParentProject) input).hasVulns()) {
-                imageURL = bundle.getEntry(PathsToIconFiles.RED_X);
+            ImageDescriptor descriptor;
+            if (!((GavWithParentProject) input).hasVulns()) {
+                descriptor = Activator.getImageDescriptor(PathsToIconFiles.GREEN_CHECK);
             } else {
-                imageURL = bundle.getEntry(PathsToIconFiles.GREEN_CHECK);
+                descriptor = Activator.getImageDescriptor(PathsToIconFiles.RED_X);
             }
-            try (InputStream image = imageURL.openStream()) {
-                return new Image(display, image);
-            } catch (IOException e) {
-                return null; // don't display image
-            }
+            return descriptor == null ? null : descriptor.createImage();
         }
         return null;
     }

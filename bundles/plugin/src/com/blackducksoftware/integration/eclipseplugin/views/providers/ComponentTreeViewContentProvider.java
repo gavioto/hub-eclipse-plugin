@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.blackducksoftware.integration.build.Gav;
 import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependencyInformation;
+import com.blackducksoftware.integration.eclipseplugin.startup.Activator;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.GavWithParentProject;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.InformationItemWithParentVulnerability;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.VulnerabilityWithParentGav;
@@ -41,6 +42,8 @@ public class ComponentTreeViewContentProvider implements ITreeContentProvider {
     public static final String[] ERR_UNKNOWN_INPUT = new String[] { "Input is of unknown type" };
 
     public static final String[] NO_VULNERABILITIES_TO_SHOW = new String[] { "No vulnerabilities to show!" };
+
+    public static final String[] NO_HUB_CONNECTION = new String[] { "Cannot display vulnerabilities because you are not currently connected to the Hub" };
 
     public ComponentTreeViewContentProvider(IPreferenceStore preferenceStore, ProjectDependencyInformation projectInformation) {
         this.preferenceStore = preferenceStore;
@@ -90,15 +93,18 @@ public class ComponentTreeViewContentProvider implements ITreeContentProvider {
             }
             boolean isActivated = preferenceStore.getBoolean(projectName);
             if (isActivated) {
-                final Gav[] gavs = projectInformation.getAllDependencyGavs(projectName);
-                GavWithParentProject[] gavsWithParents = new GavWithParentProject[gavs.length];
-                for (int i = 0; i < gavs.length; i++) {
-                    Gav gav = gavs[i];
-                    Map<Gav, List<VulnerabilityItem>> vulnMap = projectInformation.getVulnMap(projectName);
-                    boolean hasVulns = vulnMap.get(gav) != null && vulnMap.get(gav).size() > 0;
-                    gavsWithParents[i] = new GavWithParentProject(gav, projectName, hasVulns);
+                if (Activator.getDefault().hasActiveHubConnection()) {
+                    final Gav[] gavs = projectInformation.getAllDependencyGavs(projectName);
+                    GavWithParentProject[] gavsWithParents = new GavWithParentProject[gavs.length];
+                    for (int i = 0; i < gavs.length; i++) {
+                        Gav gav = gavs[i];
+                        Map<Gav, List<VulnerabilityItem>> vulnMap = projectInformation.getVulnMap(projectName);
+                        boolean hasVulns = vulnMap.get(gav) != null && vulnMap.get(gav).size() > 0;
+                        gavsWithParents[i] = new GavWithParentProject(gav, projectName, hasVulns);
+                    }
+                    return gavsWithParents;
                 }
-                return gavsWithParents;
+                return NO_HUB_CONNECTION;
             }
             return PROJECT_NOT_ACTIVATED;
         }

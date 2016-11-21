@@ -38,13 +38,17 @@ public class NewJavaProjectListener implements IResourceChangeListener {
                                     if (resource instanceof IProject
                                             && ((IProject) resource).hasNature(JavaCore.NATURE_ID)) {
                                         final String projectName = resource.getName();
-                                        System.out.println(projectName);
+                                        System.out.println("NewJavaProjectListener line 41: " + projectName);
                                         service.setAllProjectSpecificDefaults(projectName);
                                         if (!information.containsProject(projectName)) {
                                             information.addNewProject(projectName);
                                         }
                                     }
                                 } catch (final CoreException e) {
+                                    /*
+                                     * If error is thrown when calling hasNature(), then assume it isn't a Java
+                                     * project and therefore don't do anything
+                                     */
                                 }
                             }
                         }

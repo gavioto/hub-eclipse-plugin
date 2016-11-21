@@ -13,10 +13,10 @@ package com.blackducksoftware.integration.eclipseplugin.common.constants;
 
 public class PathsToIconFiles {
 
-    public static String DUCKY = "resources/icons/ducky.png";
+    public static final String DUCKY = "resources/icons/ducky.png";
 
-    public static String GREEN_CHECK = "resources/icons/approved.gif";
+    public static final String GREEN_CHECK = "resources/icons/approved.gif";
 
-    public static String RED_X = "resources/icons/rejected.gif";
+    public static final String RED_X = "resources/icons/rejected.gif";
 
 }
