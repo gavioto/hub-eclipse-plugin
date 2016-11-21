@@ -23,7 +23,19 @@ public class ComponentCache {
 
     public ComponentCache(final VulnerabilityDataService vulnService, final int cacheCapacity) {
         this.cacheCapacity = cacheCapacity;
-        cache = CacheBuilder.newBuilder().maximumSize(cacheCapacity).expireAfterWrite(1, TimeUnit.HOURS)
+        cache = buildCache(vulnService);
+    }
+
+    public LoadingCache<GavWithType, List<VulnerabilityItem>> getCache() {
+        return cache;
+    }
+
+    public void setVulnService(VulnerabilityDataService vulnService) {
+        cache = buildCache(vulnService);
+    }
+
+    public LoadingCache<GavWithType, List<VulnerabilityItem>> buildCache(VulnerabilityDataService vulnService) {
+        return CacheBuilder.newBuilder().maximumSize(cacheCapacity).expireAfterWrite(1, TimeUnit.HOURS)
                 .build(new CacheLoader<GavWithType, List<VulnerabilityItem>>() {
                     @Override
                     public List<VulnerabilityItem> load(final GavWithType gav)
@@ -36,30 +48,6 @@ public class ComponentCache {
                             }
                             throw new ComponentLookupNotFoundException(
                                     "Hub could not find vulnerabilities for component " + gav.getGav() + " with type " + gav.getType());
-                        } else {
-                            throw new ComponentLookupNotFoundException("Unable to look up component in Hub");
-                        }
-                    }
-                });
-    }
-
-    public LoadingCache<GavWithType, List<VulnerabilityItem>> getCache() {
-        return cache;
-    }
-
-    public void setVulnService(VulnerabilityDataService vulnService) {
-        cache = CacheBuilder.newBuilder().maximumSize(cacheCapacity).expireAfterWrite(1, TimeUnit.HOURS)
-                .build(new CacheLoader<GavWithType, List<VulnerabilityItem>>() {
-                    @Override
-                    public List<VulnerabilityItem> load(final GavWithType gav)
-                            throws ComponentLookupNotFoundException, IOException, URISyntaxException, BDRestException, UnexpectedHubResponseException {
-                        if (vulnService != null) {
-                            List<VulnerabilityItem> vulns = vulnService.getVulnsFromComponent(gav.getType().toString(), gav.getGav().getGroupId(),
-                                    gav.getGav().getArtifactId(), gav.getGav().getVersion());
-                            if (vulns != null) {
-                                return vulns;
-                            }
-                            throw new ComponentLookupNotFoundException("Hub could not find component " + gav.getGav() + " with type " + gav.getType());
                         } else {
                             throw new ComponentLookupNotFoundException("Unable to look up component in Hub");
                         }

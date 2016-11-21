@@ -20,7 +20,7 @@ public class ProjectDependencyInformation {
 
     private final ComponentCache componentCache;
 
-    private final HashMap<String, ConcurrentHashMap<Gav, List<VulnerabilityItem>>> projectInfo;
+    private final Map<String, Map<Gav, List<VulnerabilityItem>>> projectInfo = new HashMap<>();
 
     private final ProjectInformationService projService;
 
@@ -30,10 +30,8 @@ public class ProjectDependencyInformation {
 
     public ProjectDependencyInformation(final ProjectInformationService projService, WorkspaceInformationService workspaceService,
             ComponentCache componentCache) {
-        projectInfo = new HashMap<>();
         this.projService = projService;
         this.workspaceService = workspaceService;
-        this.componentView = null;
         this.componentCache = componentCache;
     }
 
@@ -60,7 +58,7 @@ public class ProjectDependencyInformation {
 
     public void addProject(String projectName) {
         final GavWithType[] gavs = projService.getMavenAndGradleDependencies(projectName);
-        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> deps = new ConcurrentHashMap<>();
+        final Map<Gav, List<VulnerabilityItem>> deps = new ConcurrentHashMap<>();
         for (final GavWithType gav : gavs) {
             try {
                 deps.put(gav.getGav(), componentCache.getCache().get(gav));
@@ -76,7 +74,7 @@ public class ProjectDependencyInformation {
     }
 
     public void addWarningToProject(final String projectName, final GavWithType gav) {
-        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> deps = projectInfo.get(projectName);
+        final Map<Gav, List<VulnerabilityItem>> deps = projectInfo.get(projectName);
         if (deps != null) {
             try {
                 deps.put(gav.getGav(), componentCache.getCache().get(gav));
@@ -98,7 +96,7 @@ public class ProjectDependencyInformation {
     }
 
     public void removeWarningFromProject(final String projectName, final Gav gav) {
-        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> dependencies = projectInfo.get(projectName);
+        final Map<Gav, List<VulnerabilityItem>> dependencies = projectInfo.get(projectName);
         if (dependencies != null) {
             dependencies.remove(gav);
             if (componentView != null) {
@@ -112,7 +110,7 @@ public class ProjectDependencyInformation {
     }
 
     public Gav[] getAllDependencyGavs(final String projectName) {
-        final ConcurrentHashMap<Gav, List<VulnerabilityItem>> dependencyInfo = projectInfo.get(projectName);
+        final Map<Gav, List<VulnerabilityItem>> dependencyInfo = projectInfo.get(projectName);
         if (dependencyInfo != null) {
             return dependencyInfo.keySet().toArray(new Gav[dependencyInfo.keySet().size()]);
         } else {
@@ -124,15 +122,19 @@ public class ProjectDependencyInformation {
         return projectInfo.get(projectName);
     }
 
+    public void renameProject(String oldName, String newName) {
+        Map<Gav, List<VulnerabilityItem>> info = projectInfo.get(oldName);
+        projectInfo.put(newName, info);
+        projectInfo.remove(oldName);
+    }
+
     public void updateCache(RestConnection connection) {
         if (connection != null) {
-            System.out.println("NEW HUB CONNECTION WAS NOT NULL");
             DataServicesFactory servicesFactory = new DataServicesFactory(connection);
             VulnerabilityDataService vulnService = servicesFactory.createVulnerabilityDataService();
             componentCache.setVulnService(vulnService);
             addAllProjects();
         } else {
-            System.out.println("NEW HUB CONNECTION WAS NULL");
             componentCache.setVulnService(null);
         }
     }
