@@ -31,7 +31,7 @@ public class ProjectInformationService {
         try {
             return project.hasNature(JavaCore.NATURE_ID);
         } catch (final CoreException e) {
-            return false;
+            return false; // CoreException means project is closed/ doesn't exist
         }
     }
 
@@ -43,6 +43,11 @@ public class ProjectInformationService {
                     numBinary++;
                 }
             } catch (final JavaModelException e) {
+                /*
+                 * Occurs if root does not exist or an exception occurs while accessing
+                 * resource. If this happens, assume root is not binary and therefore do
+                 * not increment count
+                 */
             }
         }
         return numBinary;
@@ -65,6 +70,11 @@ public class ProjectInformationService {
                     i++;
                 }
             } catch (final JavaModelException e) {
+                /*
+                 * If root does not exist or exception occurs while accessing
+                 * resource, do not add its filepath to the list of binary
+                 * dependency filepaths
+                 */
             }
         }
         return dependencyFilepaths;
@@ -86,6 +96,8 @@ public class ProjectInformationService {
                 final String[] dependencyFilepaths = getBinaryDependencyFilepaths(packageFragmentRoots);
                 return getGavsFromFilepaths(dependencyFilepaths);
             } catch (final JavaModelException e) {
+                // if exception thrown when getting filepaths to source and binary dependencies, assume
+                // there are no dependencies
                 return new GavWithType[0];
             }
         } else {

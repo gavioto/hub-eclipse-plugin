@@ -62,7 +62,7 @@
                 <artifactItem>
                   <groupId>com.blackducksoftware.integration</groupId>
                   <artifactId>hub-common</artifactId>
-                  <version>2.0.1-SNAPSHOT</version>
+                  <version>2.1.0</version>
                   <type>jar</type>
                   <outputDirectory>${output-dir}</outputDirectory>
                 </artifactItem>
@@ -173,6 +173,8 @@
     </plugins>
   </build>
 
+  <!-- This whole section is to take care of the fact that Mac needs a special argline to 
+run Eclipse environment for tests but no other operating system recognizes this argline -->
   <profiles>
     <profile>
       <id>unix-jvm-flags</id>

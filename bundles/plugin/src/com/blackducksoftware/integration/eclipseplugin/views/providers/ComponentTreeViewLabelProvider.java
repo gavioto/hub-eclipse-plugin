@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
+import com.blackducksoftware.integration.eclipseplugin.common.constants.PathsToIconFiles;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.GavWithParentProject;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.InformationItemWithParentVulnerability;
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.VulnerabilityWithParentGav;
@@ -60,9 +61,9 @@ public class ComponentTreeViewLabelProvider extends LabelProvider implements ISt
             Bundle bundle = Platform.getBundle("hub-eclipse-plugin");
             URL imageURL;
             if (((GavWithParentProject) input).hasVulns()) {
-                imageURL = bundle.getEntry("resources/icons/rejected.gif");
+                imageURL = bundle.getEntry(PathsToIconFiles.RED_X);
             } else {
-                imageURL = bundle.getEntry("resources/icons/approved.gif");
+                imageURL = bundle.getEntry(PathsToIconFiles.GREEN_CHECK);
             }
             try (InputStream image = imageURL.openStream()) {
                 return new Image(display, image);

@@ -78,10 +78,6 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
 
     private final int NUM_COLUMNS = 2;
 
-    private final int DEFAULT_TEXT_WIDTH = 300;
-
-    private final int DEFAULT_TEXT_HEIGHT = 60;
-
     @Override
     public void init(final IWorkbench workbench) {
         securePrefService = new SecurePreferencesService(SecurePreferenceNodes.BLACK_DUCK,

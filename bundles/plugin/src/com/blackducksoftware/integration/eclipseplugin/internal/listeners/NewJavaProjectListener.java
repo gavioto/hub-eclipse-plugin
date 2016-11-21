@@ -14,42 +14,44 @@ import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependenc
 
 public class NewJavaProjectListener implements IResourceChangeListener {
 
-	private final DefaultPreferencesService service;
-	private final ProjectDependencyInformation information;
+    private final DefaultPreferencesService service;
 
-	public NewJavaProjectListener(final DefaultPreferencesService service,
-			final ProjectDependencyInformation information) {
-		this.service = service;
-		this.information = information;
-	}
+    private final ProjectDependencyInformation information;
 
-	@Override
-	public void resourceChanged(final IResourceChangeEvent event) {
-		if (event.getSource() != null && event.getSource().equals(ResourcesPlugin.getWorkspace())) {
-			if (event.getDelta() != null) {
-				final IResourceDelta[] childrenDeltas = event.getDelta().getAffectedChildren();
-				if (childrenDeltas != null) {
-					for (final IResourceDelta delta : childrenDeltas) {
-						if (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED) {
-							if (delta.getResource() != null) {
-								final IResource resource = delta.getResource();
-								try {
-									if (resource instanceof IProject
-											&& ((IProject) resource).hasNature(JavaCore.NATURE_ID)) {
-										final String projectName = resource.getName();
-										service.setAllProjectSpecificDefaults(projectName);
-										if (!information.containsProject(projectName)) {
-											information.addNewProject(projectName);
-										}
-									}
-								} catch (final CoreException e) {
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    public NewJavaProjectListener(final DefaultPreferencesService service,
+            final ProjectDependencyInformation information) {
+        this.service = service;
+        this.information = information;
+    }
+
+    @Override
+    public void resourceChanged(final IResourceChangeEvent event) {
+        if (event.getSource() != null && event.getSource().equals(ResourcesPlugin.getWorkspace())) {
+            if (event.getDelta() != null) {
+                final IResourceDelta[] childrenDeltas = event.getDelta().getAffectedChildren();
+                if (childrenDeltas != null) {
+                    for (final IResourceDelta delta : childrenDeltas) {
+                        if (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED) {
+                            if (delta.getResource() != null) {
+                                final IResource resource = delta.getResource();
+                                try {
+                                    if (resource instanceof IProject
+                                            && ((IProject) resource).hasNature(JavaCore.NATURE_ID)) {
+                                        final String projectName = resource.getName();
+                                        System.out.println(projectName);
+                                        service.setAllProjectSpecificDefaults(projectName);
+                                        if (!information.containsProject(projectName)) {
+                                            information.addNewProject(projectName);
+                                        }
+                                    }
+                                } catch (final CoreException e) {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

@@ -65,7 +65,11 @@ public class ProjectDependencyInformation {
             try {
                 deps.put(gav.getGav(), componentCache.getCache().get(gav));
             } catch (final ExecutionException e) {
-
+                /*
+                 * Thrown if exception occurs when accessing key gav from cache. If an exception is
+                 * thrown, info associated with that gav is inaccessible, and so don't put any
+                 * information related to said gav into hashmap associated with the project
+                 */
             }
         }
         projectInfo.put(projectName, deps);
@@ -80,7 +84,11 @@ public class ProjectDependencyInformation {
                     componentView.resetInput();
                 }
             } catch (ExecutionException e) {
-
+                /*
+                 * Thrown if exception occurs when accessing key gav from cache. If an exception is
+                 * thrown, info associated with that gav is inaccessible, and so don't put any
+                 * information related to said gav into hashmap associated with the project
+                 */
             }
         }
     }
