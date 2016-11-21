@@ -100,6 +100,7 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
 
         createLabel(parent, authComposite, HUB_PASSWORD_LABEL);
         hubPassword = new Text(authComposite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
+        hubPassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         hubPassword.setText(securePrefService.getSecurePreference(SecurePreferenceNames.HUB_PASSWORD));
         hubURL = new StringFieldEditor(PreferenceNames.HUB_URL, HUB_URL_LABEL, authComposite);
         performFieldEditorSetup(authComposite, hubURL);
@@ -111,7 +112,7 @@ public class BlackDuckAuthorizationPreferences extends PreferencePage implements
         createLabel(parent, authComposite, PROXY_PASSWORD_LABEL);
         proxyPassword = new Text(authComposite, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
         proxyPassword.setText(securePrefService.getSecurePreference(SecurePreferenceNames.PROXY_PASSWORD));
-
+        proxyPassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         proxyHost = new StringFieldEditor(PreferenceNames.PROXY_HOST, PROXY_HOST_LABEL, authComposite);
         performFieldEditorSetup(authComposite, proxyHost);
         proxyPort = new IntegerFieldEditor(PreferenceNames.PROXY_PORT, PROXY_PORT_LABEL, authComposite);

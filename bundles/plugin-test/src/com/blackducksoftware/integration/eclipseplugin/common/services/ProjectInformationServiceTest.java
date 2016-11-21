@@ -117,66 +117,54 @@ public class ProjectInformationServiceTest {
             Mockito.when(nonBinaryRoot.getKind()).thenReturn(0);
             Mockito.when(binaryRoot1.getKind()).thenReturn(IPackageFragmentRoot.K_BINARY);
             final IPackageFragmentRoot[] roots = new IPackageFragmentRoot[] { nonBinaryRoot, binaryRoot1 };
-            assertEquals(1, service.getNumBinaryDependencies(roots));
+            assertEquals("Not counting binary dependencies properly", 1, service.getNumBinaryDependencies(roots));
         } catch (final CoreException e) {
         }
     }
 
     @Test
-    public void testIsJavaProject() {
+    public void testIsJavaProject() throws CoreException {
         final ProjectInformationService service = new ProjectInformationService(depService, extractor);
-        try {
-            Mockito.when(nonJavaProject.hasNature(JavaCore.NATURE_ID)).thenReturn(false);
-            Mockito.when(javaProject.hasNature(JavaCore.NATURE_ID)).thenReturn(true);
-            assertTrue(service.isJavaProject(javaProject));
-            assertFalse(service.isJavaProject(nonJavaProject));
-        } catch (final CoreException e) {
-        }
+        Mockito.when(nonJavaProject.hasNature(JavaCore.NATURE_ID)).thenReturn(false);
+        Mockito.when(javaProject.hasNature(JavaCore.NATURE_ID)).thenReturn(true);
+        assertTrue("Service says Java project is not a Java project", service.isJavaProject(javaProject));
+        assertFalse("Service says non-Java project is a Java project", service.isJavaProject(nonJavaProject));
 
     }
 
     @Test
-    public void testGettingBinaryFilepathsWithoutDeviceIDs() {
+    public void testGettingBinaryFilepathsWithoutDeviceIDs() throws CoreException {
         final ProjectInformationService service = new ProjectInformationService(depService, extractor);
-        try {
-            Mockito.when(nonBinaryRoot.getKind()).thenReturn(0);
-            Mockito.when(nonBinaryRoot.getPath()).thenReturn(nonBinaryPath);
-            Mockito.when(nonBinaryPath.getDevice()).thenReturn(null);
-            Mockito.when(nonBinaryPath.toOSString()).thenReturn("/non/binary");
-            Mockito.when(binaryRoot1.getKind()).thenReturn(IPackageFragmentRoot.K_BINARY);
-            Mockito.when(binaryRoot1.getPath()).thenReturn(binaryPath1);
-            Mockito.when(binaryPath1.getDevice()).thenReturn(null);
-            Mockito.when(binaryPath1.toOSString()).thenReturn("/binary/path/1");
+        Mockito.when(nonBinaryRoot.getKind()).thenReturn(0);
+        Mockito.when(nonBinaryRoot.getPath()).thenReturn(nonBinaryPath);
+        Mockito.when(nonBinaryPath.getDevice()).thenReturn(null);
+        Mockito.when(nonBinaryPath.toOSString()).thenReturn("/non/binary");
+        Mockito.when(binaryRoot1.getKind()).thenReturn(IPackageFragmentRoot.K_BINARY);
+        Mockito.when(binaryRoot1.getPath()).thenReturn(binaryPath1);
+        Mockito.when(binaryPath1.getDevice()).thenReturn(null);
+        Mockito.when(binaryPath1.toOSString()).thenReturn("/binary/path/1");
 
-            final IPackageFragmentRoot[] roots = new IPackageFragmentRoot[] { nonBinaryRoot, binaryRoot1 };
-            final String[] binaryDependencies = service.getBinaryDependencyFilepaths(roots);
-            assertEquals(1, binaryDependencies.length);
-            assertArrayEquals(new String[] { "/binary/path/1" }, binaryDependencies);
-
-        } catch (final CoreException e) {
-
-        }
+        final IPackageFragmentRoot[] roots = new IPackageFragmentRoot[] { nonBinaryRoot, binaryRoot1 };
+        final String[] binaryDependencies = service.getBinaryDependencyFilepaths(roots);
+        assertEquals("Not gettting binary dependencies correctly", 1, binaryDependencies.length);
+        assertArrayEquals("Not getting correct binary dependencies", new String[] { "/binary/path/1" }, binaryDependencies);
     }
 
     @Test
-    public void testGettingBinaryFilepathsWithDeviceIDs() {
+    public void testGettingBinaryFilepathsWithDeviceIDs() throws CoreException {
         final ProjectInformationService service = new ProjectInformationService(depService, extractor);
-        try {
-            Mockito.when(binaryRoot1.getKind()).thenReturn(IPackageFragmentRoot.K_BINARY);
-            Mockito.when(binaryRoot1.getPath()).thenReturn(binaryPath1);
-            Mockito.when(binaryPath1.getDevice()).thenReturn("fake/device/id/1");
-            Mockito.when(binaryPath1.toOSString()).thenReturn("fake/device/id/1/binary/path/1");
-            Mockito.when(binaryRoot2.getKind()).thenReturn(IPackageFragmentRoot.K_BINARY);
-            Mockito.when(binaryRoot2.getPath()).thenReturn(binaryPath2);
-            Mockito.when(binaryPath2.getDevice()).thenReturn("fake/device/id/2");
-            Mockito.when(binaryPath2.toOSString()).thenReturn("fake/device/id/2/binary/path/2");
-            final IPackageFragmentRoot[] roots = new IPackageFragmentRoot[] { binaryRoot1, binaryRoot2 };
-            final String[] binaryDependencies = service.getBinaryDependencyFilepaths(roots);
-            assertEquals(2, binaryDependencies.length);
-            assertArrayEquals(new String[] { "/binary/path/1", "/binary/path/2" }, binaryDependencies);
-        } catch (final CoreException e) {
-
-        }
+        Mockito.when(binaryRoot1.getKind()).thenReturn(IPackageFragmentRoot.K_BINARY);
+        Mockito.when(binaryRoot1.getPath()).thenReturn(binaryPath1);
+        Mockito.when(binaryPath1.getDevice()).thenReturn("fake/device/id/1");
+        Mockito.when(binaryPath1.toOSString()).thenReturn("fake/device/id/1/binary/path/1");
+        Mockito.when(binaryRoot2.getKind()).thenReturn(IPackageFragmentRoot.K_BINARY);
+        Mockito.when(binaryRoot2.getPath()).thenReturn(binaryPath2);
+        Mockito.when(binaryPath2.getDevice()).thenReturn("fake/device/id/2");
+        Mockito.when(binaryPath2.toOSString()).thenReturn("fake/device/id/2/binary/path/2");
+        final IPackageFragmentRoot[] roots = new IPackageFragmentRoot[] { binaryRoot1, binaryRoot2 };
+        final String[] binaryDependencies = service.getBinaryDependencyFilepaths(roots);
+        assertEquals("Not gettting binary dependencies correctly", 2, binaryDependencies.length);
+        assertArrayEquals("Not getting correct binary dependencies", new String[] { "/binary/path/1", "/binary/path/2" }, binaryDependencies);
     }
 
     private void prepareRootsAndPaths() throws CoreException {
@@ -251,7 +239,7 @@ public class ProjectInformationServiceTest {
         final ProjectInformationService service = new ProjectInformationService(depService, extractor);
         prepareDependencyTypes();
         final String[] deps = new String[] { MAVEN_1, MAVEN_2, GRADLE_1, GRADLE_2, NOT_GRAVEN_1, NOT_GRAVEN_2 };
-        assertEquals(4, service.getNumMavenAndGradleDependencies(deps));
+        assertEquals("Not counting maven and gradle dependencies correctly", 4, service.getNumMavenAndGradleDependencies(deps));
     }
 
     @Test
@@ -270,7 +258,7 @@ public class ProjectInformationServiceTest {
         final GavWithType[] expectedGavMessages = new GavWithType[] { new GavWithType(MAVEN_1_GAV, GavTypeEnum.MAVEN),
                 new GavWithType(MAVEN_2_GAV, GavTypeEnum.MAVEN), new GavWithType(GRADLE_1_GAV, GavTypeEnum.MAVEN),
                 new GavWithType(GRADLE_2_GAV, GavTypeEnum.MAVEN) };
-        assertArrayEquals(expectedGavMessages, gavs);
+        assertArrayEquals("Not getting gavs from filepaths correctly", expectedGavMessages, gavs);
     }
 
     @Test
