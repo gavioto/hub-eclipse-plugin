@@ -16,7 +16,7 @@ import com.blackducksoftware.integration.build.utils.FilePathGavExtractor;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.SecurePreferenceNames;
 import com.blackducksoftware.integration.eclipseplugin.common.constants.SecurePreferenceNodes;
-import com.blackducksoftware.integration.eclipseplugin.common.services.DefaultPreferencesService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.PreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.DependencyInformationService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.HubRestConnectionService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.ProjectInformationService;
@@ -81,7 +81,7 @@ public class Activator extends AbstractUIPlugin {
             componentCache = new ComponentCache(null, COMPONENT_CACHE_CAPACITY);
         }
         information = new ProjectDependencyInformation(projService, workspaceService, componentCache);
-        final DefaultPreferencesService defaultPrefService = new DefaultPreferencesService(
+        final PreferencesService defaultPrefService = new PreferencesService(
                 getDefault().getPreferenceStore());
         newJavaProjectListener = new NewJavaProjectListener(defaultPrefService, information);
         defaultPrefChangeListener = new DefaultPreferenceChangeListener(defaultPrefService, workspaceService);

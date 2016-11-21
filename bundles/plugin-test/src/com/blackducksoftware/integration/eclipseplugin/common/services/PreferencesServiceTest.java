@@ -7,14 +7,14 @@ import org.junit.Test;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PreferenceNames;
 
-public class DefaultPreferencesServiceTest {
+public class PreferencesServiceTest {
 
 	private final String testProject = "testProject";
 
 	@Test
 	public void testSetDefaultConfig() {
 		final IPreferenceStore mockPrefStore = new PreferenceStoreMock();
-		final DefaultPreferencesService service = new DefaultPreferencesService(mockPrefStore);
+		final PreferencesService service = new PreferencesService(mockPrefStore);
 		service.setDefaultConfig();
 		assertEquals(mockPrefStore.getString(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT), "true");
 	}
@@ -22,7 +22,7 @@ public class DefaultPreferencesServiceTest {
 	@Test
 	public void testIndividualProjectDefaultSettings() {
 		final IPreferenceStore mockPrefStore = new PreferenceStoreMock();
-		final DefaultPreferencesService service = new DefaultPreferencesService(mockPrefStore);
+		final PreferencesService service = new PreferencesService(mockPrefStore);
 		service.setDefaultConfig();
 		service.setAllProjectSpecificDefaults(testProject);
 		assertEquals(mockPrefStore.getBoolean(testProject), true);
@@ -31,7 +31,7 @@ public class DefaultPreferencesServiceTest {
 	@Test
 	public void testIndividualProjectDefaultSettingsWhenActivateByDefaultFalse() {
 		final IPreferenceStore mockPrefStore = new PreferenceStoreMock();
-		final DefaultPreferencesService service = new DefaultPreferencesService(mockPrefStore);
+		final PreferencesService service = new PreferencesService(mockPrefStore);
 		service.setDefaultConfig();
 		mockPrefStore.setValue(PreferenceNames.ACTIVATE_SCAN_BY_DEFAULT, "false");
 		service.setAllProjectSpecificDefaults(testProject);

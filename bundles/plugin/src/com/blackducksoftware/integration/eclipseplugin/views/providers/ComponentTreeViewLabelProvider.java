@@ -16,7 +16,6 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 import com.blackducksoftware.integration.eclipseplugin.common.constants.PathsToIconFiles;
 import com.blackducksoftware.integration.eclipseplugin.startup.Activator;
@@ -25,12 +24,6 @@ import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.Inf
 import com.blackducksoftware.integration.eclipseplugin.views.providers.utils.VulnerabilityWithParentGav;
 
 public class ComponentTreeViewLabelProvider extends LabelProvider implements IStyledLabelProvider {
-
-    private Display display;
-
-    public ComponentTreeViewLabelProvider(Display display) {
-        this.display = display;
-    }
 
     @Override
     public String getText(Object input) {

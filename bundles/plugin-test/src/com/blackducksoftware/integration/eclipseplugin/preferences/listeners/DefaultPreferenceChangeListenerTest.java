@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.blackducksoftware.integration.eclipseplugin.common.services.DefaultPreferencesService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.PreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.common.services.WorkspaceInformationService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -16,7 +16,7 @@ public class DefaultPreferenceChangeListenerTest {
 	@Mock
 	WorkspaceInformationService workspaceService;
 	@Mock
-	DefaultPreferencesService prefService;
+	PreferencesService prefService;
 	@Mock
 	PropertyChangeEvent e;
 

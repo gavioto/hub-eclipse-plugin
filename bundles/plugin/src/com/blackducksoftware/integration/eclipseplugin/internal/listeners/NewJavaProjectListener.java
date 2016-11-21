@@ -1,5 +1,7 @@
 package com.blackducksoftware.integration.eclipseplugin.internal.listeners;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -9,16 +11,16 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaCore;
 
-import com.blackducksoftware.integration.eclipseplugin.common.services.DefaultPreferencesService;
+import com.blackducksoftware.integration.eclipseplugin.common.services.PreferencesService;
 import com.blackducksoftware.integration.eclipseplugin.internal.ProjectDependencyInformation;
 
 public class NewJavaProjectListener implements IResourceChangeListener {
 
-    private final DefaultPreferencesService service;
+    private final PreferencesService service;
 
     private final ProjectDependencyInformation information;
 
-    public NewJavaProjectListener(final DefaultPreferencesService service,
+    public NewJavaProjectListener(final PreferencesService service,
             final ProjectDependencyInformation information) {
         this.service = service;
         this.information = information;
@@ -38,9 +40,15 @@ public class NewJavaProjectListener implements IResourceChangeListener {
                                     if (resource instanceof IProject
                                             && ((IProject) resource).hasNature(JavaCore.NATURE_ID)) {
                                         final String projectName = resource.getName();
-                                        System.out.println("NewJavaProjectListener line 41: " + projectName);
                                         service.setAllProjectSpecificDefaults(projectName);
-                                        if (!information.containsProject(projectName)) {
+                                        if ((delta.getFlags() | IResourceDelta.MOVED_FROM) != 0 && delta.getMovedFromPath() != null) {
+                                            String[] movedFromPath = delta.getMovedFromPath().toOSString().split(File.separator);
+                                            String oldProjectName = movedFromPath[movedFromPath.length - 1];
+                                            information.addProject(projectName);
+                                            if (service.isActivated(oldProjectName)) {
+                                                service.activateProject(projectName);
+                                            }
+                                        } else {
                                             information.addNewProject(projectName);
                                         }
                                     }
