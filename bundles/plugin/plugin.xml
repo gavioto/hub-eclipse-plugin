@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <!-- Menus -->
    <extension
-         point="org.eclipse.ui.menus">    
+         point="org.eclipse.ui.menus">
+      <!-- Context (right-click) menu on Package Explorer --> 
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
@@ -11,14 +13,17 @@
                label="Black Duck">
          </menu>
       </menuContribution>
+      <!-- Items on Package Explorer context menu -->
       <menuContribution
             allPopups="false"
             locationURI="popup:blackduck-PackageExplorer?after=additions">
+         <!-- Menu item that opens vulnerability view -->
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Black Duck Vulnerability View"
                style="push"
       		   icon="resources/icons/ducky.png">
+      		  <!-- only visible when right clicking on Java project -->
               <visibleWhen>
          		<with
          				variable="selection">
@@ -35,17 +40,20 @@
          		</with>
          	</visibleWhen>
          </command>
+         <!-- Menu item that opens Black Duck preference page -->
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
                label="Black Duck Settings..."
                style="push"
       		   icon="resources/icons/ducky.png">
          </command>
+         <!-- Menu item that opens project-specific preference dialog -->
          <command
          		commandId="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
          		label="Project Preferences..."
          		style="push"
       		   icon="resources/icons/ducky.png">
+      		<!-- only visible when right clicking on Java project -->
          	<visibleWhen>
          		<with
          				variable="selection">
@@ -63,6 +71,7 @@
          	</visibleWhen>
          </command>
       </menuContribution>
+      <!-- Context (right-click) menu on Project Explorer -->
       <menuContribution
       		allPopups="false"
       		locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
@@ -71,14 +80,17 @@
                label="Black Duck">
          </menu>
       </menuContribution>
+      <!-- Items on Project Explorer context menu -->
       <menuContribution
             allPopups="false"
             locationURI="popup:blackduck-ProjectExplorer?after=additions">
+         <!-- Menu item that opens vulnerability view -->
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenWarningView"
                label="Open Black Duck Vulnerability View"
                style="push"
       		   icon="resources/icons/ducky.png">
+      		  <!-- only visible when right clicking on Java project -->
               <visibleWhen>
          		<with
          				variable="selection">
@@ -95,17 +107,20 @@
          		</with>
          	</visibleWhen>
          </command>
+         <!-- Menu item that opens Black Duck preference page -->
          <command
                commandId="com.blackducksoftware.integration.popupmenu.OpenPreferences"
                label="Black Duck Settings..."
                style="push"
       		   icon="resources/icons/ducky.png">
          </command>
+         <!-- Menu item that opens project-specific preference dialog -->
          <command
          		commandId="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
          		label="Project Preferences..."
          		style="push"
       		   icon="resources/icons/ducky.png">
+      		<!-- only visible when right clicking on Java project -->
          	<visibleWhen>
          		<with
          				variable="selection">
@@ -124,31 +139,39 @@
          </command>
       </menuContribution>
    </extension>
+   <!-- Commands linked to Package/Project Explorer context menu items via commandId tag (id > commandId) -->
+   <!-- defaultHandler.execute() is the method that is called when these commands execute -->
    <extension
          point="org.eclipse.ui.commands">
+      <!-- Corresponds to "Open Black Duck Vulnerability View" menu item -->
       <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenVulnerabilityView"
             id="com.blackducksoftware.integration.popupmenu.OpenWarningView"
             name="Open Black Duck Vulnerability View">
       </command>
+      <!-- Corresponds to "Black Duck Settings..." menu item -->
       <command
             defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenPreferences"
             id="com.blackducksoftware.integration.popupmenu.OpenPreferences"
             name="Open Preferences">
       </command>
+      <!-- Corresponds to "Project Preferences..." menu item -->
       <command
       		defaultHandler="com.blackducksoftware.integration.eclipseplugin.popupmenu.handlers.OpenProjectPreferences"
       		id="com.blackducksoftware.integration.popupmenu.OpenProjectPreferences"
       		name="Open Project Preferences">
       </command>
    </extension>
+   <!-- Views -->
    <extension
          point="org.eclipse.ui.views">
+      <!-- Items in the same category show up in the same folder in the "Show View" dialog -->
       <category
       		name="Black Duck"
       		id="com.blackducksoftware.integration.eclipseplugin.views"
       >
       </category>
+      <!-- Black Duck Vulnerability View -->
       <view
             class="com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView"
             id="com.blackducksoftware.integration.eclipseplugin.views.ui.VulnerabilityView"
@@ -158,25 +181,30 @@
             restorable="true">
       </view>
    </extension>
+   <!-- Preference Pages -->
    <extension
          point="org.eclipse.ui.preferencePages">
+      <!-- Parent Black Duck preference page -->
       <page
             class="com.blackducksoftware.integration.eclipseplugin.preferences.BlackDuckPreferences"
             id="BlackDuck"
             name="Black Duck">
       </page>
+      <!-- Preference page indicating which projects Black Duck scan is activated for -->
       <page
       		class="com.blackducksoftware.integration.eclipseplugin.preferences.ActiveJavaProjects"
       		id="ActiveJavaProjects"
       		name="Active Java Projects"
       		category="BlackDuck">
       </page>
+      <!-- Preference page with Black Duck default settings -->
       <page
       		class="com.blackducksoftware.integration.eclipseplugin.preferences.PreferenceDefaults"
       		id="DefaultConfig"
       		name="Black Duck Default Settings"
       		category="BlackDuck">
       </page>
+      <!-- Preference page with Hub authorization settings -->
       <page
       		class="com.blackducksoftware.integration.eclipseplugin.preferences.BlackDuckAuthorizationPreferences"
       		id="HubAuthorization"
